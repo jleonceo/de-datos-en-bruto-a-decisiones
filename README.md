@@ -1,7 +1,7 @@
 # de-datos-en-bruto-a-decisiones
 
-**Un fichero de ventas en bruto, llevado paso a paso hasta las preguntas de la dirección, con cada cifra comprobada**
-**A raw sales file taken step by step to management's questions, with every figure checked**
+**Análisis completo de un fichero de ventas en bruto para responder a tres preguntas de negocio, con cada cifra comprobada**
+**A complete analysis of a raw sales file to answer three business questions, with every figure checked**
 
 [Español](#español) · [English](#english)
 
