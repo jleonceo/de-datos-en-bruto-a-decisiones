@@ -20,7 +20,7 @@ const fuga = seg.h7_h10_fuga_e_importancia.con_fuga;
 export const marca = {
   nombre: 'TechSoluciones',
   nombreAcento: ' Analytics',
-  titulo: 'De datos sucios a decisiones · TechSoluciones S.L.',
+  titulo: 'De datos en bruto a decisiones · TechSoluciones S.L.',
   descripcion:
     'Recorrido completo de analítica de datos: inspección, limpieza, anonimización, EDA, machine learning y cuadro de mando, con método y rigor. Cada paso, explicado.',
 };

@@ -1,11 +1,11 @@
-# de-datos-sucios-a-decisiones
+# de-datos-en-bruto-a-decisiones
 
-**Un fichero de ventas sucio, llevado paso a paso hasta las preguntas de la dirección, con cada cifra comprobada**
-**A dirty sales file taken step by step to management's questions, with every figure checked**
+**Un fichero de ventas en bruto, llevado paso a paso hasta las preguntas de la dirección, con cada cifra comprobada**
+**A raw sales file taken step by step to management's questions, with every figure checked**
 
 [Español](#español) · [English](#english)
 
-Web: https://de-datos-sucios-a-decisiones.vercel.app
+Web: https://de-datos-en-bruto-a-decisiones.vercel.app
 
 ---
 
