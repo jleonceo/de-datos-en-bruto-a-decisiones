@@ -12,9 +12,9 @@ Web: https://de-datos-en-bruto-a-decisiones.vercel.app
 
 ### El problema
 
-Una pyme tiene ocho años de ventas en un fichero y tres preguntas: qué mes vende más, qué provincia
-mejora más en satisfacción y si la satisfacción acompaña a las ventas. El fichero trae fechas en cuatro
-formatos, productos escritos de dos maneras, 827 filas duplicadas y 16 ventas imposibles.
+Una pyme tiene sus ventas de 2019 a mayo de 2026 en un fichero y tres preguntas: qué mes vende más, qué
+provincia mejora más en satisfacción y si la satisfacción acompaña a las ventas. El fichero trae fechas
+en cuatro formatos, productos escritos de dos maneras, 827 filas duplicadas y 16 ventas imposibles.
 
 Con ese fichero se puede montar un cuadro de mando en una tarde, y casi todo lo que enseñaría sería
 ruido.
@@ -65,24 +65,24 @@ desde el glosario.
 ### Cómo se comprobó
 
 Ninguna cifra de la web la calcula un modelo de lenguaje. Salen de diez scripts de Python con semilla
-fija. Escriben sus resultados en ficheros JSON y la web los lee de ahí. Antes de publicar, tres verificadores recalcularon desde el fichero original, con código propio,
-1.439 cifras de las páginas. Cuadraron 1.423. Ocho no cuadraban por redondeos o por cómo las leía la
-página. Se corrigieron. Otras tres son un mismo p de 0,60 que con más barajados sale 0,62, sin
-cambiar la conclusión. Las cinco restantes no son medidas del dato. Un revisor intentó refutar 51
-conclusiones: se sostuvieron 23, se matizaron 23 y se corrigieron las cinco que caían.
+fija. Escriben sus resultados en ficheros JSON y la web los lee de ahí. Antes de publicar, tres
+verificadores recalcularon desde el fichero original, con código propio, 1.439 cifras de las páginas.
+Cuadraron 1.423. Ocho no cuadraban por redondeos o por cómo las leía la página. Se corrigieron. Otras
+tres son un mismo p de 0,60 que con más barajados sale 0,62, sin cambiar la conclusión. Las cinco
+restantes no son medidas del dato. Un revisor intentó refutar 51 conclusiones: se sostuvieron 23, se
+matizaron 23 y se corrigieron las cinco que caían.
 
 El banco `analisis/verificar_correcciones.py` guarda 19 comprobaciones de errores que ya se
 cometieron una vez, entre ellas que ningún fichero publicado lleve un nombre, un correo o un teléfono.
 
 ### Lo que no se puede reproducir desde aquí
 
-El primer script lee el fichero original, que no se publica porque contiene datos personales:
-nombres, correos y teléfonos, aunque sean inventados. En este repositorio están los scripts, sus
-resultados y el fichero anonimizado, que solo lleva año, provincia, satisfacción y la marca de
-anomalía. Con él no se puede ejecutar la cadena de scripts. Por la misma razón, cuatro comprobaciones del banco (C1, C2, C7 y C16) salen en rojo en un clon con
-el aviso «no se pudo comprobar»: leen el fichero original, el limpio o el anonimizado interno, que
-no se publican. Las otras quince se ejecutan
-sobre lo publicado.
+El primer script lee el fichero original, que no se publica porque contiene datos personales: nombres,
+correos y teléfonos, aunque sean inventados. En este repositorio están los scripts, sus resultados y el
+fichero anonimizado, que solo lleva año, provincia, satisfacción y la marca de anomalía. Con él no se
+puede ejecutar la cadena de scripts. Por la misma razón, cuatro comprobaciones del banco (C1, C2, C7 y
+C16) salen en rojo en un clon con el aviso «no se pudo comprobar»: leen el fichero original, el limpio
+o el anonimizado interno, que no se publican. Las otras quince se ejecutan sobre lo publicado.
 
 ### Qué hay en este repositorio
 
@@ -165,8 +165,8 @@ MIT. Los datos son sintéticos y la empresa es ficticia.
 
 ### The problem
 
-A small company has eight years of sales in one file and three questions: which month sells most,
-which province improves most in customer satisfaction, and whether satisfaction goes along with
+A small company has its sales from 2019 to May 2026 in one file and three questions: which month sells
+most, which province improves most in customer satisfaction, and whether satisfaction goes along with
 sales. The file has dates in four formats, products spelled two ways, 827 duplicated rows and 16
 impossible sales.
 
@@ -221,12 +221,12 @@ the glossary.
 
 No figure on the website is calculated by a language model. They come from ten Python scripts with a
 fixed seed, which write their results to JSON files, and the website reads them from there. Before
-publishing, three verifiers recalculated 1,439 figures on the pages from the original file,
-with their own code. 1,423 matched. Eight did not match because of rounding or because of how the page
-read them, and they were corrected. Another three are the same p of 0.60, which comes out at 0.62
-with more shuffles without changing the conclusion. The remaining five are not measurements of the
-data. A reviewer tried to refute 51 conclusions: 23 held, 23 were qualified and the five that fell
-were corrected.
+publishing, three verifiers recalculated 1,439 figures on the pages from the original file, with their
+own code. 1,423 matched. Eight did not match because of rounding or because of how the page read them,
+and they were corrected. Another three are the same p of 0.60, which comes out at 0.62 with more
+shuffles without changing the conclusion. The remaining five are not measurements of the data. A
+reviewer tried to refute 51 conclusions: 23 held, 23 were qualified and the five that fell were
+corrected.
 
 The test bench `analisis/verificar_correcciones.py` keeps 19 checks for errors that were already made
 once, including that no published file contains a name, an email or a phone number.
@@ -234,12 +234,12 @@ once, including that no published file contains a name, an email or a phone numb
 ### What cannot be reproduced from here
 
 The first script reads the original file, which is not published because it contains personal data:
-names, emails and phone numbers, even though they are made up. This repository holds the scripts,
-their results and the anonymised file, which only has year, province, satisfaction and the anomaly
-flag. The script chain cannot be run with it. For the same reason, four checks in the bench (C1, C2, C7 and C16) show red in a clone with the
-message «no se pudo comprobar» (could not be checked): they read the original, the cleaned or the
-internal anonymised file, none of which is published. The
-other fifteen run on what is published.
+names, emails and phone numbers, even though they are made up. This repository holds the scripts, their
+results and the anonymised file, which only has year, province, satisfaction and the anomaly flag. The
+script chain cannot be run with it. For the same reason, four checks in the bench (C1, C2, C7 and C16)
+show red in a clone with the message «no se pudo comprobar» (could not be checked): they read the
+original, the cleaned or the internal anonymised file, none of which is published. The other fifteen
+run on what is published.
 
 ### What is in this repository
 

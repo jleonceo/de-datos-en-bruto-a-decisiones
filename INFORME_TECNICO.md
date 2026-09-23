@@ -21,8 +21,8 @@ Sobre las 19.984 ventas válidas:
 | ¿Correlación ventas y satisfacción? | r = 0,0034 sobre 15.980 ventas | ninguna relación útil |
 
 La facturación de 2019 a 2025 cae un 1,31 % y la satisfacción media es 5,5 sobre 10. Con este dato no se
-pueden segmentar clientes. 5.035 correos los usan personas con nombre distinto. Los 97 nombres que aparecen dos
-veces llevan teléfonos distintos, así que son homónimos: nadie compra dos veces.
+pueden segmentar clientes. 5.035 correos los usan personas con nombre distinto. Los 97 nombres que
+aparecen dos veces llevan teléfonos distintos, así que son homónimos: nadie compra dos veces.
 
 ## 1 · Contexto
 
@@ -76,11 +76,11 @@ anomalía. Las cifras de venta se publican agregadas en el cuadro de mando.
 | + categoría + producto (no se publica) | 1 | 169 | 17,75 % |
 | + categoría + producto + cantidad (no se publica) | 1 | 5.522 | · |
 
-El fichero público cumple k = 10 y l = 5 sobre la satisfacción sin suprimir ninguna venta. La l no cuenta
-el valor vacío como un valor más; contándolo sería 6. El producto no se publica. Tampoco el precio, la
-cantidad ni el importe por venta: cada producto tiene un precio de catálogo único, así que cualquiera de
-esas columnas lo revela. Quien supiera qué compró alguien, cuándo y
-dónde, encontraría 169 ventas solas en su grupo y leería su satisfacción.
+El fichero público cumple k = 10 y l = 5 sobre la satisfacción sin suprimir ninguna venta. La l no
+cuenta el valor vacío como un valor más; contándolo sería 6. El producto no se publica. Tampoco el
+precio, la cantidad ni el importe por venta: cada producto tiene un precio de catálogo único, así que
+cualquiera de esas columnas lo revela. Quien supiera qué compró alguien, cuándo y dónde, encontraría 169
+ventas solas en su grupo y leería su satisfacción.
 
 Una primera versión de este mismo día publicaba el producto y agrupaba por nombre. Lo encontró la revisión
 escéptica del paso de verificación, y está corregido.
@@ -101,11 +101,11 @@ provincias está mucho más repartida: hacen falta 40 de las 52 para llegar al 8
 
 ### Las 16 anomalías
 
-Todas tienen un identificador múltiplo de 50 y una cantidad de 41 a 45, que es 40 más una cantidad normal.
-No hay ninguna venta de 6 a 40 unidades. Doce tienen
-además un precio exactamente doble o triple del de catálogo, un precio que no aparece en ninguna venta
-normal. La lista completa, con fecha, producto, precio y precio de catálogo, está en `eda.json`
-(`anomalias.lista`) y en la página 8 de la web.
+Todas tienen un identificador múltiplo de 50 y una cantidad de 41 a 45, que es 40 más una cantidad
+normal. No hay ninguna venta de 6 a 40 unidades. Doce tienen además un precio exactamente doble o triple
+del de catálogo, un precio que no aparece en ninguna venta normal. La lista completa, con fecha,
+producto, precio y precio de catálogo, está en `eda.json` (`anomalias.lista`) y en la página 8 de la
+web.
 
 Causas propuestas, **todas hipótesis sin confirmar**:
 
@@ -152,11 +152,11 @@ que una estacionalidad suave no queda descartada.
 
 ### P2 · región con mayor crecimiento en satisfacción
 
-Medido como la pendiente de la satisfacción media anual, Navarra es la primera (pasa de 4,58 a 6,56). Con
-52 provincias alguna tenía que serlo: barajando la satisfacción 2.000 veces, el azar produce una pendiente
-igual o mayor con p = 0,60. Sin 2026, que solo tiene unos meses, la primera pasa a ser Madrid y el test da
-p = 0,36. Ninguna región crece más de lo que se puede distinguir del azar. La que sale primera cambia según el periodo
-y la forma de medir.
+Medido como la pendiente de la satisfacción media anual, Navarra es la primera (pasa de 4,58 a 6,56).
+Con 52 provincias alguna tenía que serlo: barajando la satisfacción 2.000 veces, el azar produce una
+pendiente igual o mayor con p = 0,60. Sin 2026, que solo tiene unos meses, la primera pasa a ser Madrid
+y el test da p = 0,36. Ninguna región crece más de lo que se puede distinguir del azar. La que sale
+primera cambia según el periodo y la forma de medir.
 
 ### P3 · correlación entre ventas y satisfacción
 
@@ -167,11 +167,14 @@ bosque aleatorio tampoco predicen la satisfacción (R² de test −0,002 en los 
 
 ## 6 · Verificación
 
-Tres comprobaciones, cada una con un método distinto del que produjo las cifras.
+Cuatro comprobaciones, cada una con un método distinto del que produjo las cifras.
 
-**Banco de comprobaciones** (`analisis/verificar_correcciones.py`). Dieciocho casos: uno por defecto
+**Banco de comprobaciones** (`analisis/verificar_correcciones.py`). Diecinueve casos: uno por defecto
 corregido el 13/09, la matriz de los 19 requisitos del encargo con su evidencia en disco y, desde el
-23/09, tres más sobre las lecturas de los resultados. Sale todo en verde sobre este proyecto. El 13/09,
+23/09, cuatro más: tres sobre las lecturas de los resultados y uno que impide que un fichero publicado
+lleve un nombre, un correo o un teléfono. Sale todo en verde en la carpeta de trabajo, que tiene el
+fichero original. En un clon del repositorio, cuatro casos no se pueden comprobar porque leen ficheros
+que no se publican. El 13/09,
 sobre la copia de antes de corregir, salía en rojo 14 de 15; el que quedaba en verde, el mes con mayores
 ventas, ya estaba bien y está puesto como control de que no se estropea.
 
@@ -191,6 +194,14 @@ bruto o reproduciendo el cálculo. Salieron errores de lectura de cifras correct
 a la mezcla de productos el 98,2 % de una diferencia que la mezcla explica entera. En la limpieza, los
 correos corregidos contaban dos veces 812 que tenían los dos defectos. Y once textos de lectura de los
 resultados decían algo que el dato no sostiene. Todo quedó corregido y el banco vigila que no vuelva.
+
+**Verificación antes de publicar, 23/09.** Tres agentes recalcularon desde el fichero original, con código
+propio, 1.439 cifras de las páginas. Cuadraron 1.423. Ocho no cuadraban por redondeos o por cómo las
+leía la página y se corrigieron. Otras tres son el p = 0,60 de la P2, que con 40.000 barajados sale 0,62
+sin cambiar la conclusión. Las cinco restantes no son medidas del dato. Un cuarto agente intentó
+refutar 51 conclusiones de la web: se sostuvieron 23, se matizaron 23 y cayeron cinco, que se
+corrigieron. La más seria presentaba el margen de la facturación media como umbral de alerta para un mes
+suelto.
 
 ## 7 · Limitaciones
 

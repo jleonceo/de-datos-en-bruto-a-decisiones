@@ -2,10 +2,26 @@
 import Layout from '../layouts/Layout.astro';
 import Callout from '../components/Callout.astro';
 import eda from '../data/eda.json';
-// Nota: los enlaces exactos a los repos se completan en la fase de publicación.
-const repos = [
-  ['Perfil en GitHub', 'https://github.com/jleonceo', 'Todos los proyectos, con su historia y su código.'],
-  ['Portfolio', 'https://juanluisleon.vercel.app', 'CV interactivo y casos de análisis, desplegado en Vercel.'],
+const propio = [
+  ['Este proyecto en GitHub', 'https://github.com/jleonceo/de-datos-en-bruto-a-decisiones', 'El código de esta web, los diez scripts del análisis con sus resultados, el banco de comprobaciones, el fichero anonimizado y el informe técnico.'],
+];
+const analitica = [
+  ['RFM-Customer-Analytics', 'https://github.com/jleonceo/RFM-Customer-Analytics', 'Segmentación RFM de los clientes de un comercio electrónico. Aquí esa segmentación no se puede hacer porque el fichero no identifica al cliente; la parte V lo explica.'],
+  ['lead-scoring-ml', 'https://github.com/jleonceo/lead-scoring-ml', 'Un modelo que ordena los contactos por probabilidad de compra. Es el caso en que sí hay algo que predecir; aquí, la satisfacción no se puede predecir con estas variables.'],
+  ['accident-intelligent-agent', 'https://github.com/jleonceo/accident-intelligent-agent', 'Los accidentes de tráfico de Madrid en 2020 a partir de los datos abiertos del Ayuntamiento: limpieza, análisis y un modelo de gravedad. Otro fichero público que no se puede contar tal cual viene.'],
+  ['analisis-contable', 'https://github.com/jleonceo/analisis-contable', 'Análisis financiero con Python y MySQL de otra empresa ficticia a partir de su libro diario.'],
+  ['tesoreria-forecast-ia', 'https://github.com/jleonceo/tesoreria-forecast-ia', 'Previsión de caja comprobada con datos pasados. Es la pregunta de qué pasará, que aquí solo se toca de pasada.'],
+  ['control-interno-fraude-ia', 'https://github.com/jleonceo/control-interno-fraude-ia', 'Detección de fraude en apuntes contables con aritmética. Aquí las anomalías son ventas imposibles, con el mismo principio de marcar y no borrar.'],
+];
+const metodo = [
+  ['verificacion-determinista-ia', 'https://github.com/jleonceo/verificacion-determinista-ia', 'Comprobaciones de coherencia hechas con código y sin IA, el mismo principio que el banco de este proyecto.'],
+  ['pii-output-gate', 'https://github.com/jleonceo/pii-output-gate', 'Una puerta que bloquea los datos personales antes de que salgan. Aquí se anonimiza el fichero antes de publicarlo.'],
+  ['Portfolio', 'https://juanluisleon.vercel.app', 'La web que reúne todos estos proyectos.'],
+];
+const grupos = [
+  ['El código y los datos', propio],
+  ['Otros proyectos de analítica de datos', analitica],
+  ['Piezas de método', metodo],
 ];
 ---
 <Layout current="/ecosistema" title="Ecosistema y créditos · TechSoluciones Analytics">
@@ -18,30 +34,38 @@ const repos = [
     y revisión de cada texto.
   </p>
 
-  <div class="mt-6 space-y-3">
-    {repos.map(([t, url, d]) => (
-      <a href={url} class="tarjeta block p-4 no-underline transition hover:-translate-y-0.5" target="_blank" rel="noopener">
-        <div class="flex items-center gap-2">
-          <h3 class="text-[.95rem] font-semibold text-acento-deep">{t}</h3>
-          <span class="text-suave">→</span>
-        </div>
-        <p class="mt-1 text-[.85rem] text-tinta-soft">{d}</p>
-        <p class="mt-1 text-[.72rem] text-suave">{url}</p>
-      </a>
-    ))}
-  </div>
+  {grupos.map(([titulo, lista]) => (
+    <>
+      <h2 class="mt-8 font-display text-[1.2rem] font-bold">{titulo}</h2>
+      <div class="mt-3 space-y-3">
+        {lista.map(([t, url, d]) => (
+          <a href={url} class="tarjeta block p-4 no-underline transition hover:-translate-y-0.5" target="_blank" rel="noopener">
+            <div class="flex items-center gap-2">
+              <h3 class="text-[.95rem] font-semibold text-acento-deep">{t}</h3>
+              <span class="text-suave">→</span>
+            </div>
+            <p class="mt-1 text-[.85rem] text-tinta-soft">{d}</p>
+            <p class="mt-1 text-[.72rem] text-suave">{url}</p>
+          </a>
+        ))}
+      </div>
+    </>
+  ))}
 
   <Callout tipo="info" titulo="Sobre los datos">
     El conjunto de datos es <strong>sintético</strong>: los nombres y contactos son generados y no
-    corresponden a ninguna persona real. Si se comparte, será solo el fichero público, con año y provincia. El caso
-    «TechSoluciones S.L.» es una empresa ficticia que sirve de caso de ejemplo.
+    corresponden a ninguna persona real. El repositorio publica solo el fichero anonimizado, con año, provincia,
+    satisfacción y la marca de anomalía. El caso «TechSoluciones S.L.» es una empresa ficticia que sirve de
+    caso de ejemplo.
   </Callout>
 
   <Callout tipo="idea" titulo="Créditos y método">
     La primera versión, del 01/07/2026, se hizo sin aplicar las reglas
     de revisión del proyecto y dio por buenas {eda.anomalias.n} ventas erróneas. La corrección del
     13/09/2026 pasó por un verificador que recalculó las cifras desde el fichero original y por un revisor
-    que intentó refutar cada conclusión.
+    que intentó refutar cada conclusión, y el 23/09/2026 se repitió con la web entera antes de publicarla.
+    Está hecho con ayuda de IA: Claude, de Anthropic, escribió buena parte del análisis, del código y del
+    texto, y las decisiones y la revisión de cada página son del autor, Juan Luis León Rodríguez.
   </Callout>
 
   <p class="mt-8">
