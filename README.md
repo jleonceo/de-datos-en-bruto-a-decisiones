@@ -43,6 +43,26 @@ qué productos se venden.
 Tampoco se pueden segmentar clientes. El fichero no trae un código de cliente, 5.035 correos los usan
 personas con nombre distinto y, contando por nombre y teléfono, nadie compra dos veces.
 
+### Qué hay en la web
+
+Las 63 páginas siguen el orden en que se trabaja un análisis. Cada concepto tiene su página con el
+mismo esquema: el problema, por qué engaña, el principio, la solución, lo que pasa con estos datos y
+para qué sirve fuera de este caso. El cálculo queda plegado al final, para quien lo quiera ver.
+
+| Parte | Qué cuenta | Páginas |
+|---|---|---|
+| I · El problema y los datos | El encargo, el primer contacto con el fichero y los tipos de error que se buscan | 3 |
+| II · Preparación | La limpieza paso a paso, el diccionario de datos y la anonimización | 3 |
+| III · Análisis exploratorio | Estadística descriptiva, atípicos y anomalías, series, y producto, categoría y provincia | 16 |
+| IV · Las preguntas de negocio | Las tres preguntas y once casos en los que el ruido parece un hallazgo | 15 |
+| V · Machine Learning | Por qué no se pueden segmentar los clientes, qué se puede predecir y cómo se detectan anomalías | 10 |
+| VI · Cuadro de mando y negocio | Qué va en el panel y en qué orden, los KPI y las recomendaciones | 10 |
+| VII · Cómo se hizo | La metodología, las conclusiones y los créditos | 3 |
+| VIII · Consulta y repaso | Un glosario de 60 conceptos y 50 preguntas de repaso | 2 |
+
+La portada completa las 63. Sirve para leerla de principio a fin o para consultar un concepto suelto
+desde el glosario.
+
 ### Cómo se comprobó
 
 Ninguna cifra de la web la calcula un modelo de lenguaje. Salen de diez scripts de Python con semilla
@@ -88,15 +108,27 @@ npm run dev
 
 Hace falta Node 22.12 o posterior. `npm run build` genera la web estática en `web/dist`.
 
-### Cómo se publica
+### Cómo se publica la web
 
-La web está en Vercel, conectada a este repositorio de GitHub. Vercel construye la carpeta `web` con
-`npm run build` y publica `web/dist`. Cada cambio que llega a la rama `main` vuelve a publicar la web
-sin pasos a mano. Un cambio en otra rama o en una pull request genera su propia
-dirección de prueba, así que se puede revisar antes de que llegue a la web principal.
+La web está en Vercel, conectada a este repositorio de GitHub. La conexión se hace una sola vez,
+importando el repositorio desde Vercel con estos valores:
+
+| Ajuste | Valor |
+|---|---|
+| Framework | Astro, que Vercel reconoce solo |
+| Carpeta raíz (*Root Directory*) | `web` |
+| Orden de construcción | `npm run build` |
+| Carpeta que se publica | `dist`, dentro de `web` |
+| Rama de producción | `main` |
+| Variables de entorno | ninguna |
+
+Desde ese momento Vercel vigila el repositorio. Cada cambio que llega a `main` vuelve a construir y
+publicar la web sin pasos a mano, y GitHub muestra junto a cada commit si la construcción salió bien.
+Un cambio en otra rama o en una pull request genera su propia dirección de prueba, así que se puede
+revisar antes de que llegue a la web principal.
 
 Si un script cambia sus resultados, el orden es: ejecutar la cadena en la carpeta de trabajo, copiar
-los JSON de `analisis/salidas` a `web/src/data`, pasar el banco y subir los cambios.
+los JSON de `analisis/salidas` a `web/src/data`, pasar el banco y subir los cambios. Vercel hace el resto.
 
 ### Cómo está hecho
 
@@ -105,14 +137,22 @@ escrito buena parte del análisis, del código y del texto bajo esa revisión, y
 recalcularon las cifras también son agentes de IA, con la instrucción de no fiarse de los scripts del
 proyecto.
 
-### Ecosistema
+### Otros proyectos de analítica de datos
 
-- **[RFM-Customer-Analytics](https://github.com/jleonceo/RFM-Customer-Analytics)**, segmentación RFM de clientes. Aquí la misma técnica no se puede aplicar; la web explica por qué.
-- **[lead-scoring-ml](https://github.com/jleonceo/lead-scoring-ml)**, un modelo que predice qué contactos van a comprar.
-- **[control-interno-fraude-ia](https://github.com/jleonceo/control-interno-fraude-ia)**, detección de anomalías contables con aritmética. Aquí las anomalías son ventas imposibles.
+Cada uno aplica el mismo oficio a un caso distinto:
+
+- **[RFM-Customer-Analytics](https://github.com/jleonceo/RFM-Customer-Analytics)**, segmentación RFM de los clientes de un comercio electrónico. Aquí esa segmentación no se puede hacer porque el fichero no identifica al cliente; la parte V de la web explica por qué.
+- **[lead-scoring-ml](https://github.com/jleonceo/lead-scoring-ml)**, un modelo que ordena los contactos por probabilidad de compra. Es el caso en que sí hay algo que predecir; aquí, la satisfacción no se puede predecir con estas variables.
+- **[accident-intelligent-agent](https://github.com/jleonceo/accident-intelligent-agent)**, los accidentes de tráfico de Madrid en 2020 a partir de los datos abiertos del Ayuntamiento: limpieza, análisis y un modelo de gravedad. Otro fichero público que no se puede contar tal cual viene.
+- **[analisis-contable](https://github.com/jleonceo/analisis-contable)**, análisis financiero con Python y MySQL de otra empresa ficticia a partir de su libro diario.
+- **[tesoreria-forecast-ia](https://github.com/jleonceo/tesoreria-forecast-ia)**, previsión de caja comprobada con datos pasados. Es la pregunta de qué pasará, que aquí solo se toca de pasada.
+- **[control-interno-fraude-ia](https://github.com/jleonceo/control-interno-fraude-ia)**, detección de fraude en apuntes contables con aritmética. Aquí las anomalías son ventas imposibles, con el mismo principio de marcar y no borrar.
+
+### Piezas de método
+
+- **[verificacion-determinista-ia](https://github.com/jleonceo/verificacion-determinista-ia)**, comprobaciones de coherencia hechas con código y sin IA, el mismo principio que el banco de este repositorio.
 - **[pii-output-gate](https://github.com/jleonceo/pii-output-gate)**, una puerta que bloquea los datos personales antes de que salgan. Aquí se anonimiza el fichero antes de publicarlo.
-- **[verificacion-determinista-ia](https://github.com/jleonceo/verificacion-determinista-ia)**, comprobaciones de coherencia sin IA, el mismo principio que el banco de este repositorio.
-- **[analisis-contable](https://github.com/jleonceo/analisis-contable)**, análisis financiero con Python y MySQL sobre otra empresa ficticia.
+- **[Portfolio](https://juanluisleon.vercel.app)**, la web que reúne todos estos proyectos.
 
 ### Licencia
 
@@ -154,6 +194,27 @@ that depends on which products are sold.
 
 Customers cannot be segmented either. The file has no customer code, 5,035 email addresses are used by
 people with different names and, counting by name and phone, nobody buys twice.
+
+### What is on the website
+
+The 63 pages follow the order in which an analysis is done. Each concept has its own page with the
+same outline: the problem, why it misleads, the principle, the solution, what happens with these data
+and what it is useful for beyond this case. The calculation is folded away at the end, for whoever
+wants to see it.
+
+| Part | What it covers | Pages |
+|---|---|---|
+| I · The problem and the data | The brief, the first look at the file and the kinds of error to look for | 3 |
+| II · Preparation | Cleaning step by step, the data dictionary and anonymisation | 3 |
+| III · Exploratory analysis | Descriptive statistics, outliers and anomalies, time series, and product, category and province | 16 |
+| IV · The business questions | The three questions and eleven cases where noise looks like a finding | 15 |
+| V · Machine learning | Why customers cannot be segmented, what can be predicted and how anomalies are detected | 10 |
+| VI · Dashboard and business | What goes on the dashboard and in which order, the KPIs and the recommendations | 10 |
+| VII · How it was made | The methodology, the conclusions and the credits | 3 |
+| VIII · Reference and review | A glossary of 60 concepts and 50 review questions | 2 |
+
+The home page makes 63. It can be read from start to finish or used to look up a single concept from
+the glossary.
 
 ### How it was checked
 
@@ -202,15 +263,27 @@ npm run dev
 
 It needs Node 22.12 or later. `npm run build` generates the static site in `web/dist`.
 
-### How it is published
+### How the website is published
 
-The website is on Vercel, connected to this GitHub repository. Vercel builds the `web` folder with
-`npm run build` and publishes `web/dist`. Every change that reaches the `main` branch republishes the
-site with no manual steps. A change on another branch or in a pull request gets
-its own preview address, so it can be reviewed before it reaches the main site.
+The website is on Vercel, connected to this GitHub repository. The connection is made once, by
+importing the repository from Vercel with these settings:
+
+| Setting | Value |
+|---|---|
+| Framework | Astro, which Vercel detects on its own |
+| Root Directory | `web` |
+| Build command | `npm run build` |
+| Output folder | `dist`, inside `web` |
+| Production branch | `main` |
+| Environment variables | none |
+
+From then on Vercel watches the repository. Every change that reaches `main` rebuilds and republishes
+the site with no manual steps, and GitHub shows next to each commit whether the build succeeded. A
+change on another branch or in a pull request gets its own preview address, so it can be reviewed
+before it reaches the main site.
 
 If a script changes its results, the order is: run the chain in the working folder, copy the JSON
-files from `analisis/salidas` to `web/src/data`, run the bench and push the changes.
+files from `analisis/salidas` to `web/src/data`, run the bench and push the changes. Vercel does the rest.
 
 ### How it was made
 
@@ -218,14 +291,22 @@ With the help of AI. The decisions and the review of every page are mine. Claude
 a good part of the analysis, the code and the text under that review, and the verifiers that
 recalculated the figures are also AI agents, instructed not to trust the project's scripts.
 
-### Ecosystem
+### Other data analytics projects
 
-- **[RFM-Customer-Analytics](https://github.com/jleonceo/RFM-Customer-Analytics)**, RFM customer segmentation. Here the same technique cannot be applied, and the website explains why.
-- **[lead-scoring-ml](https://github.com/jleonceo/lead-scoring-ml)**, a model that predicts which leads will buy.
-- **[control-interno-fraude-ia](https://github.com/jleonceo/control-interno-fraude-ia)**, detecting accounting anomalies with arithmetic. Here the anomalies are impossible sales.
+Each one applies the same craft to a different case:
+
+- **[RFM-Customer-Analytics](https://github.com/jleonceo/RFM-Customer-Analytics)**, RFM segmentation of an online shop's customers. Here that segmentation cannot be done because the file does not identify the customer; part V of the website explains why.
+- **[lead-scoring-ml](https://github.com/jleonceo/lead-scoring-ml)**, a model that ranks leads by their probability of buying. It is the case where there is something to predict; here, satisfaction cannot be predicted from these variables.
+- **[accident-intelligent-agent](https://github.com/jleonceo/accident-intelligent-agent)**, traffic accidents in Madrid in 2020 from the city council's open data: cleaning, analysis and a severity model. Another public file that cannot be counted as it comes.
+- **[analisis-contable](https://github.com/jleonceo/analisis-contable)**, financial analysis with Python and MySQL of another fictitious company, from its general journal.
+- **[tesoreria-forecast-ia](https://github.com/jleonceo/tesoreria-forecast-ia)**, a cash forecast tested against past data. It is the question of what will happen, which this project only touches on.
+- **[control-interno-fraude-ia](https://github.com/jleonceo/control-interno-fraude-ia)**, detecting fraud in accounting entries with arithmetic. Here the anomalies are impossible sales, with the same principle of flagging rather than deleting.
+
+### Method pieces
+
+- **[verificacion-determinista-ia](https://github.com/jleonceo/verificacion-determinista-ia)**, coherence checks done with code and without AI, the same principle as this repository's bench.
 - **[pii-output-gate](https://github.com/jleonceo/pii-output-gate)**, a gate that blocks personal data before it leaves. Here the file is anonymised before it is published.
-- **[verificacion-determinista-ia](https://github.com/jleonceo/verificacion-determinista-ia)**, coherence checks without AI, the same principle as this repository's bench.
-- **[analisis-contable](https://github.com/jleonceo/analisis-contable)**, financial analysis with Python and MySQL on another fictitious company.
+- **[Portfolio](https://juanluisleon.vercel.app)**, the website that brings all these projects together.
 
 ### License
 
