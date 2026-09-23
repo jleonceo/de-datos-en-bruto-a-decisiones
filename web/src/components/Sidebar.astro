@@ -11,7 +11,18 @@ const { current = '' } = Astro.props;
   </a>
   <p class="mt-1 text-[.72rem] text-suave">Caso TechSoluciones S.L.</p>
 
-  <nav class="mt-6 space-y-4" aria-label="Índice del recorrido">
+  <!-- En pantallas estrechas el índice va plegado: si no, sus más de 60 entradas quedan encima del texto. -->
+  <button
+    id="abrir-indice"
+    type="button"
+    class="mt-4 rounded-md border border-linea px-3 py-1.5 text-[.85rem] font-semibold text-tinta-soft lg:hidden"
+    aria-controls="indice"
+    aria-expanded="false"
+  >
+    Índice ▾
+  </button>
+
+  <nav id="indice" class="mt-6 hidden space-y-4 lg:block" aria-label="Índice del recorrido">
     {partes.map((p) => (
       <div>
         {p.titulo && (
@@ -59,6 +70,17 @@ const { current = '' } = Astro.props;
 </aside>
 
 <script is:inline>
+  (function () {
+    var boton = document.getElementById('abrir-indice');
+    var indice = document.getElementById('indice');
+    if (!boton || !indice) return;
+    boton.addEventListener('click', function () {
+      var abierto = indice.classList.toggle('hidden') === false;
+      boton.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+      boton.textContent = abierto ? 'Índice ▴' : 'Índice ▾';
+    });
+  })();
+
   /* Continuidad del índice entre páginas (Astro es multipágina: cada clic recarga).
      Guarda la posición de scroll del índice al navegar y la restaura al cargar,
      asegurando que el ítem activo quede siempre a la vista. Solo en desktop (índice sticky). */
