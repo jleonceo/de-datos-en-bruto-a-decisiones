@@ -1,0 +1,104 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import eda from '../../data/eda.json';
+import rob from '../../data/robustez.json';
+
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/descriptiva', t: '7 · Estadística descriptiva' };
+
+const fases = [
+  { n: 1, t: 'Formular la pregunta', d: 'Concreta, medible y que permita decidir algo. Aquí son tres y cada una tiene su página.',
+    paginas: [['/pregunta-mes', '11'], ['/pregunta-region', '12'], ['/pregunta-correlacion', '13']] },
+  { n: 2, t: 'Auditar la calidad antes de concluir', d: `Perfilar, limpiar y apartar lo que no es venta. Aquí salieron ${eda.anomalias.n} ventas fuera de las reglas del catálogo antes de calcular un solo total.`,
+    paginas: [['/inspeccion', '2'], ['/calidad-datos', '3'], ['/etl', '4']] },
+  { n: 3, t: 'Describir cada variable', d: 'Centro, dispersión y forma, una a una, antes de cruzar nada.',
+    paginas: [['/descriptiva', '7'], ['/descriptiva/forma', 'D3'], ['/atipicos', '8']] },
+  { n: 4, t: 'Segmentar antes de concluir', d: 'Partir por producto, categoría y zona, porque el agregado puede decir lo contrario que cada parte.',
+    paginas: [['/segmentos', '10'], ['/senal-ruido/simpson', 'F9']] },
+  { n: 5, t: 'Contrastar con el azar y con otra muestra', d: `Cada respuesta se enfrenta a ${f(rob.n_permutaciones)} reordenaciones al azar de los datos y se repite quitando el año incompleto.`,
+    paginas: [['/pregunta-mes', '11'], ['/pregunta-region', '12'], ['/senal-ruido', '14']] },
+  { n: 6, t: 'Poder decir de qué filas sale cada cifra', d: 'Scripts con semilla que vuelcan cada resultado a un fichero, del que la web lee sus cifras.',
+    paginas: [['/metodologia', '19']] },
+  { n: 7, t: 'Concluir en lenguaje de decisión', d: 'Qué se hace, qué no y qué dato habría que recoger para poder responder lo que hoy no se puede.',
+    paginas: [['/cuadro-mando', '17'], ['/recomendaciones', '18'], ['/conclusiones', '20']] },
+];
+---
+<Layout current="/descriptiva/fases" title="El EDA por fases · TechSoluciones Analytics">
+  <Concepto
+    ficha="D9"
+    madre={madre}
+    titulo="Este mismo recorrido, puesto en el orden que exige el método"
+    pregunta="¿En qué orden se explora un conjunto de datos para que la conclusión sea fiable?"
+  >
+    <Fragment slot="problema">
+      <p>
+        Con el fichero abierto, es tentador ir directamente a la pregunta que interesa: qué mes vende más, qué
+        región crece. Un gráfico de barras lo contesta en un minuto y el análisis parece hecho.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        El gráfico sale igual con datos sucios que con datos limpios, con un año incompleto que con doce
+        meses enteros y con ruido que con señal. Todo lo que no se revisó antes queda dentro de la respuesta
+        sin que se note. Con una herramienta de IA que responde en segundos, ese riesgo aumenta.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Primero se comprueba lo que se va a usar, después se concluye">
+        El método se resume en cuatro órdenes que se le dan al analista, o a la IA que
+        trabaja con él: razona por pasos, audita la calidad antes de concluir, cita de qué filas sale cada
+        dato y repite con otra muestra. A esas cuatro se suma una quinta, pensada para la paradoja de
+        Simpson: segmenta antes de concluir.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Ordenar el trabajo en fases que no se saltan, de modo que cada una deje su resultado escrito
+        antes de empezar la siguiente.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <ol class="mt-2 space-y-3">
+        {fases.map((x) => (
+          <li class="tarjeta p-4">
+            <div class="flex items-baseline gap-2">
+              <span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-acento-claro text-[.78rem] font-bold text-acento-deep">{x.n}</span>
+              <span class="font-semibold text-tinta">{x.t}</span>
+            </div>
+            <p class="mt-1 text-[.9rem]">{x.d}</p>
+            <p class="mt-1 text-[.8rem] text-suave">
+              En esta web:{' '}
+              {x.paginas.map(([s, t], i) => (
+                <span>{i > 0 && ' · '}<a href={s} class="text-acento no-underline hover:underline">{t}</a></span>
+              ))}
+            </p>
+          </li>
+        ))}
+      </ol>
+      <p class="mt-4">
+        El orden importa. La primera versión de esta web dio mayo como mes ganador porque sumaba
+        meses con distinto número de años y el ganador desapareció en cuanto se compararon solo meses
+        completos. Era un fallo de la fase 2 que ningún contraste de la fase 5 habría arreglado.
+      </p>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Como lista de control antes de enseñar cualquier análisis, propio o hecho con ayuda de una IA. Si
+        alguna fase no tiene nada escrito, la conclusión todavía no está lista.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Las cifras de la página salen de <code>eda.json</code> y <code>robustez.json</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

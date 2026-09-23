@@ -1,0 +1,68 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import eda from '../data/eda.json';
+import ml from '../data/ml.json';
+const nf = (v, d = 0) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: d }).format(v);
+const an = eda.anomalias;
+const seg = ml.segmentacion_clientes;
+const par = eda.extra_pareto.productos;
+const recs = [
+  {
+    t: `Validar las ${an.n} ventas anómalas con quien las registró`,
+    p: `Suman ${nf(an.importe_total)} €, el ${nf(an.pct_facturacion_registrada, 2)} % de lo facturado. Si son errores de captura, la facturación real es la válida (${nf(eda.kpis.facturacion_valida)} €) y hay que corregir el registro. Si alguna fuera un pedido real, lo que falla es el catálogo de precios. En los dos casos, alguien tiene que mirarlas.`,
+  },
+  {
+    t: 'Validar los datos al registrarlos antes de construir cuadros de mando',
+    p: `El programa de ventas no debería aceptar cantidades fuera de rango ni precios que no son de catálogo al registrar una venta. Tampoco correos con tildes y espacios, ni fechas en cuatro formatos. Y falta uno de cada cinco valores de satisfacción. Validar los datos al registrarlos aporta más que cualquier gráfico hecho con datos sucios.`,
+  },
+  {
+    t: 'Crear un identificador de cliente',
+    p: `Hoy no se puede segmentar ni medir la fidelización: ${nf(seg.emails_con_varios_nombres)} correos los comparten personas distintas, los nombres repetidos son de personas distintas y nadie compra dos veces. Un código de cliente asignado en origen es el requisito previo de cualquier análisis RFM.`,
+  },
+  {
+    t: 'Los ingresos dependen sobre todo de la mezcla de productos',
+    p: `${par.n_para_80pct} de ${par.de_total} productos, los de precio alto, concentran el 80 % de la facturación, mientras entre provincias la facturación está mucho más repartida. Conviene proteger disponibilidad y margen de esos productos antes que buscar diferencias comerciales por región: la mayor diferencia de ticket entre provincias se explica por la mezcla de productos que vende cada una.`,
+  },
+  {
+    t: 'No lanzar campañas por «mes fuerte» ni «región estrella»',
+    p: 'Los dos patrones se pusieron a prueba y ninguno superó al azar. Actuar sobre ellos supondría gastar presupuesto en diferencias que no se distinguen de la casualidad.',
+  },
+  {
+    t: 'Recoger la satisfacción de forma que se pueda analizar',
+    p: 'Si la satisfacción se recogiera bien (encuesta consistente, ligada a la venta y al canal), se podría volver a estudiar su relación con las ventas con datos fiables. El método de análisis ya está preparado.',
+  },
+];
+---
+<Layout current="/recomendaciones" title="Recomendaciones de negocio · TechSoluciones Analytics">
+  <p class="eyebrow">Parte VI · Cuadro de mando y negocio</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">18 · Recomendaciones de negocio</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    Cada recomendación sale de algo que el dato <em>sostiene</em> y que las páginas anteriores pusieron a
+    prueba. Con este dataset son {recs.length} decisiones argumentadas, ordenadas por urgencia.
+  </p>
+
+  <div class="mt-6 space-y-3">
+    {recs.map((r, i) => (
+      <div class="tarjeta p-5">
+        <div class="flex gap-3">
+          <span class="credo-n">{i + 1}</span>
+          <div>
+            <h3 class="font-display text-[1.05rem] font-bold text-tinta">{r.t}</h3>
+            <p class="mt-1.5 text-[.9rem] text-tinta-soft">{r.p}</p>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <Callout tipo="idea" titulo="El error que se ha evitado">
+    Lo fácil habría sido entregar «este es tu mes, esta tu región, sube la satisfacción y venderás más».
+    Parecería útil, pero sería falso. Estas recomendaciones son menos vistosas, pero resisten la comprobación.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Siguiente: <a href="/metodologia" class="lnk font-semibold">cómo se hizo →</a>
+  </p>
+</Layout>

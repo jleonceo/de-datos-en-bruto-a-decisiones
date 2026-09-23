@@ -1,0 +1,63 @@
+---
+import IndiceSub from '../components/IndiceSub.astro';
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import Code from '../components/Code.astro';
+import eda from '../data/eda.json';
+import robustez from '../data/robustez.json';
+const MES = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const f = (v, d) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+const pe = eda.p3_correlacion_ventas_satisfaccion.importe_vs_satisfaccion_pearson;
+const tarjetas = [
+  { t: 'Mes del año estrella', v: 'Ruido', d: `${MES[robustez.p1_estacionalidad.mes_observado]}: permutación p = ${f(robustez.p1_estacionalidad.p_valor_permutacion, 2)}` },
+  { t: 'Región estrella', v: 'Ruido', d: `${robustez.p2_region_satisfaccion.region_observada}: permutación p = ${f(robustez.p2_region_satisfaccion.p_valor_permutacion, 2)}` },
+  { t: 'Ventas ~ satisfacción', v: 'Sin relación', d: `Pearson r = ${f(pe.r, 4)}` },
+];
+const permCode = `# Test de permutación: ¿el efecto observado supera al azar?
+# El estadístico es EXACTAMENTE el que se afirma (aquí, la media más alta de un mes del año)
+obs = mayor_media_por_mes(meses, facturacion)
+rng = np.random.default_rng(42)          # un generador propio para cada test
+nulos = [mayor_media_por_mes(rng.permutation(meses), facturacion) for _ in range(2000)]
+p = mean(nulos >= obs)                   # ¿con qué frecuencia el azar iguala lo observado?`;
+---
+<Layout current="/senal-ruido" title="La lección: señal frente a ruido · TechSoluciones Analytics">
+  <p class="eyebrow">Parte IV · Las preguntas de negocio</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">14 · La lección: señal frente a ruido</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    Las tres preguntas tenían una respuesta aparente (un mes, una región, quizá una relación) y las tres se
+    deshicieron al ponerlas a prueba. Esta parte explica por qué ocurrió y cómo se comprueba.
+  </p>
+
+  <div class="mt-6 grid gap-3 sm:grid-cols-3">
+    {tarjetas.map((x) => (
+      <div class="tarjeta p-4"><div class="text-[.8rem] font-semibold text-suave">{x.t}</div><div class="mt-1 font-display text-[1.1rem] font-bold text-tinta">{x.v}</div><div class="text-[.78rem] text-suave">{x.d}</div></div>
+    ))}
+  </div>
+
+  <Callout tipo="idea" titulo="Por qué un cuadro de mando sin contrastes lleva a conclusiones falsas">
+    Cualquier gráfico ordena de mayor a menor y siempre hay un primero. Quien se queda ahí «descubre»
+    ganadores en datos puramente aleatorios. La comprobación es barata: antes de dar por bueno un hallazgo, preguntar
+    «¿esto lo haría también el azar?». El <strong>test de permutación</strong> lo responde sin fórmulas: se
+    barajan los datos miles de veces y se comprueba si el efecto real supera a los que produce el azar.
+  </Callout>
+
+  <Code titulo="Ver el test de permutación (idea del código)" code={permCode} lang="python" />
+
+  <Callout tipo="warn" titulo="Dos condiciones para que el test valga">
+    <p>Medir en el test <strong>lo mismo que se afirma</strong>. Si la página habla de facturación por mes, el test no puede medir el ticket medio.</p>
+    <p class="mt-2">Comparar <strong>sobre la misma base</strong>: meses completos y ventas válidas. Un ganador fabricado por sumar años desiguales o por {eda.anomalias.n} ventas fuera de rango no lo corrige ningún test.</p>
+  </Callout>
+
+  <Callout tipo="ok" titulo="El hallazgo que sí se sostiene">
+    Mientras se buscaban patrones, lo que destacaba en los datos eran
+    <a href="/atipicos" class="lnk">{eda.anomalias.n} ventas fuera de las reglas del catálogo</a> por {f(eda.anomalias.importe_total, 0)} €.
+    Encontrarlas exige mirar el rango de cada variable antes de agregar nada.
+  </Callout>
+
+  <IndiceSub slug="/senal-ruido" titulo="Casos en los que el ruido parece un hallazgo" entrada="Esta página responde a las tres preguntas de negocio con una regla general. Las páginas siguientes aplican esa regla a casos concretos, cada uno con su cálculo sobre estas mismas ventas, y se pueden leer en cualquier orden." />
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Siguiente: <a href="/segmentacion" class="lnk font-semibold">¿se pueden segmentar los clientes? →</a>
+  </p>
+</Layout>

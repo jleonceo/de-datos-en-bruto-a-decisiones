@@ -1,0 +1,203 @@
+{
+  "semilla": 42,
+  "n_bootstrap": 5000,
+  "base": "ventas validas (sin las 16 anomalias)",
+  "generador": "uno por bloque, derivado de la semilla 42",
+  "f5_intervalo_confianza": {
+    "estadistico": "ticket medio de una venta, con su intervalo del 95 % por percentil del bootstrap",
+    "n": 19984,
+    "n_bootstrap": 5000,
+    "media": 2405.41,
+    "ic95_bajo": 2360.4,
+    "ic95_alto": 2451.85,
+    "ancho": 91.46,
+    "lectura": "de cada 100 muestras como esta, unas 95 darian un intervalo que contiene el valor verdadero"
+  },
+  "f8_potencia": {
+    "estadistico": "tamano de muestra por grupo para detectar la diferencia observada con 80 % de potencia y 5 % de error",
+    "region_a": "Islas Baleares",
+    "region_b": "Murcia",
+    "n_a": 366,
+    "n_b": 375,
+    "media_a": 2812.25,
+    "media_b": 2067.97,
+    "d_de_cohen": 0.2205,
+    "n_por_grupo_necesario": 323,
+    "p_valor_t": 0.0028,
+    "alcanza": true,
+    "lectura": "si el n necesario supera al que hay, el estudio no podia detectar ese efecto aunque fuera real"
+  },
+  "f9_simpson": {
+    "estadistico": "ticket medio por region en el agregado, frente al mismo ticket dentro de cada producto",
+    "region_agregado_alto": "Islas Baleares",
+    "media_alto": 2812.25,
+    "region_agregado_bajo": "Murcia",
+    "media_bajo": 2067.97,
+    "brecha_pct": 36.0,
+    "detalle_por_producto": [
+      {
+        "producto": "Antivirus Corporativo",
+        "n_alto": 28,
+        "media_alto": 143.0,
+        "n_bajo": 31,
+        "media_bajo": 145.2,
+        "se_invierte": true
+      },
+      {
+        "producto": "Licencia ERP Cloud",
+        "n_alto": 37,
+        "media_alto": 3535.1,
+        "n_bajo": 40,
+        "media_bajo": 3240.0,
+        "se_invierte": false
+      },
+      {
+        "producto": "Monitor UltraWide 27",
+        "n_alto": 39,
+        "media_alto": 804.1,
+        "n_bajo": 42,
+        "media_bajo": 806.7,
+        "se_invierte": true
+      },
+      {
+        "producto": "Módulo Nóminas",
+        "n_alto": 68,
+        "media_alto": 939.7,
+        "n_bajo": 66,
+        "media_bajo": 850.0,
+        "se_invierte": false
+      },
+      {
+        "producto": "Portátil Core i7",
+        "n_alto": 64,
+        "media_alto": 2746.1,
+        "n_bajo": 87,
+        "media_bajo": 2850.0,
+        "se_invierte": true
+      },
+      {
+        "producto": "Servidor Rack Xeon",
+        "n_alto": 55,
+        "media_alto": 10054.5,
+        "n_bajo": 22,
+        "media_bajo": 10340.9,
+        "se_invierte": true
+      },
+      {
+        "producto": "Suscripción CRM Pro",
+        "n_alto": 40,
+        "media_alto": 1271.2,
+        "n_bajo": 38,
+        "media_bajo": 1278.9,
+        "se_invierte": true
+      },
+      {
+        "producto": "Switch Gestionable 24p",
+        "n_alto": 35,
+        "media_alto": 560.6,
+        "n_bajo": 49,
+        "media_bajo": 558.4,
+        "se_invierte": false
+      }
+    ],
+    "productos_invertidos": 5,
+    "productos_comparados": 8,
+    "producto_caro": "Servidor Rack Xeon",
+    "peso_producto_caro_alto_pct": 15.0,
+    "peso_producto_caro_bajo_pct": 5.9,
+    "hay_paradoja": true,
+    "lectura": "la region que gana en el total pierde producto a producto: lo que cambia es la mezcla y no el rendimiento"
+  },
+  "f10_margen_kpi": {
+    "estadistico": "facturacion mensual media con su margen del 95 % por bootstrap, sobre meses completos",
+    "n_meses": 88,
+    "n_bootstrap": 5000,
+    "media": 541241.42,
+    "ic95_bajo": 529684.05,
+    "ic95_alto": 553014.35,
+    "margen_pct": 2.16,
+    "lectura": "un KPI sin margen invita a leer como caida lo que cabe dentro de su propia variacion"
+  },
+  "f11_comparaciones_multiples": {
+    "estadistico": "cada provincia contra la satisfaccion media global, con los tres umbrales sobre los mismos p",
+    "n_contrastes": 52,
+    "alfa": 0.05,
+    "umbral_bonferroni": 0.00096,
+    "umbral_bh_mayor": 0.0,
+    "significativos_sin_corregir": 3,
+    "significativos_bonferroni": 0,
+    "significativos_bh": 0,
+    "esperados_por_azar": 2.6,
+    "top5": [
+      {
+        "region": "Córdoba",
+        "n": 272,
+        "media": 5.846,
+        "p": 0.0357
+      },
+      {
+        "region": "Murcia",
+        "n": 295,
+        "media": 5.837,
+        "p": 0.0392
+      },
+      {
+        "region": "Pontevedra",
+        "n": 289,
+        "media": 5.145,
+        "p": 0.0407
+      },
+      {
+        "region": "Ciudad Real",
+        "n": 300,
+        "media": 5.76,
+        "p": 0.1015
+      },
+      {
+        "region": "Guadalajara",
+        "n": 296,
+        "media": 5.23,
+        "p": 0.1086
+      }
+    ],
+    "lectura": "Bonferroni controla la probabilidad de que haya algun falso positivo; BH controla que la proporcion de falsos entre los aceptados no pase del 5 %"
+  },
+  "f12_bootstrap_vs_normal": {
+    "estadistico": "el mismo ticket medio por dos caminos: percentil del bootstrap y formula normal",
+    "media": 2405.41,
+    "no_parametrico": {
+      "bajo": 2359.24,
+      "alto": 2450.86,
+      "ancho": 91.63
+    },
+    "parametrico_normal": {
+      "bajo": 2359.16,
+      "alto": 2451.67,
+      "ancho": 92.51
+    },
+    "asimetria_de_la_variable": 2.781,
+    "diferencia_de_ancho_pct": -0.95,
+    "lectura": "con muestras grandes los dos intervalos coinciden aunque la variable sea muy asimetrica, porque lo que tiene que ser normal es la media"
+  },
+  "f13_correlacion_parcial": {
+    "estadistico": "Pearson entre importe y satisfaccion, antes y despues de restar la media de su producto",
+    "n": 15980,
+    "r_bruta": 0.0034,
+    "p_bruta": 0.6696,
+    "r_parcial_controlando_producto": 0.0133,
+    "p_parcial": 0.0936,
+    "variable_controlada": "producto",
+    "lectura": "si la correlacion cambia al controlar el producto, el producto la estaba moviendo; si sigue sin ser significativa, tampoco hay relacion dentro de cada producto"
+  },
+  "f15_emparejamiento": {
+    "estadistico": "diferencia de ticket medio entre dos regiones, cruda y emparejando por producto",
+    "region_a": "Islas Baleares",
+    "region_b": "Murcia",
+    "diferencia_bruta": 744.28,
+    "diferencia_emparejada": -13.77,
+    "pares_formados": 329,
+    "reduccion_pct": 98.2,
+    "variable_de_emparejamiento": "producto",
+    "lectura": "comparar solo ventas del mismo producto quita de la diferencia lo que era mezcla"
+  }
+}

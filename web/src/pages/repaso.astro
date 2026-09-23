@@ -1,0 +1,114 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Cincuenta preguntas de repaso por bloques. Cada respuesta es corta y enlaza la página que la
+// desarrolla. Sin cifras: las cifras están en las páginas, leídas de los JSON.
+const bloques = [
+  {
+    id: 'D', t: 'Estadística descriptiva',
+    q: [
+      { p: 'Si se pide «la venta normal» de una empresa con unas pocas ventas muy grandes, ¿se da la media o la mediana?', r: 'La mediana. Las ventas muy grandes suben la media por encima del importe de la mayoría de las ventas.', en: '/descriptiva/media-mediana' },
+      { p: '¿Para qué sigue sirviendo la media cuando unas pocas ventas muy grandes la suben por encima de la mayoría?', r: 'Para repartir un total: multiplicada por el número de ventas devuelve la facturación. La mediana no.', en: '/descriptiva/media-mediana' },
+      { p: 'Dos variables tienen la misma media y la misma desviación. ¿Pueden tener formas opuestas?', r: 'Sí. La tabla resumen no dice si los valores se reparten por igual a los dos lados del centro o si unos pocos, mucho más grandes, alargan el reparto hacia un lado, que es lo que se llama cola larga. Eso lo dicen la asimetría y el histograma.', en: '/descriptiva/forma' },
+      { p: '¿Se puede dar por buena la regla del 80/20 sin calcularla?', r: 'No. La concentración aparece cuando unos pocos elementos son mucho más grandes que el resto y desaparece cuando los elementos se parecen. Aquí hay concentración por producto, menor que la del 80/20, y muy poca por provincia.', en: '/descriptiva/pareto' },
+      { p: '¿Por qué la misma pregunta puede dar ganadores distintos?', r: 'Por el nivel de agregación: resumir por venta, por mes o por año cambia qué se está comparando.', en: '/descriptiva/nivel-agregacion' },
+      { p: 'Una provincia es la tercera en facturación. ¿Es de las que más deja por venta?', r: 'No necesariamente. Un total grande puede venir de muchas ventas pequeñas; hay que mirar el denominador.', en: '/descriptiva/denominador' },
+      { p: '¿Cuándo se lee bien un gráfico circular?', r: 'Solo con dos o tres porciones muy desiguales. Con muchas porciones parecidas no se distingue nada.', en: '/descriptiva/grafico' },
+      { p: '¿Qué gráfico muestra que dos medidas no tienen relación?', r: 'Una dispersión: una medida en cada eje. Si no hay relación, la nube de puntos no tiene inclinación.', en: '/descriptiva/grafico' },
+      { p: '¿Qué fase del EDA va antes de calcular el primer total?', r: 'Auditar la calidad: perfilar, limpiar y apartar lo que no es una venta válida.', en: '/descriptiva/fases' },
+      { p: '¿Por qué la primera versión de esta web dio un mes ganador equivocado?', r: 'Sumaba meses con distinto número de años. Era un fallo de calidad del dato que ningún contraste posterior arreglaba.', en: '/descriptiva/fases' },
+    ],
+  },
+  {
+    id: 'E', t: 'Atípicos y anomalías',
+    q: [
+      { p: '¿Qué diferencia hay entre un atípico y una anomalía?', r: 'Un atípico es un valor extremo que puede ser real. Una anomalía es algo que las reglas del negocio no permiten.', en: '/atipicos' },
+      { p: '¿Qué problema tiene el z-score para buscar atípicos?', r: 'Los propios atípicos aumentan la desviación, así que su z sale más pequeño de lo que debería.', en: '/atipicos/z-score' },
+      { p: '¿Por qué la regla de Tukey resiste mejor los extremos que el z-score?', r: 'Porque usa cuartiles, que no cambian cuando hay unos pocos valores muy grandes.', en: '/atipicos' },
+      { p: 'Un detector marca por error una parte muy pequeña de lo normal. ¿Es un buen detector?', r: 'No se sabe todavía. Si lo buscado es muy raro, casi todos sus avisos pueden ser falsos. Hay que mirar la precisión.', en: '/atipicos/falsos-positivos' },
+      { p: 'Dos detectores dan exactamente el mismo resultado. ¿Se confirman uno al otro?', r: 'No, si miran lo mismo. Aquí el z-score y el IsolationForest marcan las mismas ventas porque los dos miran el importe.', en: '/atipicos/falsos-positivos' },
+      { p: '¿Qué pasa si una alerta da muchos avisos falsos?', r: 'Es fácil que se dejen de mirar, que es la fatiga de alertas. El umbral se calibra pensando en quien los recibe.', en: '/atipicos/alertas' },
+      { p: '¿Qué es una anomalía contextual?', r: 'Una venta que es normal en el conjunto y rara en su contexto, por ejemplo en su provincia y trimestre.', en: '/atipicos/clases' },
+      { p: '¿Cuándo decide la regla y cuándo el algoritmo?', r: 'Si se sabe qué está mal, decide la regla. El algoritmo propone candidatas para revisar.', en: '/prediccion' },
+      { p: '¿En qué se fijan LOF y DBSCAN para marcar un punto?', r: 'En la densidad: un punto es sospechoso si está en una zona mucho más vacía que la de sus vecinos.', en: '/atipicos/lof-dbscan' },
+    ],
+  },
+  {
+    id: 'F', t: 'Señal frente a ruido',
+    q: [
+      { p: '¿Qué dice el p-valor de una correlación y qué no dice?', r: 'Dice si se distingue de cero. No dice si es grande ni si importa.', en: '/senal-ruido/tamano-efecto' },
+      { p: '¿Cuándo se prefiere Spearman a Pearson?', r: 'Cuando hay valores extremos o la relación no es una línea recta: Spearman trabaja con el orden.', en: '/pregunta-correlacion' },
+      { p: '¿Cómo funciona un test de permutación?', r: 'Se barajan los datos muchas veces, se calcula lo mismo en cada barajado y se ve si el resultado real se sale de lo que da el azar.', en: '/pregunta-mes' },
+      { p: 'Un mes vende más que los otros once. ¿Es estacionalidad?', r: 'Solo si supera al mejor mes que produce el azar. Entre doce meses siempre hay uno que queda primero.', en: '/senal-ruido/doce-meses' },
+      { p: '¿Qué hace falta para comparar dos promedios?', r: 'Su margen. Si los intervalos se solapan mucho, la diferencia puede deberse al azar.', en: '/senal-ruido/intervalo-confianza' },
+      { p: 'Una relación sale con p menor que 0,05 sobre miles de datos. ¿Hay que actuar?', r: 'Antes hay que medir su tamaño. Con muchos datos, efectos minúsculos salen significativos.', en: '/senal-ruido/tamano-efecto' },
+      { p: 'Un estudio no encuentra diferencia. ¿Prueba que no la hay?', r: 'No, si le faltaba potencia. Hay que calcular cuántos datos harían falta para detectarla.', en: '/senal-ruido/potencia' },
+      { p: '¿Cómo puede una provincia ganar en el total y perder producto a producto?', r: 'Porque vende una proporción mayor de un producto caro. Es la paradoja de Simpson: la diferencia está en la mezcla.', en: '/senal-ruido/simpson' },
+      { p: '¿Cómo se quita el efecto de la mezcla al comparar dos grupos?', r: 'Emparejando: se comparan solo casos parecidos, como ventas del mismo producto.', en: '/senal-ruido/emparejamiento' },
+      { p: 'Se contrasta cada provincia por separado y salen tres especiales. ¿Qué hay que preguntar?', r: 'Cuántas saldrían por azar con tantas pruebas. Luego se corrige con Bonferroni o Benjamini-Hochberg.', en: '/senal-ruido/comparaciones-multiples' },
+      { p: '¿Para qué sirve el bootstrap en un KPI?', r: 'Para saber con qué precisión se conoce el indicador. Ese margen es el de la media: para juzgar un mes suelto hace falta la banda del mes, que es más ancha.', en: '/senal-ruido/margen-kpi' },
+      { p: '¿Qué es una correlación parcial?', r: 'La relación entre dos variables una vez quitado el efecto de una tercera que podría influir en las dos.', en: '/senal-ruido/correlacion-parcial' },
+      { p: 'Una de cada cinco ventas no tiene nota de satisfacción. ¿Qué se comprueba antes de usar las demás?', r: 'Si la falta depende de algo del fichero. Y se dice que la prueba no puede ver si depende de la propia nota.', en: '/senal-ruido/sesgo-seleccion' },
+    ],
+  },
+  {
+    id: 'H', t: 'Segmentación y machine learning',
+    q: [
+      { p: '¿Qué hace falta en la tabla para calcular un RFM?', r: 'Una clave que identifique al cliente de forma estable. Aquí no la hay: el correo lo comparten personas distintas.', en: '/segmentacion/rfm' },
+      { p: 'K-means devuelve cuatro grupos. ¿Prueba que hay cuatro tipos de cliente?', r: 'No. Siempre devuelve los grupos que se le piden. La silueta indica si los grupos están separados.', en: '/segmentacion/elegir-k' },
+      { p: '¿Por qué la inercia no sirve para elegir el número de grupos?', r: 'Porque siempre baja al añadir grupos. La silueta sí puede empeorar.', en: '/segmentacion/elegir-k' },
+      { p: '¿Qué pasa si no se escalan las variables antes de k-means?', r: 'La variable con valores más grandes, como los euros, domina el resultado y las demás apenas cuentan.', en: '/segmentacion/escalado' },
+      { p: '¿Cuándo conviene el escalado robusto?', r: 'Cuando unos pocos valores son mucho más grandes que el resto. Usa mediana y rango intercuartílico, así que los extremos no comprimen al resto de valores.', en: '/segmentacion/escalado' },
+      { p: '¿Por qué meter más variables puede empeorar un agrupamiento?', r: 'Porque con muchas variables todas las distancias se parecen y el algoritmo ya no distingue cerca de lejos.', en: '/segmentacion/dimensionalidad' },
+      { p: '¿Qué añade una mezcla gaussiana sobre k-means?', r: 'La seguridad de cada asignación, en forma de probabilidad.', en: '/segmentacion/mezclas' },
+      { p: 'Un modelo saca muy buena nota sobre los datos con los que aprendió. ¿Es bueno?', r: 'Todavía no se sabe. La nota que cuenta es la de los datos que no ha visto.', en: '/prediccion/particion' },
+      { p: 'Un modelo saca un R² perfecto. ¿Qué se sospecha primero?', r: 'Una fuga: que una variable contenga la respuesta o no se conozca a tiempo.', en: '/prediccion/fuga' },
+      { p: 'Dos modelos empatan con predecir la media. ¿Cuál se elige?', r: 'El más simple. Y la conclusión es que esas variables no explican lo que se busca.', en: '/prediccion/elegir-algoritmo' },
+    ],
+  },
+  {
+    id: 'J', t: 'Del KPI al cuadro de mando',
+    q: [
+      { p: '¿Qué dos condiciones cumple un KPI?', r: 'Puede empeorar y alguien sabe qué hacer cuando empeora.', en: '/cuadro-mando/kpi-vanidad' },
+      { p: '¿Por qué la facturación acumulada es una métrica de vanidad?', r: 'Porque solo puede subir, así que no sirve para avisar de un problema.', en: '/cuadro-mando/kpi-vanidad' },
+      { p: 'Falta el dato para un KPI importante. ¿Se sustituye por otro parecido?', r: 'No. Se anota el dato que falta para empezar a recogerlo. Un sustituto no mide lo mismo.', en: '/cuadro-mando/mapa-kpis' },
+      { p: '¿Qué va en la primera fila de un panel?', r: 'Lo que obliga a decidir algo hoy. El contexto va abajo.', en: '/cuadro-mando/que-va-arriba' },
+      { p: '¿Cómo se comprueba que una medida DAX está bien?', r: 'Calculando la misma cifra con un script independiente y los mismos filtros. Tienen que coincidir al céntimo.', en: '/cuadro-mando/dax' },
+      { p: '¿Qué hay que hacer con el párrafo que una herramienta escribe sobre el panel?', r: 'Comprobar cada afirmación antes de enviarlo y marcarlo como texto generado.', en: '/cuadro-mando/narrativa' },
+      { p: '¿Cuáles son los cuatro peldaños de la analítica?', r: 'Qué pasó, por qué, qué pasará y qué hacer. Cada uno se apoya en el anterior.', en: '/cuadro-mando/escalera' },
+      { p: '¿Qué paso evita que una IA invente al recomendar?', r: 'El contexto: qué significa cada columna, qué está mal y qué falta.', en: '/cuadro-mando/recomendacion' },
+    ],
+  },
+];
+const total = bloques.reduce((a, b) => a + b.q.length, 0);
+---
+<Layout current="/repaso" title="Repaso · TechSoluciones Analytics">
+  <p class="eyebrow">Parte VIII · Consulta y repaso</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">22 · {total} preguntas de repaso</h1>
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    Una tanda por bloque. La idea es contestar cada pregunta antes de abrir la respuesta. Cada una enlaza
+    la página donde el concepto se desarrolla con los datos.
+  </p>
+
+  {bloques.map((b) => (
+    <section class="mt-10">
+      <h2 class="font-display text-[1.25rem] font-bold">{b.id} · {b.t} <span class="text-[.85rem] font-normal text-suave">({b.q.length})</span></h2>
+      <ol class="mt-4 space-y-2">
+        {b.q.map((x) => (
+          <li>
+            <details class="tarjeta p-4">
+              <summary class="cursor-pointer font-semibold text-tinta">{x.p}</summary>
+              <p class="mt-2 text-[.9rem] text-tinta-soft">
+                {x.r} <a href={x.en} class="text-acento no-underline hover:underline">Ver la página →</a>
+              </p>
+            </details>
+          </li>
+        ))}
+      </ol>
+    </section>
+  ))}
+
+  <p class="mt-10 text-[.9rem] text-suave">
+    Para buscar un concepto concreto: <a href="/glosario" class="lnk font-semibold">el glosario →</a>
+  </p>
+</Layout>

@@ -1,0 +1,63 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import BarList from '../components/BarList.astro';
+import eda from '../data/eda.json';
+import robustez from '../data/robustez.json';
+const p2 = eda.p2_region_crecimiento_satisfaccion;
+const sens = p2.sensibilidad_sin_2026;
+const rob = robustez.p2_region_satisfaccion;
+const rob26 = robustez.p2_region_satisfaccion_sin_2026;
+const a0 = eda.kpis.periodo[0].slice(0, 4);
+const a1 = eda.kpis.periodo[1].slice(0, 4);
+const top5 = Object.entries(p2.ranking_top5).map(([label, v]) => ({ label, value: v.slope }));
+const f2 = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+const f3 = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(v);
+---
+<Layout current="/pregunta-region" title="¿Qué región crece en satisfacción? · TechSoluciones Analytics">
+  <p class="eyebrow">Parte IV · Las preguntas de negocio</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">12 · ¿Qué región crece más en satisfacción?</h1>
+
+  <Callout tipo="info" titulo="Respuesta aparente">
+    El «crecimiento» de cada provincia se mide como la inclinación de la recta que une su satisfacción
+    media año tras año, sobre las ventas válidas: cuanto más inclinada, más sube. Con ese criterio, la que más
+    crece es <strong>{p2.region_top}</strong>: pasa de {f2(p2.detalle_top.primer_anio)} a
+    {f2(p2.detalle_top.ultimo_anio)} (+{f2(p2.detalle_top.delta)} puntos).
+  </Callout>
+
+  <div class="tarjeta mt-5 p-4">
+    <h3 class="text-[.9rem] font-semibold text-tinta">Cuánto sube la satisfacción al año, por provincia (top 5)</h3>
+    <div class="mt-3"><BarList items={top5} decimals={3} /></div>
+  </div>
+
+  <p class="mt-5 max-w-2xl text-tinta-soft">
+    Un informe hecho con prisa titularía «{p2.region_top}, nuestra región estrella». Pero con
+    {' '}{Object.keys(eda.por_region).length} provincias, <em>alguna</em> tenía que salir la primera. La pregunta
+    correcta es si esa pendiente supera lo que produciría el azar.
+  </p>
+
+  <Callout tipo="warn" titulo={`La pendiente de ${p2.region_top} no supera al azar`}>
+    Se baraja la satisfacción entre las ventas {new Intl.NumberFormat('es-ES', { useGrouping: true }).format(robustez.n_permutaciones)} veces y se mide cada vez la pendiente más alta de
+    cualquier provincia. El azar iguala o supera la observada con <strong>p = {f2(rob.p_valor_permutacion)}</strong>:
+    {Math.round(rob.p_valor_permutacion * 100)} de cada 100 barajados producen algo igual de llamativo.
+    El resultado <strong>no se distingue del azar</strong>.
+  </Callout>
+
+  <Callout tipo="idea" titulo={`La misma prueba sin ${a1}`}>
+    {a1} solo tiene unos meses de datos. Un año con pocas ventas mueve mucho una recta. Repitiendo el
+    cálculo con {a0}-{Number(a1) - 1}, la primera pasa a ser <strong>{sens.region_top}</strong> en lugar de {p2.region_top} (pendiente
+    {f2(sens.detalle_top.slope)}) y el test vuelve a darla por ruido: p = {f2(rob26.p_valor_permutacion)}. Que el
+    «ganador» cambie al quitar unos meses indica que ninguna provincia destaca de forma estable.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    La misma prueba explicada paso a paso, con los meses:
+    <a href="/senal-ruido/doce-meses" class="lnk">el ganador de doce meses</a>. Y lo que pasa cuando cada
+    provincia se contrasta por separado: <a href="/senal-ruido/comparaciones-multiples" class="lnk">comparaciones
+    múltiples</a>.
+  </p>
+
+  <p class="mt-3 text-[.9rem] text-suave">
+    Siguiente: <a href="/pregunta-correlacion" class="lnk font-semibold">¿ventas y satisfacción se relacionan? →</a>
+  </p>
+</Layout>

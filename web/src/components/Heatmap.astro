@@ -1,0 +1,43 @@
+---
+// Mapa de calor en tabla (CSS, accesible). data = { fila: { columna: valor } }
+// escalaSin: columnas que no entran en la escala de color (p. ej. un anio incompleto).
+const { data = {}, caption = '', filaTitulo = '', escalaSin = [], unit = '' } = Astro.props;
+const filas = Object.keys(data);
+const columnas = filas.length ? Object.keys(data[filas[0]]) : [];
+const enEscala = columnas.filter((c) => !escalaSin.includes(c));
+const valores = filas.flatMap((f) => enEscala.map((c) => data[f][c]));
+const min = Math.min(...valores);
+const max = Math.max(...valores);
+const fmt = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: 0 }).format(v);
+const fondo = (c, v) => {
+  if (escalaSin.includes(c)) return 'background:var(--color-crema-deep)';
+  const t = max > min ? (v - min) / (max - min) : 0;
+  return `background:color-mix(in srgb, var(--color-acento) ${Math.round(8 + 62 * t)}%, white)`;
+};
+---
+<div class="max-h-[34rem] overflow-auto rounded-lg border border-linea">
+  <table class="w-full border-collapse text-[.74rem]">
+    <caption class="sr-only">{caption}</caption>
+    <thead class="sticky top-0 bg-white">
+      <tr class="border-b border-linea text-left text-suave">
+        <th scope="col" class="px-2 py-1.5 font-semibold">{filaTitulo}</th>
+        {columnas.map((c) => <th scope="col" class="px-2 py-1.5 text-right font-semibold">{c}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {filas.map((f) => (
+        <tr class="border-b border-linea/40">
+          <th scope="row" class="whitespace-nowrap px-2 py-1 text-left font-normal text-tinta-soft">{f}</th>
+          {columnas.map((c) => (
+            <td class="px-2 py-1 text-right tabular-nums text-tinta" style={fondo(c, data[f][c])} title={`${f} · ${c}: ${fmt(data[f][c])}${unit}`}>
+              {fmt(data[f][c] / 1000)}
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+<p class="mt-2 text-[.74rem] text-suave">
+  Cifras en miles{unit}. Color más intenso, más facturación{escalaSin.length ? `; la columna ${escalaSin.join(', ')} va en gris y fuera de la escala porque el año está incompleto` : ''}.
+</p>

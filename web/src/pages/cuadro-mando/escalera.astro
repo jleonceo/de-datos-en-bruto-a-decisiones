@@ -1,0 +1,112 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import eda from '../../data/eda.json';
+import inf from '../../data/inferencia.json';
+import ml from '../../data/ml.json';
+
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/cuadro-mando', t: '17 · Cuadro de mando' };
+const k = eda.kpis;
+const s = inf.f9_simpson;
+const rf = ml.prediccion_satisfaccion.resultados.random_forest;
+
+const peldanos = [
+  {
+    n: 1, t: 'Descriptiva', q: '¿Qué pasó?',
+    r: `Se facturaron ${f(k.facturacion_valida)} € válidos en ${f(k.n_validas)} ventas, con un ticket medio de ${f(k.ticket_medio, 2)} €.`,
+    en: '/descriptiva', p: 'páginas 7 a 10',
+  },
+  {
+    n: 2, t: 'Diagnóstica', q: '¿Por qué pasó?',
+    r: `${s.region_agregado_alto} factura más por venta que ${s.region_agregado_bajo} porque vende más ${s.producto_caro}: el ${f(s.peso_producto_caro_alto_pct, 1)} % de sus ventas frente al ${f(s.peso_producto_caro_bajo_pct, 1)} %. Producto a producto, las dos quedan muy cerca.`,
+    en: '/senal-ruido/simpson', p: 'la paradoja de Simpson',
+  },
+  {
+    n: 3, t: 'Predictiva', q: '¿Qué pasará?',
+    r: `La satisfacción de la próxima venta no se puede anticipar: el mejor modelo saca un R² de prueba de ${f(rf.r2_test, 3)}, lo mismo que predecir la media.`,
+    en: '/prediccion', p: 'página 16',
+  },
+  {
+    n: 4, t: 'Prescriptiva', q: '¿Qué hacer?',
+    r: `Revisar las ${f(eda.anomalias.n)} ventas imposibles, validar los datos en la captura y crear un código de cliente. Ninguna de las tres sale de una predicción.`,
+    en: '/recomendaciones', p: 'página 18',
+  },
+];
+---
+<Layout current="/cuadro-mando/escalera" title="La escalera de la analítica · TechSoluciones Analytics">
+  <Concepto
+    ficha="J3"
+    madre={madre}
+    titulo="Las cuatro preguntas del análisis van en orden y cada una se apoya en la anterior"
+    pregunta="¿Hasta dónde puede llegar un análisis con estos datos?"
+  >
+    <Fragment slot="problema">
+      <p>
+        Se espera que la analítica no se quede en contar lo que pasó y que diga qué hacer. Las herramientas
+        con IA prometen justo eso: subir el fichero y recibir recomendaciones.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        El error es saltar de la primera pregunta a la última. Del «agosto vende más» se pasa al «hagamos la campaña en
+        agosto» sin haber preguntado por qué vende más ni si lo seguirá haciendo. La recomendación parece
+        sólida, pero no tiene base.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="La escalera de cuatro peldaños">
+        Descriptiva, qué pasó. Diagnóstica, por qué. Predictiva, qué pasará. Prescriptiva, qué hacer. Una
+        recomendación vale lo que valgan los peldaños que tiene debajo y, si uno falla, la recomendación
+        tiene que decirlo.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Contestar las cuatro en orden, cada una con su prueba, y dejar escrito en qué peldaño se paró el
+        análisis. Detenerse en el tercero es aceptable si se explica.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <ol class="mt-2 space-y-3">
+        {peldanos.map((x) => (
+          <li class="tarjeta p-4">
+            <div class="flex items-baseline gap-3">
+              <span class="credo-n">{x.n}</span>
+              <div>
+                <div class="font-display text-[1.02rem] font-bold text-tinta">{x.t} · <span class="font-normal text-tinta-soft">{x.q}</span></div>
+                <p class="mt-1 text-[.9rem]">{x.r}</p>
+                <p class="mt-1 text-[.8rem] text-suave">En esta web: <a href={x.en} class="text-acento no-underline hover:underline">{x.p}</a></p>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <Callout tipo="warn" titulo="El peldaño que falla">
+        El tercer peldaño no encuentra nada que predecir. Eso cambia el cuarto. Como no se puede predecir, las
+        recomendaciones de esta web no dicen «vende más en tal mes» ni «cuida tal provincia». Dicen que primero
+        hay que corregir los datos, que es la única recomendación que los datos permiten sostener.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Para leer cualquier recomendación, propia o de una IA: se pregunta en qué peldaño se apoya cada frase.
+        Una recomendación sin diagnóstico ni predicción debajo es una opinión presentada como informe.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Cada peldaño toma
+        sus cifras de su página: <code>eda.json</code>, <code>inferencia.json</code> (<code>f9_simpson</code>)
+        y <code>ml.json</code> (<code>prediccion_satisfaccion</code>).
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

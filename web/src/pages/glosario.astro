@@ -1,0 +1,69 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { bloques } from '../data/glosario.js';
+
+const total = bloques.reduce((a, b) => a + b.items.length, 0);
+---
+<Layout current="/glosario" title="Glosario · TechSoluciones Analytics">
+  <p class="eyebrow">Parte VIII · Consulta y repaso</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">21 · Glosario</h1>
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    Los {total} conceptos que trabaja esta web, en sus cinco bloques. Cada uno lleva una explicación corta y
+    el enlace a la página donde se aplica sobre los datos de TechSoluciones.
+  </p>
+
+  <label class="mt-6 block max-w-md">
+    <span class="text-[.8rem] font-semibold text-suave">Buscar un concepto</span>
+    <input id="buscar" type="search" autocomplete="off" placeholder="p. ej. mediana, silueta, KPI"
+      class="mt-1 w-full rounded-lg border border-linea bg-crema px-3 py-2 text-[.9rem] text-tinta outline-none focus:border-acento" />
+  </label>
+  <p id="sin-resultados" class="mt-3 hidden text-[.88rem] text-suave">Ningún concepto contiene esa palabra.</p>
+
+  <nav class="mt-6 flex flex-wrap gap-2 text-[.82rem]" aria-label="Bloques">
+    {bloques.map((b) => (
+      <a href={`#bloque-${b.id}`} class="rounded border border-linea px-2 py-1 text-tinta-soft no-underline hover:border-acento">{b.id} · {b.t}</a>
+    ))}
+  </nav>
+
+  {bloques.map((b) => (
+    <section id={`bloque-${b.id}`} class="bloque-glosario mt-10">
+      <h2 class="font-display text-[1.25rem] font-bold">{b.id} · {b.t}</h2>
+      <dl class="mt-4 space-y-3">
+        {b.items.map((x) => (
+          <div class="entrada tarjeta p-4" data-texto={`${x.f} ${x.t} ${x.d}`.toLowerCase()}>
+            <dt class="flex items-baseline gap-2">
+              <span class="rounded bg-crema px-1.5 py-[2px] font-mono text-[.68rem] text-suave">{x.f}</span>
+              <span class="font-semibold text-tinta">{x.t}</span>
+            </dt>
+            <dd class="mt-1.5 text-[.9rem] text-tinta-soft">
+              {x.d} <a href={x.en} class="text-acento no-underline hover:underline">Ver →</a>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  ))}
+
+  <p class="mt-10 text-[.9rem] text-suave">
+    Siguiente: <a href="/repaso" class="lnk font-semibold">las preguntas de repaso →</a>
+  </p>
+
+  <script>
+    const campo = document.getElementById('buscar');
+    const vacio = document.getElementById('sin-resultados');
+    const quitarTildes = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+    campo?.addEventListener('input', () => {
+      const q = quitarTildes(campo.value.trim().toLowerCase());
+      let vistos = 0;
+      document.querySelectorAll('.entrada').forEach((e) => {
+        const ok = !q || quitarTildes(e.dataset.texto || '').includes(q);
+        e.classList.toggle('hidden', !ok);
+        if (ok) vistos++;
+      });
+      document.querySelectorAll('.bloque-glosario').forEach((s) => {
+        s.classList.toggle('hidden', !s.querySelector('.entrada:not(.hidden)'));
+      });
+      vacio?.classList.toggle('hidden', vistos > 0);
+    });
+  </script>
+</Layout>

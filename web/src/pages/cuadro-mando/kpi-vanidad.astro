@@ -1,0 +1,119 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import ak from '../../data/atipicos_kpi.json';
+import ml from '../../data/ml.json';
+
+const j = ak.j1_kpi_vs_vanidad;
+const s = ml.segmentacion_clientes;
+const f = (v, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(v);
+const madre = { slug: '/cuadro-mando', t: '17 · Cuadro de mando' };
+
+const code = `acumulado = datos["importe"].sum()            # solo puede subir
+ticket    = datos["importe"].mean()           # puede subir y bajar
+# recurrencia = (compras_por_cliente >= 2).mean()  -> necesita una clave de cliente`;
+---
+<Layout current="/cuadro-mando/kpi-vanidad" title="KPI frente a métrica de vanidad · TechSoluciones Analytics">
+  <Concepto
+    ficha="J1"
+    madre={madre}
+    titulo="Una cifra que solo puede subir no sirve para avisar de un problema"
+    pregunta="¿Cuáles de los números del panel sirven para decidir?"
+  >
+    <Fragment slot="problema">
+      <p>
+        El panel de esta empresa puede enseñar una facturación acumulada de
+        {' '}<strong>{f(j.vanidad_facturacion_acumulada, 0)} €</strong>. Es una cifra grande, es correcta y
+        se ve bien en la primera tarjeta.
+      </p>
+      <p>
+        También puede enseñar que se venden {f(j.vanidad_numero_de_ventas.media, 0)} operaciones al mes de
+        media. También es correcta.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        El acumulado <strong>solo puede subir</strong>. Tanto si el negocio crece como si cae, mañana será mayor que hoy,
+        porque las ventas de ayer no se borran. Un número que nunca baja no puede avisar de nada.
+      </p>
+      <p>
+        El número de operaciones tiene otro problema: puede bajar sin que el negocio vaya peor, porque la
+        empresa puede estar vendiendo menos veces pero con importes más altos. Sin el importe al lado, su
+        caída no dice nada.
+      </p>
+      <Callout tipo="warn" titulo="Una comprobación rápida">
+        Si un número no puede empeorar, es un indicador de vanidad. Si puede empeorar pero nadie sabe qué haría al verlo
+        empeorar, tampoco sirve.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Un KPI es una cifra que puede empeorar y que alguien sabe qué hacer si empeora">
+        Las dos condiciones cuentan. Sin la primera no hay señal. Sin la segunda hay señal, pero nadie actúa.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Repasar el panel tarjeta a tarjeta con esas dos preguntas. Lo que no las supere sale de la primera fila,
+        aunque no se borra: un acumulado sirve para la memoria anual y para el informe al banco.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="mt-2 grid gap-3 sm:grid-cols-2">
+        <div class="tarjeta border-dashed p-4">
+          <div class="text-[.72rem] font-semibold uppercase tracking-wide text-suave">Vanidad</div>
+          <div class="mt-2 font-display text-[1.25rem] font-bold text-tinta">{f(j.vanidad_facturacion_acumulada, 0)} €</div>
+          <div class="text-[.78rem] text-suave">facturación acumulada, todo el histórico</div>
+          <div class="mt-3 font-display text-[1.25rem] font-bold text-tinta">{f(j.vanidad_numero_de_ventas.media, 0)}</div>
+          <div class="text-[.78rem] text-suave">operaciones al mes de media</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.72rem] font-semibold uppercase tracking-wide text-acento-deep">Accionable</div>
+          <div class="mt-2 font-display text-[1.25rem] font-bold text-acento-deep">{f(j.kpi_ticket_medio, 2)} €</div>
+          <div class="text-[.78rem] text-suave">ticket medio, con su banda calculada</div>
+          <div class="mt-3 font-display text-[1.25rem] font-bold text-suave">sin dato</div>
+          <div class="text-[.78rem] text-suave">clientes que repiten: la tabla no identifica al cliente</div>
+        </div>
+      </div>
+      <p class="mt-4">
+        El ticket medio puede bajar y, cuando baja de verdad, la respuesta está clara: mirar qué producto ha
+        perdido peso. Tiene además
+        {' '}<a href="/senal-ruido/intervalo-confianza" class="text-acento no-underline hover:underline">su
+        margen calculado</a> para el histórico. Para juzgar un mes suelto falta calcular el suyo, que es más ancho.
+      </p>
+      <p>
+        La recurrencia sería el más útil de los cuatro, porque una acción comercial la mueve directamente.
+        Aquí no se puede calcular. Hay {f(s.emails_con_varios_nombres)} correos que usan personas con nombre distinto y, contando por nombre y teléfono, cada persona aparece en una sola venta. Que el KPI que más
+        importa no se pueda medir es en sí un resultado del análisis. La solución es empezar a registrar un código de cliente.
+      </p>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Para revisar la primera fila de un panel. Lo que más impresiona
+        no tiene por qué ser lo que ayuda a decidir.
+      </p>
+      <p>
+        Y para escribir el objetivo del año. Un objetivo sobre una cifra de vanidad se cumple solo con dejar
+        pasar el tiempo.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Sobre las ventas válidas del histórico. El crecimiento de operaciones compara el último mes completo
+        con el primero. Por qué no hay recurrencia lo explica la
+        {' '}<a href="/segmentacion/rfm" class="text-acento no-underline hover:underline">página del RFM</a>.
+      </p>
+      <Code titulo="Ver los cálculos" code={code} lang="python" />
+      <p class="mt-3">
+        Fuentes: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/atipicos_kpi.json" class="text-acento no-underline hover:underline"><code>atipicos_kpi.json</code></a>, campo <code>j1_kpi_vs_vanidad</code> y <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/ml.json" class="text-acento no-underline hover:underline"><code>ml.json</code></a>, campo <code>segmentacion_clientes</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

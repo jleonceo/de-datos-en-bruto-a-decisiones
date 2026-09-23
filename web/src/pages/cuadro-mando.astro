@@ -1,0 +1,141 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import Kpi from '../components/Kpi.astro';
+import LineChart from '../components/LineChart.astro';
+import BarList from '../components/BarList.astro';
+import Heatmap from '../components/Heatmap.astro';
+import eda from '../data/eda.json';
+import robustez from '../data/robustez.json';
+const k = eda.kpis;
+const p1 = eda.p1_mes_mayores_ventas;
+const p2 = eda.p2_region_crecimiento_satisfaccion;
+const pe = eda.p3_correlacion_ventas_satisfaccion.importe_vs_satisfaccion_pearson;
+const MES = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const nf = (v, d = 0) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: d }).format(v);
+const fd = (v, d) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+const signo = (v) => (v > 0 ? '+' : '') + fd(v, 2);
+const am = Object.entries(eda.ventas_por_anio_mes).sort(([a], [b]) => a.localeCompare(b)).map(([x, y]) => ({ x, y }));
+const prod = Object.entries(eda.por_producto).map(([label, v]) => ({ label, value: v.facturacion }));
+const reg = Object.entries(eda.por_region).slice(0, 8).map(([label, v]) => ({ label, value: v.facturacion }));
+const anios = Object.keys(Object.values(eda.mapa_calor_provincia_anio)[0]);
+const anioParcial = k.periodo[1].slice(0, 4);
+const alertas = eda.anomalias.lista;
+const qa = [
+  { q: '¿Cuál fue el mes con mayores ventas?',
+    a: `${MES[Number(p1.anio_mes_top.slice(5))]} de ${p1.anio_mes_top.slice(0, 4)}, con ${nf(p1.facturacion)} €. Por mes del año, ${MES[p1.mes_calendario_top_media]} tiene la media más alta, pero esa ventaja no supera al azar (p = ${fd(robustez.p1_estacionalidad.p_valor_permutacion, 2)}).` },
+  { q: '¿Qué región crece más en satisfacción?',
+    a: `${p2.region_top} tiene la mayor pendiente, pero el azar la iguala o supera con p = ${fd(robustez.p2_region_satisfaccion.p_valor_permutacion, 2)}. Sin ${anioParcial} la primera es ${p2.sensibilidad_sin_2026.region_top}, que tampoco supera al azar (p = ${fd(robustez.p2_region_satisfaccion_sin_2026.p_valor_permutacion, 2)}).` },
+  { q: '¿Hay correlación entre ventas y satisfacción?',
+    a: `Sin relación práctica: r = ${fd(pe.r, 4)} sobre ${nf(pe.n)} ventas válidas con satisfacción.` },
+];
+import IndiceSub from '../components/IndiceSub.astro';
+---
+<Layout current="/cuadro-mando" title="Cuadro de mando · TechSoluciones Analytics">
+  <p class="eyebrow">Parte VI · Cuadro de mando y negocio</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">17 · Cuadro de mando</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    El encargo pedía un cuadro de mando en Power BI con tendencia por mes, mapa de calor, KPI de
+    crecimiento y de satisfacción y alertas de anomalías. Esta página es su equivalente en la web, con las
+    cifras leídas de los mismos ficheros que produce el análisis. Las «preguntas en lenguaje natural»
+    (la función Q&A de Power BI) se responden abajo.
+  </p>
+
+  <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <Kpi valor={nf(k.facturacion_valida) + ' €'} etiqueta="facturación válida" sub={`registrada: ${nf(k.facturacion_registrada)} €`} />
+    <Kpi valor={signo(k.crecimiento_2019_2025_pct) + ' %'} etiqueta="crecimiento de ventas 2019-2025" sub="años completos, ventas válidas" />
+    <Kpi valor={fd(k.satisfaccion_media, 1) + ' / 10'} etiqueta="satisfacción media" sub={`${nf(k.pct_satisfaccion_disponible, 1)} % de ventas con respuesta`} />
+    <Kpi valor={nf(eda.anomalias.n)} etiqueta="alertas de anomalía" sub={`${nf(eda.anomalias.importe_total)} € en revisión`} />
+  </div>
+
+  <div class="tarjeta mt-5 p-4">
+    <h3 class="text-[.9rem] font-semibold text-tinta">Crecimiento interanual de la facturación válida (%)</h3>
+    <div class="mt-3 flex flex-wrap gap-2 text-[.8rem]">
+      {Object.entries(k.crecimiento_interanual_pct).map(([a, v]) => (
+        <span class={`rounded px-2 py-1 tabular-nums ${v < 0 ? 'bg-amber-50 text-tinta' : 'bg-acento-claro text-tinta'}`}>{a}: {signo(v)} %</span>
+      ))}
+    </div>
+  </div>
+
+  <div class="tarjeta mt-5 p-4">
+    <h3 class="text-[.9rem] font-semibold text-tinta">Tendencia de facturación mensual válida (€)</h3>
+    <div class="mt-3"><LineChart points={am} label="Tendencia de la facturación mensual válida, en euros" /></div>
+    <p class="mt-2 text-[.74rem] text-suave">El último punto, {['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][Number(k.periodo[1].slice(5, 7))]} de {k.periodo[1].slice(0, 4)}, es un mes incompleto.</p>
+  </div>
+
+  <div class="tarjeta mt-5 p-4">
+    <h3 class="text-[.9rem] font-semibold text-tinta">Mapa de calor: facturación válida por provincia y año</h3>
+    <div class="mt-3">
+      <Heatmap data={eda.mapa_calor_provincia_anio} caption="Facturación válida por provincia y año" filaTitulo="Provincia" escalaSin={[anioParcial]} unit=" €" />
+    </div>
+  </div>
+
+  <div class="mt-5 rounded-lg border-l-4 border-l-amber-400 bg-amber-50 p-4">
+    <h3 class="text-[.95rem] font-semibold text-tinta">⚠ Alertas: {alertas.length} ventas fuera de rango</h3>
+    <p class="mt-1 text-[.82rem] text-tinta-soft">
+      Cantidad fuera de 1-5 o precio distinto del de catálogo. Excluidas de los KPI hasta que se validen.
+      <a href="/atipicos" class="lnk">Qué son y por qué se apartan →</a>
+    </p>
+    <div class="mt-3 overflow-x-auto">
+      <table class="w-full border-collapse text-[.78rem]">
+        <caption class="sr-only">Ventas marcadas como anomalía</caption>
+        <thead>
+          <tr class="border-b border-amber-200 text-left text-suave">
+            <th scope="col" class="py-1.5 pr-3 font-semibold">Venta</th>
+            <th scope="col" class="py-1.5 pr-3 font-semibold">Fecha</th>
+            <th scope="col" class="py-1.5 pr-3 font-semibold">Producto</th>
+            <th scope="col" class="py-1.5 pr-3 font-semibold">Uds.</th>
+            <th scope="col" class="py-1.5 pr-3 font-semibold">Precio / catálogo</th>
+            <th scope="col" class="py-1.5 pr-3 font-semibold">Importe</th>
+          </tr>
+        </thead>
+        <tbody>
+          {alertas.map((r) => (
+            <tr class="border-b border-amber-100">
+              <td class="py-1.5 pr-3 font-mono">{r.id_venta}</td>
+              <td class="py-1.5 pr-3 tabular-nums text-suave">{r.fecha}</td>
+              <td class="py-1.5 pr-3 text-tinta-soft">{r.prod}</td>
+              <td class="py-1.5 pr-3 tabular-nums font-semibold">{r.cant}</td>
+              <td class={`py-1.5 pr-3 tabular-nums ${r.precio !== r.precio_catalogo ? 'font-semibold text-tinta' : 'text-suave'}`}>{nf(r.precio)} / {nf(r.precio_catalogo)} €</td>
+              <td class="py-1.5 pr-3 tabular-nums">{nf(r.importe)} €</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-5 grid gap-5 lg:grid-cols-2">
+    <div class="tarjeta p-4">
+      <h3 class="text-[.9rem] font-semibold text-tinta">Facturación válida por producto (€)</h3>
+      <div class="mt-3"><BarList items={prod} unit=" €" /></div>
+    </div>
+    <div class="tarjeta p-4">
+      <h3 class="text-[.9rem] font-semibold text-tinta">Top 8 provincias (€)</h3>
+      <div class="mt-3"><BarList items={reg} unit=" €" /></div>
+    </div>
+  </div>
+
+  <h2 class="mt-8 font-display text-[1.2rem] font-bold">Preguntas en lenguaje natural</h2>
+  <div class="mt-3 space-y-2">
+    {qa.map((x) => (
+      <div class="tarjeta p-4">
+        <p class="text-[.9rem] font-semibold text-tinta">{x.q}</p>
+        <p class="mt-1 text-[.86rem] text-tinta-soft">{x.a}</p>
+      </div>
+    ))}
+  </div>
+
+  <Callout tipo="idea" titulo="Por qué el cuadro de mando está en la web">
+    Un cuadro de mando en la web es reproducible, versionable y público sin licencias. Los cálculos que en
+    Power BI se harían con medidas DAX (sumar el importe, la media de satisfacción, las alertas por umbral)
+    están aquí en scripts que cualquiera puede revisar.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Siguiente: <a href="/recomendaciones" class="lnk font-semibold">las recomendaciones de negocio →</a>
+  </p>
+  <IndiceSub slug="/cuadro-mando" titulo="Cómo se decide qué va en el panel y cómo se representa" entrada="Esta página presenta el panel. Las páginas siguientes explican los criterios que lo ordenan: qué cifra va arriba, cuál no sirve para avisar de un problema, cómo se construye el mapa y cómo se comprueba cada medida." />
+
+</Layout>

@@ -1,0 +1,121 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import ak from '../../data/atipicos_kpi.json';
+
+const l = ak.e11_lof_dbscan;
+const f = (v, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(v);
+const madre = { slug: '/atipicos', t: '8 · Atípicos y anomalías' };
+
+const code = `# LOF: compara la densidad de cada punto con la de sus vecinos
+LocalOutlierFactor(n_neighbors=35, contamination=0.01).fit_predict(X)
+
+# DBSCAN: agrupa lo denso y lo que sobra lo llama ruido
+DBSCAN(eps=0.8, min_samples=10).fit(X)   # el ruido sale con etiqueta -1`;
+---
+<Layout current="/atipicos/lof-dbscan" title="LOF y DBSCAN · TechSoluciones Analytics">
+  <Concepto
+    ficha="E11"
+    madre={madre}
+    titulo={`LOF y DBSCAN encuentran las ${l.anomalias_reales_en_la_muestra} anomalías de la muestra`}
+    pregunta="¿Hay algo mejor que el IsolationForest para encontrar ventas raras?"
+  >
+    <Fragment slot="problema">
+      <p>
+        La <a href="/prediccion" class="text-acento no-underline hover:underline">página 16</a> usa un
+        IsolationForest, que aísla puntos partiendo el espacio al azar. Hay al menos dos familias más y
+        conviene saber en qué se diferencian, porque cada una falla en situaciones distintas.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        El error es tratarlos como intercambiables. Cada uno define de una forma distinta qué es un valor
+        raro. Esa definición decide lo que encuentra.
+      </p>
+      <p>
+        Además, la mayoría trae un parámetro que fija <em>cuántos</em> atípicos va a devolver. Si se deja en su
+        valor por defecto, el número de anomalías lo decide el parámetro y no el dato.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Tres formas de definir un valor raro">
+        <p><strong>IsolationForest:</strong> raro es lo que se aísla con pocos cortes al azar.</p>
+        <p class="mt-1"><strong>LOF:</strong> raro es lo que está en una zona mucho menos poblada que la de sus
+        vecinos. Es densidad <em>local</em>, así que funciona con nubes de densidad desigual.</p>
+        <p class="mt-1"><strong>DBSCAN:</strong> agrupa lo que está denso. Lo que no cabe en ningún grupo
+        queda como ruido. Ese ruido son los atípicos.</p>
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Pasar los tres por los mismos datos y comparar contra la respuesta verdadera, que aquí existe: las
+        anomalías vienen etiquetadas con su motivo en el propio fichero.
+      </p>
+      <p>
+        Se usan tres variables, el importe, la cantidad y la satisfacción, tipificadas, sobre una muestra de
+        {' '}{f(l.n_muestra, 0)} ventas que contiene {l.anomalias_reales_en_la_muestra} anomalías reales.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">LOF, fijado al 1 %</div>
+          <div class="mt-1 font-display text-[1.4rem] font-bold text-tinta">{l.lof_marcadas} marcadas</div>
+          <div class="text-[.78rem] text-suave">
+            acierta {l.lof_aciertos} de {l.anomalias_reales_en_la_muestra}
+          </div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">DBSCAN</div>
+          <div class="mt-1 font-display text-[1.4rem] font-bold text-acento-deep">{l.dbscan_ruido} de ruido</div>
+          <div class="text-[.78rem] text-suave">
+            en {l.dbscan_grupos} grupos, acierta {l.dbscan_aciertos} de {l.anomalias_reales_en_la_muestra}
+          </div>
+        </div>
+      </div>
+      <p class="mt-4">
+        <strong>DBSCAN las encuentra todas</strong> y no señala ninguna de más: su ruido son exactamente las
+        {' '}{l.anomalias_reales_en_la_muestra} anomalías reales. LOF también las encuentra, con
+        {' '}{l.lof_marcadas - l.lof_aciertos} falsos positivos más, porque se le pidió que marcara el
+        1 % de la muestra.
+      </p>
+      <Callout tipo="warn" titulo="El parámetro que decide el resultado">
+        LOF marcó {l.lof_marcadas} porque se le dijo que marcara el 1 %. Con otro porcentaje habría marcado
+        otro número. El número de atípicos que devuelve un detector puede
+        venir más de su configuración que del dato. Hay que mirarla antes de leer el resultado.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Para elegir con criterio. LOF encaja cuando la nube tiene zonas de densidad muy distinta, que es el
+        caso de una cartera con clientes grandes y pequeños. DBSCAN sirve cuando interesa a la vez agrupar y
+        detectar. Además no exige decir cuántos grupos hay.
+      </p>
+      <p>
+        Y como control cruzado. Que tres algoritmos con criterios distintos señalen las mismas ventas es una
+        prueba mucho más sólida que el resultado de uno solo. Para que cuente así, los algoritmos tienen que
+        ser independientes. La página de <a href="/atipicos/falsos-positivos" class="text-acento no-underline hover:underline">falsos
+        positivos</a> muestra dos que parecen distintos y miran lo mismo.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Muestra de {f(l.n_muestra, 0)} ventas con satisfacción, elegidas con semilla 42, tipificadas en
+        importe, cantidad y satisfacción. LOF con 35 vecinos y contaminación del 1 %. DBSCAN con radio 0,8 y
+        diez puntos mínimos. Son los valores elegidos para este ejemplo; su estabilidad no se ha medido.
+      </p>
+      <Code titulo="Ver las dos llamadas" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/atipicos_kpi.json" class="text-acento no-underline hover:underline"><code>atipicos_kpi.json</code></a>, campo <code>e11_lof_dbscan</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

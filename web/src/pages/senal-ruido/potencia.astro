@@ -1,0 +1,133 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import inf from '../../data/inferencia.json';
+
+const p = inf.f8_potencia;
+const f = (v, d = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+const madre = { slug: '/senal-ruido', t: '14 · La lección: señal frente a ruido' };
+
+const code = `# Cuantos datos harian falta para ver un efecto de este tamano
+s = sqrt((var_a + var_b) / 2)             # desviacion combinada
+d = abs(media_a - media_b) / s            # d de Cohen: el efecto en desviaciones
+
+# 1,96 es el umbral del 5 % de error; 0,84 el del 80 % de potencia
+n_por_grupo = ceil(2 * ((1.96 + 0.84) / d) ** 2)`;
+---
+<Layout current="/senal-ruido/potencia" title="Potencia estadística · TechSoluciones Analytics">
+  <Concepto
+    ficha="F8"
+    madre={madre}
+    titulo="Un «no hay diferencia» puede significar que no había datos para verla"
+    pregunta={`¿Cuántas ventas hacen falta para detectar una diferencia como la de ${p.region_a} y ${p.region_b}?`}
+  >
+    <Fragment slot="problema">
+      <p>
+        Casi todos los contrastes de esta web han terminado igual: no se encontró efecto. El mes ganador no superaba al azar. La
+        región que crecía en satisfacción, tampoco. Ventas y satisfacción no se relacionan.
+      </p>
+      <p>
+        Queda una duda razonable. ¿De verdad no hay nada, o es que con estos datos no se podía ver?
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Un contraste que no encuentra efecto no demuestra que no lo haya. Demuestra que <em>este</em> estudio no
+        lo vio. Eso depende de tres cosas: el tamaño del efecto, cuánto varía la magnitud y cuántos datos hay.
+      </p>
+      <p>
+        Con pocos datos, un efecto real e importante puede pasar desapercibido. Con muchos, una diferencia insignificante sale
+        significativa. En los dos casos, el <em>p</em> leído solo lleva a una conclusión equivocada.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Potencia">
+        La potencia es la probabilidad de detectar un efecto si de verdad existe. Un resultado negativo sin
+        potencia declarada dice muy poco.
+      </Callout>
+      <p>
+        La convención es 80 %: se acepta fallar una de cada cinco veces. Y el tamaño del efecto se mide en
+        desviaciones, con la <em>d</em> de Cohen, para poder comparar magnitudes que van en unidades distintas.
+      </p>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Se fija el tamaño del efecto que se quiere poder ver, se convierte en <em>d</em> y se despeja cuántos
+        datos por grupo hacen falta para detectarlo con un 80 % de potencia. Si hay menos, el estudio no podía
+        verlo, y su «no hay diferencia» no dice nada.
+      </p>
+      <p>
+        El ejemplo toma como referencia la diferencia de ticket entre las dos provincias de los extremos,
+        {' '}{p.region_a} y {p.region_b}, las mismas de <a href="/senal-ruido/simpson" class="text-acento no-underline hover:underline">la paradoja de Simpson</a>.
+        Para los resultados negativos de esta web, el mes y la satisfacción, se haría la misma cuenta con el
+        efecto más pequeño que interesara detectar. Esa cuenta no está hecha aquí.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-4">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Efecto</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-tinta">d = {f(p.d_de_cohen, 3)}</div>
+          <div class="text-[.78rem] text-suave">pequeño, en la escala de Cohen</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Hacían falta</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-acento-deep">{f(p.n_por_grupo_necesario, 0)}</div>
+          <div class="text-[.78rem] text-suave">ventas por provincia</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Había</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-tinta">{f(p.n_a, 0)} y {f(p.n_b, 0)}</div>
+          <div class="text-[.78rem] text-suave">{p.alcanza ? 'llega' : 'no llega'}</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Resultado</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-tinta">p = {f(p.p_valor_t, 4)}</div>
+          <div class="text-[.78rem] text-suave">t de Welch</div>
+        </div>
+      </div>
+      <p class="mt-4">
+        Para ver una diferencia de ese tamaño con un 80 % de probabilidad hacen falta
+        {' '}<strong>{f(p.n_por_grupo_necesario, 0)} ventas por provincia</strong>. Estas dos tienen {f(p.n_a, 0)}
+        {' '}y {f(p.n_b, 0)}, así que un efecto así estaba a su alcance.
+      </p>
+      <Callout tipo="warn" titulo="Lo que este ejemplo no dice">
+        No confirma que las dos provincias facturen distinto por venta. Se eligieron por ser el máximo y el
+        mínimo del ticket entre 52, y con tantas parejas posibles el p de {f(p.p_valor_t, 4)} no pasa la
+        corrección que explica la página de las
+        {' '}<a href="/senal-ruido/comparaciones-multiples" class="text-acento no-underline hover:underline">comparaciones múltiples</a>.
+        Además, la potencia calculada con el efecto ya observado solo repite lo que dice el p. Donde sirve es
+        antes de medir.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Para calcular el tamaño de la muestra <strong>antes</strong> de montar el experimento, que es cuando
+        resulta útil. Un test A/B que arranca sin este número puede durar semanas sin llegar a ninguna conclusión.
+      </p>
+      <p>
+        Y para leer con criterio los resultados negativos de otros estudios. Cuando un informe concluye que una medida no
+        tuvo efecto, la pregunta es con cuántos casos lo midió.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        <em>d</em> de Cohen con desviación combinada, fórmula de dos muestras independientes para 80 % de
+        potencia y 5 % de error en un contraste bilateral. El contraste que acompaña es una t de Welch, que no supone
+        varianzas iguales.
+      </p>
+      <Code titulo="Ver el cálculo" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/inferencia.json" class="text-acento no-underline hover:underline"><code>inferencia.json</code></a>, campo <code>f8_potencia</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

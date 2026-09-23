@@ -1,0 +1,50 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import eda from '../data/eda.json';
+// Nota: los enlaces exactos a los repos se completan en la fase de publicación.
+const repos = [
+  ['Perfil en GitHub', 'https://github.com/jleonceo', 'Todos los proyectos, con su historia y su código.'],
+  ['Portfolio', 'https://juanluisleon.vercel.app', 'CV interactivo y casos de análisis, desplegado en Vercel.'],
+];
+---
+<Layout current="/ecosistema" title="Ecosistema y créditos · TechSoluciones Analytics">
+  <p class="eyebrow">Parte VII · Cómo se hizo</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">Ecosistema y créditos</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    Este proyecto forma parte de un conjunto más amplio de trabajos sobre datos y análisis. Comparte con
+    ellos los mismos principios: cálculos deterministas, cifras recalculadas por un verificador independiente
+    y revisión de cada texto.
+  </p>
+
+  <div class="mt-6 space-y-3">
+    {repos.map(([t, url, d]) => (
+      <a href={url} class="tarjeta block p-4 no-underline transition hover:-translate-y-0.5" target="_blank" rel="noopener">
+        <div class="flex items-center gap-2">
+          <h3 class="text-[.95rem] font-semibold text-acento-deep">{t}</h3>
+          <span class="text-suave">→</span>
+        </div>
+        <p class="mt-1 text-[.85rem] text-tinta-soft">{d}</p>
+        <p class="mt-1 text-[.72rem] text-suave">{url}</p>
+      </a>
+    ))}
+  </div>
+
+  <Callout tipo="info" titulo="Sobre los datos">
+    El conjunto de datos es <strong>sintético</strong>: los nombres y contactos son generados y no
+    corresponden a ninguna persona real. Si se comparte, será solo el fichero público, con año y provincia. El caso
+    «TechSoluciones S.L.» es una empresa ficticia que sirve de caso de ejemplo.
+  </Callout>
+
+  <Callout tipo="idea" titulo="Créditos y método">
+    La primera versión, del 01/07/2026, se hizo sin aplicar las reglas
+    de revisión del proyecto y dio por buenas {eda.anomalias.n} ventas erróneas. La corrección del
+    13/09/2026 pasó por un verificador que recalculó las cifras desde el fichero original y por un revisor
+    que intentó refutar cada conclusión.
+  </Callout>
+
+  <p class="mt-8">
+    <a href="/" class="btn-acento">Volver al inicio</a>
+  </p>
+</Layout>

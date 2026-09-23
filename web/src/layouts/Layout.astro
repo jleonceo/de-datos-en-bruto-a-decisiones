@@ -1,0 +1,58 @@
+---
+import '../styles/global.css';
+import Sidebar from '../components/Sidebar.astro';
+import Footer from '../components/Footer.astro';
+import { marca, vecinos } from '../data/site.js';
+
+const { title = marca.titulo, description = marca.descripcion, current = '' } = Astro.props;
+const { prev, next } = vecinos(current);
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content={marca.titulo} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </head>
+  <body class="font-sans leading-relaxed antialiased text-tinta">
+    <a href="#main" class="skip-link">Saltar al contenido</a>
+    <div class="mx-auto max-w-[1180px] px-5 lg:grid lg:grid-cols-[266px_minmax(0,1fr)] lg:gap-12">
+      <Sidebar current={current} />
+      <main id="main" class="min-w-0 py-10 lg:py-14">
+        <slot />
+        <nav class="mt-16 flex items-stretch justify-between gap-4 border-t border-linea pt-6 text-[.9rem]">
+          {prev ? (
+            <a href={prev.slug} class="lnk max-w-[46%]">← {prev.t}</a>
+          ) : (<span></span>)}
+          {next ? (
+            <a href={next.slug} class="lnk ml-auto max-w-[46%] text-right">{next.t} →</a>
+          ) : (<span></span>)}
+        </nav>
+      </main>
+    </div>
+    <Footer />
+
+    <script is:inline>
+      (function () {
+        var els = document.querySelectorAll('.reveal');
+        if (!els.length) return;
+        if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('is-visible'); }); return; }
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('is-visible'); io.unobserve(en.target); } });
+        }, { rootMargin: '0px 0px -6% 0px', threshold: 0.06 });
+        els.forEach(function (e) { io.observe(e); });
+      })();
+    </script>
+  </body>
+</html>

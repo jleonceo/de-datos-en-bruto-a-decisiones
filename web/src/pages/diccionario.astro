@@ -1,0 +1,55 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import dicc from '../data/diccionario.json';
+const pill = (pii) =>
+  pii.startsWith('SI') ? 'bg-amber-100 text-amber-800'
+  : pii.startsWith('Cuasi') ? 'bg-blue-100 text-blue-800'
+  : 'bg-crema-deep text-suave';
+---
+<Layout current="/diccionario" title="Diccionario de datos · TechSoluciones Analytics">
+  <p class="eyebrow">Parte II · Preparación</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">5 · Diccionario de datos</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    En este trabajo <strong>no se usa ninguna variable que no esté documentada</strong>. El diccionario fija qué
+    significa cada campo antes de analizar nada. No podía escribirse antes de la limpieza, porque varios
+    campos (la fecha en formato ISO, el importe, el año) se crean en ella.
+  </p>
+
+  <div class="mt-6 overflow-x-auto">
+    <table class="w-full border-collapse text-[.82rem]">
+      <caption class="sr-only">Diccionario de campos del conjunto de datos</caption>
+      <thead>
+        <tr class="border-b border-linea text-left text-suave">
+          <th scope="col" class="py-2 pr-3 font-semibold">Campo</th>
+          <th scope="col" class="py-2 pr-3 font-semibold">Tipo</th>
+          <th scope="col" class="py-2 pr-3 font-semibold">Descripción</th>
+          <th scope="col" class="py-2 pr-3 font-semibold">PII</th>
+          <th scope="col" class="py-2 pr-3 font-semibold">Nulos</th>
+        </tr>
+      </thead>
+      <tbody>
+        {dicc.campos.map((c) => (
+          <tr class="border-b border-linea/60 align-top">
+            <td class="py-2 pr-3 font-mono text-[.78rem] font-semibold text-tinta">{c.campo}</td>
+            <td class="py-2 pr-3 text-suave">{c.tipo}</td>
+            <td class="py-2 pr-3 text-tinta-soft">{c.descripcion}</td>
+            <td class="py-2 pr-3"><span class={`rounded px-1.5 py-0.5 text-[.68rem] font-semibold ${pill(c.pii)}`}>{c.pii.split(/[ ,]/)[0]}</span></td>
+            <td class="py-2 pr-3 tabular-nums text-suave">{c.n_nulos.toLocaleString('es-ES', { useGrouping: true })}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <Callout tipo="warn" titulo="Tres campos son datos personales (PII)">
+    <code>nombre_completo</code>, <code>email</code> y <code>telefono</code> identifican a una persona.
+    Se tratan en el siguiente paso, la anonimización. La provincia y la fecha son cuasi-identificadores:
+    no identifican a nadie por sí solas, pero combinadas con otros datos pueden hacerlo.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Siguiente: <a href="/anonimizacion" class="lnk font-semibold">proteger los datos personales →</a>
+  </p>
+</Layout>

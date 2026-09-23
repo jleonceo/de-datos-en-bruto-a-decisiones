@@ -1,0 +1,127 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import inf from '../../data/inferencia.json';
+
+const k = inf.f10_margen_kpi;
+const f = (v, d = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+const madre = { slug: '/senal-ruido', t: '14 · La lección: señal frente a ruido' };
+const banda = k.ic95_alto - k.ic95_bajo;
+
+const code = `# La facturacion mensual media, con su margen
+mensual = val.groupby("anio_mes")["importe"].sum()
+mensual = mensual[mensual.index != mensual.index.max()]   # fuera el mes a medias
+
+rng = np.random.default_rng(43)                            # su propio generador
+idx = rng.integers(0, len(mensual), size=(${k.n_bootstrap}, len(mensual)))
+lo, hi = np.percentile(mensual.values[idx].mean(axis=1), [2.5, 97.5])`;
+---
+<Layout current="/senal-ruido/margen-kpi" title="El margen de un KPI · TechSoluciones Analytics">
+  <Concepto
+    ficha="F10"
+    madre={madre}
+    titulo={`La facturación media mensual se conoce con un margen de ${f(banda / 2, 0)} € arriba o abajo`}
+    pregunta="¿Con qué precisión se conoce la facturación mensual típica?"
+  >
+    <Fragment slot="problema">
+      <p>
+        La empresa factura <strong>{f(k.media, 0)} €</strong> al mes de media, contando los {k.n_meses} meses
+        completos del histórico. Es la cifra con la que se prepara un presupuesto o se compara un periodo
+        con otro.
+      </p>
+      <p>
+        Pero una media de {k.n_meses} meses también es una estimación: con otros {k.n_meses} meses parecidos
+        habría salido algo distinta. ¿Cuánto se puede fiar uno de ella?
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Si la cifra se publica sin margen, se lee como exacta. El presupuesto se ajusta al euro sobre un
+        número que podría estar varios miles de euros por encima o por debajo, y dos medias que se diferencian
+        en menos que ese margen se comparan como si fueran distintas.
+      </p>
+      <p>
+        El error contrario también es habitual: usar este margen para juzgar un mes suelto. La banda es la de
+        la media de {k.n_meses} meses. Un mes concreto se mueve mucho más, así que una caída pequeña puede ser
+        normal o no según la variación de los propios meses, que es otra cuenta.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Un KPI se publica con su banda">
+        El margen dice con qué precisión se conoce el indicador. Para decidir si un mes concreto se sale de lo
+        normal hace falta la banda de ese mes, que es otra y bastante más ancha.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Se aplica el mismo procedimiento que en el <a href="/senal-ruido/intervalo-confianza" class="text-acento no-underline hover:underline">intervalo
+        del ticket medio</a>, aplicado a los totales mensuales. Se remuestrean los {k.n_meses} meses
+        {' '}{f(k.n_bootstrap, 0)} veces y se mira el 95 % central de las medias.
+      </p>
+      <p>
+        El mes en curso se deja fuera. Un mes a medias baja la media solo por estar incompleto,
+        aunque las ventas diarias sean las mismas.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Media mensual</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-tinta">{f(k.media, 0)} €</div>
+          <div class="text-[.78rem] text-suave">{k.n_meses} meses completos</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Banda del 95 %</div>
+          <div class="mt-1 font-display text-[1.05rem] font-bold text-acento-deep">{f(k.ic95_bajo, 0)} a {f(k.ic95_alto, 0)} €</div>
+          <div class="text-[.78rem] text-suave">{f(banda, 0)} € de recorrido</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Margen relativo</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-tinta">± {f(k.margen_pct, 2)} %</div>
+          <div class="text-[.78rem] text-suave">sobre la media</div>
+        </div>
+      </div>
+      <p class="mt-4">
+        La banda va de {f(k.ic95_bajo, 0)} a {f(k.ic95_alto, 0)} €: <strong>{f(banda, 0)} € de recorrido</strong>,
+        unos {f(banda / 2, 0)} € arriba o abajo de la media. Es el margen con el que se conoce la facturación
+        mensual típica, calculado al 95 %.
+      </p>
+      <Callout tipo="ok" titulo="Lo que sale de aquí y lo que no">
+        Sale una cifra de planificación con su precisión: {f(k.media, 0)} € al mes, ± {f(k.margen_pct, 2)} %.
+        No sale un umbral de alerta. Un mes nuevo mueve muy poco una media de {k.n_meses} meses aunque se
+        hunda, así que la comparación útil es la del mes con su propia banda, y esta página no la calcula.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Sirve para presupuestar y para comparar periodos largos: dos medias de varios años se comparan con sus
+        bandas, no con sus valores sueltos. Las alertas del
+        {' '}<a href="/cuadro-mando" class="text-acento no-underline hover:underline">cuadro de mando</a> necesitan
+        además el margen de cada mes, que es mayor.
+      </p>
+      <p>
+        Vale para la facturación, para el número de pedidos, para el plazo medio de cobro y para cualquier
+        indicador que se resuma en una media. Sin banda, una media se lee como un dato exacto.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Bootstrap por percentil sobre los {k.n_meses} totales mensuales completos, {f(k.n_bootstrap, 0)}{' '}
+        remuestreos con generador propio derivado de la semilla 42. El margen relativo es la semianchura de la
+        banda dividida por la media.
+      </p>
+      <Code titulo="Ver el cálculo" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/inferencia.json" class="text-acento no-underline hover:underline"><code>inferencia.json</code></a>, campo <code>f10_margen_kpi</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

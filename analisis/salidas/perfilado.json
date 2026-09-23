@@ -1,0 +1,351 @@
+{
+  "n_filas": 20827,
+  "columnas": [
+    "id_venta",
+    "fecha_str",
+    "nombre_completo",
+    "email",
+    "telefono",
+    "reg",
+    "cat",
+    "prod",
+    "cant",
+    "precio",
+    "satisfaccion"
+  ],
+  "encoding": {
+    "utf8_valido": true,
+    "bytes": 2658632,
+    "mojibake_latin1_hits": 39356
+  },
+  "campos": {
+    "id_venta": {
+      "n_vacios": 0,
+      "pct_vacios": 0.0,
+      "n_distintos": 20000,
+      "top5": [
+        [
+          "V0015",
+          2
+        ],
+        [
+          "V0024",
+          2
+        ],
+        [
+          "V0119",
+          2
+        ],
+        [
+          "V0168",
+          2
+        ],
+        [
+          "V0191",
+          2
+        ]
+      ]
+    },
+    "fecha_str": {
+      "n_vacios": 0,
+      "pct_vacios": 0.0,
+      "n_distintos": 9077,
+      "top5": [
+        [
+          "14-08-2022",
+          10
+        ],
+        [
+          "08/23/25",
+          10
+        ],
+        [
+          "2019/12/15",
+          10
+        ],
+        [
+          "11/30/20",
+          9
+        ],
+        [
+          "21-06-2022",
+          9
+        ]
+      ]
+    },
+    "nombre_completo": {
+      "n_vacios": 0,
+      "pct_vacios": 0.0,
+      "n_distintos": 19903
+    },
+    "email": {
+      "n_vacios": 0,
+      "pct_vacios": 0.0,
+      "n_distintos": 13182
+    },
+    "telefono": {
+      "n_vacios": 0,
+      "pct_vacios": 0.0,
+      "n_distintos": 19999
+    },
+    "reg": {
+      "n_vacios": 0,
+      "pct_vacios": 0.0,
+      "n_distintos": 55,
+      "top5": [
+        [
+          "Toledo",
+          419
+        ],
+        [
+          "Santa Cruz de Tenerife",
+          418
+        ],
+        [
+          "Salamanca",
+          417
+        ],
+        [
+          "Sevilla",
+          416
+        ],
+        [
+          "Badajoz",
+          414
+        ]
+      ]
+    },
+    "cat": {
+      "n_vacios": 0,
+      "pct_vacios": 0.0,
+      "n_distintos": 2,
+      "top5": [
+        [
+          "Software",
+          10428
+        ],
+        [
+          "Hardware",
+          10399
+        ]
+      ]
+    },
+    "prod": {
+      "n_vacios": 0,
+      "pct_vacios": 0.0,
+      "n_distintos": 10,
+      "top5": [
+        [
+          "Portatil Core i7",
+          2159
+        ],
+        [
+          "Antivirus Corporativo",
+          2141
+        ],
+        [
+          "Modulo Nominas",
+          2115
+        ],
+        [
+          "Suscripcion CRM Pro",
+          2110
+        ],
+        [
+          "Switch Gestionable 24p",
+          2085
+        ]
+      ]
+    },
+    "cant": {
+      "n_vacios": 0,
+      "pct_vacios": 0.0,
+      "n_distintos": 10,
+      "top5": [
+        [
+          "3",
+          4280
+        ],
+        [
+          "4",
+          4208
+        ],
+        [
+          "2",
+          4170
+        ],
+        [
+          "1",
+          4151
+        ],
+        [
+          "5",
+          4002
+        ]
+      ],
+      "numerico": {
+        "n_numericos": 20827,
+        "min": 1.0,
+        "max": 45.0,
+        "media": 3.018
+      },
+      "no_numericos_muestra": []
+    },
+    "precio": {
+      "n_vacios": 0,
+      "pct_vacios": 0.0,
+      "n_distintos": 15,
+      "top5": [
+        [
+          "950.0",
+          4237
+        ],
+        [
+          "300.0",
+          4135
+        ],
+        [
+          "45.0",
+          2141
+        ],
+        [
+          "450.0",
+          2109
+        ],
+        [
+          "180.0",
+          2084
+        ]
+      ],
+      "numerico": {
+        "n_numericos": 20827,
+        "min": 45.0,
+        "max": 3500.0,
+        "media": 804.277
+      },
+      "no_numericos_muestra": []
+    },
+    "satisfaccion": {
+      "n_vacios": 4159,
+      "pct_vacios": 19.97,
+      "n_distintos": 10,
+      "top5": [
+        [
+          "10",
+          1725
+        ],
+        [
+          "2",
+          1712
+        ],
+        [
+          "3",
+          1694
+        ],
+        [
+          "5",
+          1684
+        ],
+        [
+          "7",
+          1662
+        ]
+      ],
+      "numerico": {
+        "n_numericos": 16668,
+        "min": 1.0,
+        "max": 10.0,
+        "media": 5.499
+      },
+      "no_numericos_muestra": []
+    }
+  },
+  "diagnostico_suciedad": {
+    "formatos_fecha": [
+      [
+        "dd-mm-aaaa (guion)",
+        5316
+      ],
+      [
+        "ISO aaaa-mm-dd",
+        5304
+      ],
+      [
+        "xx/xx/aa (barra, 2 dig anio)",
+        5106
+      ],
+      [
+        "aaaa/mm/dd",
+        5101
+      ]
+    ],
+    "satisfaccion_dist": [
+      [
+        "",
+        4159
+      ],
+      [
+        "10",
+        1725
+      ],
+      [
+        "2",
+        1712
+      ],
+      [
+        "3",
+        1694
+      ],
+      [
+        "5",
+        1684
+      ],
+      [
+        "7",
+        1662
+      ],
+      [
+        "4",
+        1651
+      ],
+      [
+        "9",
+        1649
+      ],
+      [
+        "6",
+        1640
+      ],
+      [
+        "1",
+        1636
+      ],
+      [
+        "8",
+        1615
+      ]
+    ],
+    "productos_variantes": {
+      "modulo nominas": [
+        "Modulo Nominas",
+        "Módulo Nóminas"
+      ],
+      "portatil core i7": [
+        "Portatil Core i7",
+        "Portátil Core i7"
+      ]
+    },
+    "email_con_espacio": 914,
+    "email_sin_arroba": 0,
+    "telefono_longitudes": [
+      [
+        9,
+        20827
+      ]
+    ],
+    "id_venta_duplicados": 827,
+    "filas_identicas_duplicadas": 827,
+    "cant_no_positiva": 0,
+    "precio_no_positivo": 0
+  }
+}

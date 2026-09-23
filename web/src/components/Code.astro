@@ -1,0 +1,10 @@
+---
+// Bloque de código o prompt, plegable. Se pasa el texto por la prop `code` (se escapa solo).
+const { titulo = 'Ver código', code = '', lang = '' } = Astro.props;
+---
+<details class="group my-4 overflow-hidden rounded-lg border border-linea bg-crema">
+  <summary class="cursor-pointer select-none px-4 py-2 text-[.82rem] font-semibold text-acento-deep">
+    {titulo}
+  </summary>
+  <pre class="overflow-x-auto border-t border-linea px-4 py-3 text-[.76rem] leading-relaxed"><code data-lang={lang}>{code}</code></pre>
+</details>

@@ -1,0 +1,127 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import ak from '../../data/atipicos_kpi.json';
+import ml from '../../data/ml.json';
+
+const z = ak.e2_zscore;
+const escapada = ml.anomalias.anomalias_regla_no_cazadas[0];
+const f = (v, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(v);
+const madre = { slug: '/atipicos', t: '8 · Atípicos y anomalías' };
+
+const code = `# z-score: cuantas desviaciones se separa cada venta de la media
+z = (x - x.mean()) / x.std()      # media y desviacion las calcula el PROPIO dato
+
+# Tukey por IQR: cuartiles, que no se mueven con los extremos
+q1, q3 = percentile(x, [25, 75])
+limite = q3 + 1.5 * (q3 - q1)`;
+---
+<Layout current="/atipicos/z-score" title="Atípico por z-score · TechSoluciones Analytics">
+  <Concepto
+    ficha="E2"
+    madre={madre}
+    titulo="Los atípicos aumentan la desviación con la que el z-score intenta detectarlos"
+    pregunta="¿Por qué esta web marca los atípicos con cuartiles en lugar de con el z-score?"
+  >
+    <Fragment slot="problema">
+      <p>
+        La <a href="/atipicos" class="text-acento no-underline hover:underline">página 8</a> marca las ventas
+        raras con el límite de Tukey, que sale de los cuartiles. El método más conocido es otro:
+        el z-score, que cuenta cuántas desviaciones se aleja cada valor de la media.
+      </p>
+      <p>
+        Con estas ventas, la media es {f(z.media, 2)} € y la desviación {f(z.desviacion, 2)} €. Con esas dos
+        cifras parece fácil decidir qué venta es rara.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        El z-score se calcula con la media y la desviación, y las dos <strong>dependen de los propios
+        atípicos</strong>. Una venta muy grande sube la media y aumenta la desviación, de modo que el umbral para
+        considerarla rara también sube. Cuantos más atípicos hay, más difícil resulta detectarlos.
+      </p>
+      <p>
+        Los cuartiles no tienen ese problema. El primero y el tercero no cambian con lo que ocurre en los
+        extremos, porque solo dependen de dónde caen el 25 % y el 75 % de los datos.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Usar medidas que los valores extremos no alteren">
+        Un estadístico es robusto cuando unos pocos valores extremos no lo alteran. La mediana y los cuartiles
+        lo son. La media y la desviación no.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Usar el límite de Tukey (el tercer cuartil más una vez y media el rango intercuartílico) y dejar el
+        z-score para las variables que se reparten por igual a los dos lados de la media. Comparando los dos sobre las mismas {f(z.n, 0)} ventas se ve la
+        diferencia.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">z-score, umbral 3</div>
+          <div class="mt-1 font-display text-[1.4rem] font-bold text-tinta">{f(z.marcados_por_z['3'], 0)} marcadas</div>
+          <div class="text-[.78rem] text-suave">caza {z.reales_cazadas_por_z3} de las {z.anomalias_reales} reales</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Tukey, límite {f(z.limite_iqr_superior, 0)} €</div>
+          <div class="mt-1 font-display text-[1.4rem] font-bold text-acento-deep">{f(z.marcados_por_iqr, 0)} marcadas</div>
+          <div class="text-[.78rem] text-suave">caza {z.reales_cazadas_por_iqr} de las {z.anomalias_reales} reales</div>
+        </div>
+      </div>
+      <p class="mt-4">
+        Tukey encuentra <strong>las {z.anomalias_reales} anomalías reales</strong> del catálogo. El z-score con
+        umbral 3 no detecta <strong>una</strong>: la venta de {escapada.cant} unidades de {escapada.prod} a su precio de
+        catálogo. Aquí no
+        se le escapa por culpa de las otras anomalías, porque sin ellas tampoco llegaría al umbral. Se le
+        escapa porque su importe, imposible para ese producto, es normal al lado de las ventas de servidores, y
+        un z-score calculado sobre todas las ventas no sabe de qué producto es cada una.
+      </p>
+      <p>
+        Tukey tampoco es gratis: además de las {z.anomalias_reales} marca {f(z.marcados_por_iqr - z.anomalias_reales, 0)}
+        {' '}ventas que no tienen nada raro. Ninguno de los dos sirve sin separar por producto.
+      </p>
+      <Callout tipo="warn" titulo="Otro problema del z-score con estos datos">
+        Los umbrales 2,5 y 3 marcan exactamente las mismas {f(z.marcados_por_z['2.5'], 0)} ventas. El importe
+        solo toma unos pocos valores, porque son ocho productos por cantidades enteras, así que entre un
+        umbral y el siguiente no cae ninguna venta. Ajustar el umbral entre esos dos valores no cambia el resultado.
+      </Callout>
+      <p>
+        La venta mayor está a <strong>{f(z.z_del_mayor, 1)} desviaciones</strong> de la media. Con unas pocas ventas tan alejadas
+        del resto, el criterio de las tres desviaciones pierde su sentido.
+      </p>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Para elegir el detector antes de configurarlo. Si la variable tiene <a href="/descriptiva/forma" class="text-acento no-underline hover:underline">cola larga</a>, es decir, unos pocos valores mucho más grandes que el resto, el z-score se
+        va a quedar corto. El importe de estas ventas la tiene.
+      </p>
+      <p>
+        El mismo razonamiento vale para la media frente a la mediana y para el
+        {' '}<a href="/segmentacion/escalado" class="text-acento no-underline hover:underline">escalador robusto
+        frente al estándar</a>. En los tres casos se prefiere la medida que los valores extremos no alteran.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Sobre las {f(z.n, 0)} ventas del fichero limpio, anomalías incluidas, porque el objetivo es ver si
+        el detector las encuentra. Las {z.anomalias_reales} reales están etiquetadas en el propio dataset con
+        su motivo, así que aquí hay respuesta verdadera con la que comparar.
+      </p>
+      <Code titulo="Ver los dos criterios" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/atipicos_kpi.json" class="text-acento no-underline hover:underline"><code>atipicos_kpi.json</code></a>, campo <code>e2_zscore</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

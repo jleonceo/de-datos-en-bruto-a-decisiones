@@ -1,0 +1,133 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import ak from '../../data/atipicos_kpi.json';
+import eda from '../../data/eda.json';
+import ml from '../../data/ml.json';
+
+const e = ak.e6_tasas;
+const iso = ml.anomalias;
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/atipicos', t: '8 · Atípicos y anomalías' };
+const nombres = {
+  iqr_global_importe: 'Rango intercuartílico sobre el importe',
+  zscore_mayor_3: 'z-score mayor que 3',
+  iqr_por_producto_cantidad: 'Rango intercuartílico de la cantidad, por producto',
+  isolationforest: 'IsolationForest',
+};
+const bosque = e.detectores.find((x) => x.detector === 'isolationforest');
+const precio = eda.descriptivos.precio;
+const titulo = `Un ${f(bosque.tasa_falsos_positivos_pct, 1)} % de falsas alarmas puede ser ${f(100 - bosque.precision_pct, 0)} de cada 100 avisos`;
+
+const code = `tasa_falsos   = falsos / normales        # de lo que estaba bien, cuanto se marco
+precision     = verdaderos / marcadas    # de lo que se marco, cuanto era de verdad
+exhaustividad = verdaderos / reales      # de lo que habia que encontrar, cuanto se encontro`;
+---
+<Layout current="/atipicos/falsos-positivos" title="Cuánto se equivoca un detector · TechSoluciones Analytics">
+  <Concepto
+    ficha="E6"
+    madre={madre}
+    titulo={titulo}
+    pregunta="¿Cómo se sabe si un detector de anomalías sirve?"
+  >
+    <Fragment slot="problema">
+      <p>
+        La página 16 pasa un IsolationForest por las {f(e.normales + e.anomalias_reales)} ventas y marca {f(bosque.marcadas)}. Encuentra
+        {' '}{f(bosque.verdaderos)} de las {f(e.anomalias_reales)} anomalías de la regla y además
+        {' '}{f(bosque.falsos)} ventas que eran normales. Contado así, parece un detector que casi acierta.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Esa frase mezcla tres cifras que responden a preguntas diferentes. Cuando
+        lo que se busca es muy raro, la que más se cita, la tasa de falsos positivos, sale pequeña aunque casi
+        todos los avisos sean falsos.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Tres preguntas, tres cifras">
+        La <strong>tasa de falsos positivos</strong> mide qué parte de lo normal se marca por error. La
+        {' '}<strong>precisión</strong>, qué parte de los avisos es real. La <strong>exhaustividad</strong>,
+        qué parte de lo que había que encontrar se encontró. Un detector se juzga con las tres. A quien
+        recibe los avisos le afecta sobre todo la segunda.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Calcular las tres contra una verdad conocida, que aquí es la regla del catálogo con sus
+        {' '}{f(e.anomalias_reales)} ventas imposibles y comparar los detectores entre sí.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full border-collapse text-[.86rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">Detector</th>
+              <th class="py-2 pr-3 text-right font-semibold">Marca</th>
+              <th class="py-2 pr-3 text-right font-semibold">Falsos positivos</th>
+              <th class="py-2 pr-3 text-right font-semibold">Precisión</th>
+              <th class="py-2 text-right font-semibold">Exhaustividad</th>
+            </tr>
+          </thead>
+          <tbody>
+            {e.detectores.map((x) => (
+              <tr class="border-b border-linea/60">
+                <td class="py-2 pr-3">{nombres[x.detector]}</td>
+                <td class="py-2 pr-3 text-right tabular-nums">{f(x.marcadas)}</td>
+                <td class="py-2 pr-3 text-right tabular-nums">{f(x.tasa_falsos_positivos_pct, 2)} %</td>
+                <td class={`py-2 pr-3 text-right tabular-nums ${x.precision_pct >= 50 ? 'font-semibold text-acento-deep' : ''}`}>{f(x.precision_pct, 1)} %</td>
+                <td class="py-2 text-right tabular-nums">{f(x.exhaustividad_pct, 1)} %</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4">
+        El IsolationForest marca por error el {f(bosque.tasa_falsos_positivos_pct, 2)} % de las ventas
+        normales, una cifra que en una presentación parece buena. Pero de cada cien avisos suyos solo
+        {' '}{f(bosque.precision_pct, 0)} son reales: quien los revise gastará casi todo su tiempo en ventas
+        de servidores que no tenían nada raro.
+      </p>
+      <p>
+        El único detector con las tres cifras buenas es el más simple, el rango intercuartílico de la
+        cantidad calculado dentro de cada producto. Acierta todo porque mide la misma variable con la que se
+        definieron las anomalías, así que su resultado no es una evaluación independiente. El importe mezcla productos de {f(precio.min)} € con otros de {f(precio.max)}.
+      </p>
+      <Callout tipo="warn" titulo="Por qué dos detectores dan lo mismo">
+        El z-score y el IsolationForest coinciden en las cuatro cifras porque los dos acaban marcando las
+        ventas de más importe: en este fichero, todas las normales que marcan son de servidores. Dos métodos
+        que miran lo mismo cuentan como una sola prueba.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Fraude, fallos de máquina, incidencias de facturación. En todos los casos lo que se busca es raro y
+        la tasa de falsos positivos sola hace parecer bueno a cualquier detector. Lo que decide si el equipo
+        seguirá mirando los avisos es la precisión, que es lo que la página de
+        {' '}<a href="/atipicos/alertas" class="text-acento no-underline hover:underline">calibrar una
+        alerta</a> ajusta con el umbral.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Verdad de referencia: las {f(e.anomalias_reales)} ventas con cantidad fuera del catálogo, sobre
+        {' '}{f(e.normales)} ventas normales. Los tres primeros detectores se recalculan en el script; el
+        IsolationForest se lee de <code>ml.json</code>, que lo calcula con una contaminación del 5 %. Marca {f(iso.isolationforest_n)} y no
+        {f(0.05 * ak.e2_zscore.n)}, que sería el 5 % de las {f(ak.e2_zscore.n)}, porque las ventas solo forman unas pocas combinaciones distintas
+        de importe, cantidad y precio: el corte cae en medio de un grupo de ventas idénticas y el algoritmo las
+        deja todas fuera.
+      </p>
+      <Code titulo="Las tres cifras" code={code} lang="python" />
+      <p class="mt-3">Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/atipicos_kpi.json" class="text-acento no-underline hover:underline"><code>atipicos_kpi.json</code></a>, campo <code>e6_tasas</code>.</p>
+    </Fragment>
+  </Concepto>
+</Layout>

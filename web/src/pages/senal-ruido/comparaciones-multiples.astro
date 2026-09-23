@@ -1,0 +1,166 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import inf from '../../data/inferencia.json';
+
+const m = inf.f11_comparaciones_multiples;
+const f = (v, d = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+const madre = { slug: '/senal-ruido', t: '14 · La lección: señal frente a ruido' };
+
+const code = `# Los mismos ${m.n_contrastes} p-valores, leidos con tres umbrales distintos
+p = sorted(p_por_provincia)                    # de menor a mayor
+alfa = 0.05
+
+sin_corregir = sum(1 for x in p if x < alfa)   # cada test por su cuenta
+bonferroni   = sum(1 for x in p if x < alfa / len(p))
+
+bh = 0                                          # Benjamini-Hochberg
+for i, x in enumerate(p, 1):
+    if x <= i / len(p) * alfa:
+        bh = i                                  # el ultimo que pasa arrastra a los anteriores`;
+---
+<Layout current="/senal-ruido/comparaciones-multiples" title="Corregir por comparaciones múltiples · TechSoluciones Analytics">
+  <Concepto
+    ficha="F11"
+    madre={madre}
+    titulo={`Salen ${m.significativos_sin_corregir} provincias especiales cuando el azar ya daba ${f(m.esperados_por_azar, 1)}`}
+    pregunta={`Si se prueban ${m.n_contrastes} hipótesis a la vez, ¿cuántos hallazgos salen solo por azar?`}
+  >
+    <Fragment slot="problema">
+      <p>
+        La empresa vende en {m.n_contrastes} provincias. Comparar la satisfacción de cada una contra la media
+        de la compañía es una de las comparaciones habituales de un cuadro de mando. El contraste es sencillo de calcular.
+      </p>
+      <p>
+        Hecho sobre estos datos, salen <strong>{m.significativos_sin_corregir} provincias significativas</strong> con
+        el criterio habitual, el de <em>p</em> menor que 0,05.
+      </p>
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full border-collapse text-[.84rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-1.5 pr-3 font-semibold">Provincia</th>
+              <th class="py-1.5 pr-3 text-right font-semibold">n</th>
+              <th class="py-1.5 pr-3 text-right font-semibold">Satisfacción</th>
+              <th class="py-1.5 pr-3 text-right font-semibold">p</th>
+              <th class="py-1.5 font-semibold">Con 0,05</th>
+            </tr>
+          </thead>
+          <tbody>
+            {m.top5.map((r) => (
+              <tr class="border-b border-linea/60">
+                <td class="py-1.5 pr-3">{r.region}</td>
+                <td class="py-1.5 pr-3 text-right tabular-nums">{r.n}</td>
+                <td class="py-1.5 pr-3 text-right tabular-nums">{f(r.media, 3)}</td>
+                <td class="py-1.5 pr-3 text-right tabular-nums">{f(r.p, 4)}</td>
+                <td class={`py-1.5 ${r.p < 0.05 ? 'font-semibold text-acento-deep' : 'text-suave'}`}>
+                  {r.p < 0.05 ? 'significativa' : 'no significativa'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Un umbral de 0,05 significa aceptar una equivocación de cada veinte. Con un solo contraste eso
+        es asumible. Con {m.n_contrastes}, el número esperado de errores es <strong>0,05 × {m.n_contrastes} = {f(m.esperados_por_azar, 1)}</strong>.
+      </p>
+      <p>
+        Es decir, aunque las {m.n_contrastes} provincias fueran idénticas, el método ya esperaba de antemano unos
+        {' '}{f(m.esperados_por_azar, 1)} falsos positivos. Han salido {m.significativos_sin_corregir}. El resultado
+        está dentro de lo que produce el azar, así que no hace falta buscarles una explicación.
+      </p>
+      <Callout tipo="warn" titulo="El error que esto produce">
+        Si el informe no dice «se probaron {m.n_contrastes} cosas» y solo cuenta la que salió, esa parece la única prueba realizada.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Comparaciones múltiples">
+        El umbral de significación vale para cada contraste por separado. Cuantos más contrastes, más exigente tiene
+        que ser el umbral para que el conjunto siga siendo fiable.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Las dos correcciones más usadas <strong>controlan cosas distintas</strong>.
+      </p>
+      <p>
+        <strong>Bonferroni</strong> divide el umbral entre el número de contrastes. Aquí queda en
+        {' '}<strong>{f(m.umbral_bonferroni, 5)}</strong>. Lo que controla es que no haya <em>ningún</em>
+        {' '}falso positivo en todo el estudio. Es muy exigente, por lo que se le escapan efectos reales pequeños.
+      </p>
+      <p>
+        <strong>Benjamini-Hochberg</strong> ordena los p de menor a mayor y los compara con un umbral que va
+        aumentando. Lo que controla es la <em>proporción</em> de falsos positivos entre los resultados
+        aceptados. Con un 5 %, si acepta veinte resultados admite que uno pueda ser falso.
+      </p>
+      <p>
+        La elección depende de lo que cueste equivocarse. Para decidir un tratamiento médico, Bonferroni. Para
+        cribar mil genes y llevarse los cien mejores al laboratorio, Benjamini-Hochberg.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Sin corregir</div>
+          <div class="mt-1 font-display text-[1.6rem] font-bold text-tinta">{m.significativos_sin_corregir}</div>
+          <div class="text-[.78rem] text-suave">umbral 0,05</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Bonferroni</div>
+          <div class="mt-1 font-display text-[1.6rem] font-bold text-acento-deep">{m.significativos_bonferroni}</div>
+          <div class="text-[.78rem] text-suave">umbral {f(m.umbral_bonferroni, 5)}</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Benjamini-Hochberg</div>
+          <div class="mt-1 font-display text-[1.6rem] font-bold text-acento-deep">{m.significativos_bh}</div>
+          <div class="text-[.78rem] text-suave">umbral escalonado</div>
+        </div>
+      </div>
+      <p class="mt-4">
+        Las dos correcciones dan cero. El p más pequeño de las {m.n_contrastes} provincias es
+        {' '}<strong>{f(m.top5[0].p, 4)}</strong> y el umbral de Bonferroni está en {f(m.umbral_bonferroni, 5)}, así que
+        no se acerca. Benjamini-Hochberg, que es la menos exigente de las dos, tampoco deja ninguna como significativa.
+      </p>
+      <p>
+        Con estos datos no se puede decir que ninguna provincia tenga una satisfacción distinta de la media
+        de la empresa. Las {m.significativos_sin_corregir} que lo parecían son compatibles con los falsos
+        positivos que el método ya esperaba, unos {f(m.esperados_por_azar, 1)}.
+      </p>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Siempre que un panel permite filtrar por muchas categorías. Cada segmento que el usuario abre es un
+        contraste más. El panel no lleva la cuenta de cuántos se han hecho.
+      </p>
+      <p>
+        También en los tests A/B con muchas métricas, en la búsqueda del «mejor canal» entre quince y en
+        cualquier informe que empiece diciendo «hemos detectado que». La pregunta que hay que hacer es cuántas
+        cosas se miraron antes de detectar esa.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Se contrasta cada provincia con al menos 30 ventas válidas con satisfacción contra la media global,
+        con una t de una muestra. Los tres umbrales se aplican sobre <strong>los mismos {m.n_contrastes} p</strong>,
+        así que la diferencia entre correcciones se debe solo al umbral.
+      </p>
+      <Code titulo="Ver las tres lecturas" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/inferencia.json" class="text-acento no-underline hover:underline"><code>inferencia.json</code></a>, campo <code>f11_comparaciones_multiples</code>. El caso
+        del <a href="/pregunta-mes" class="text-acento no-underline hover:underline">mes ganador</a> resuelve
+        el mismo problema por otra vía: un test de permutación sobre el máximo.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

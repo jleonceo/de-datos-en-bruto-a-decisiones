@@ -1,0 +1,141 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import inf from '../../data/inferencia.json';
+
+const c = inf.f5_intervalo_confianza;
+const f = (v, d = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+const madre = { slug: '/senal-ruido', t: '14 · La lección: señal frente a ruido' };
+const margen = c.ancho / 2;
+const fuera = Math.ceil((c.ic95_alto + margen / 2) / 50) * 50;
+// Dos medias del mismo tamaño: la diferencia se compara con el margen de las dos juntas (raíz de 2 veces uno)
+const umbral2 = margen * Math.SQRT2;
+const justo = Math.ceil(c.ic95_alto / 5) * 5;
+
+const code = `# Intervalo por el metodo del percentil: se remuestrea y se miran los extremos
+rng = np.random.default_rng(42)
+idx = rng.integers(0, len(x), size=(${c.n_bootstrap}, len(x)))   # muestras CON reemplazo
+medias = x[idx].mean(axis=1)                       # ${f(c.n_bootstrap, 0)} medias posibles
+lo, hi = np.percentile(medias, [2.5, 97.5])        # el 95 % central`;
+---
+<Layout current="/senal-ruido/intervalo-confianza" title="El intervalo de confianza · TechSoluciones Analytics">
+  <Concepto
+    ficha="F5"
+    madre={madre}
+    titulo={`El ticket medio de ${f(c.media, 0)} € tiene un margen de error de unos ${f(margen, 0)} € arriba o abajo`}
+    pregunta={`El ticket medio es ${f(c.media, 0)} €, pero ¿con qué precisión se conoce?`}
+  >
+    <Fragment slot="problema">
+      <p>
+        El ticket medio de TechSoluciones es <strong>{f(c.media, 2)} €</strong>. Es la cifra que aparece en el
+        cuadro de mando cuando se pregunta cuánto deja cada venta y la que se compara con la de otros
+        periodos para decidir si el negocio mejora.
+      </p>
+      <p>
+        Ese valor sale de {f(c.n, 0)} ventas concretas. Con otras {f(c.n, 0)} ventas del mismo negocio,
+        parecidas pero no idénticas, el promedio habría salido algo distinto, porque cada venta tiene su
+        propio importe y basta con que entren unas pocas más caras para mover la media. Por eso, además del
+        valor, hace falta saber cuánto podría cambiar si la muestra fuera otra.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Un promedio que se publica sin su margen se lee como si fuera exacto. Cualquier diferencia con otro
+        promedio parece entonces un cambio del negocio, aunque sea de pocos euros y se deba solo a qué ventas
+        entraron en la muestra.
+      </p>
+      <p>
+        El problema se agrava cuando se comparan periodos de tamaño distinto. El ticket medio de un solo mes
+        se calcula con unas pocas centenas de ventas y su margen es mucho más ancho que el del histórico
+        completo. Si se compara un mes con el margen del histórico, cualquier mes corriente parece una
+        anomalía.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Intervalo de confianza">
+        Un promedio es una estimación. El intervalo de confianza es un tramo de valores alrededor del
+        promedio, y su anchura dice cuánto cambiaría el promedio de una muestra a otra del mismo tamaño.
+      </Callout>
+      <p>
+        Con un intervalo del 95 %, de cada 100 muestras como esta unas 95 darían un intervalo que contiene el
+        valor verdadero. Es frecuente leerlo como la probabilidad de que el valor verdadero esté dentro del
+        tramo calculado. Esa lectura es incorrecta porque el valor verdadero es fijo y lo que cambia de una
+        muestra a otra es el intervalo.
+      </p>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        El intervalo se puede calcular con una fórmula que supone una forma concreta para la variable. Aquí se
+        usa el bootstrap, que no necesita esa suposición: genera muchas muestras nuevas a partir de la que ya
+        se tiene y mira cuánto varía la media entre ellas.
+      </p>
+      <p>
+        De las {f(c.n, 0)} ventas se saca al azar, con reemplazo, otra tanda de {f(c.n, 0)}, de modo que
+        algunas ventas salen dos veces y otras ninguna. Se calcula la media de esa tanda y el proceso se repite
+        {' '}<strong>{f(c.n_bootstrap, 0)} veces</strong>. El intervalo son los dos valores que dejan fuera el 2,5 %
+        más bajo y el 2,5 % más alto de esas medias.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Ticket medio</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-tinta">{f(c.media, 2)} €</div>
+          <div class="text-[.78rem] text-suave">{f(c.n, 0)} ventas válidas</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Intervalo del 95 %</div>
+          <div class="mt-1 font-display text-[1.1rem] font-bold text-acento-deep">{f(c.ic95_bajo, 0)} a {f(c.ic95_alto, 0)} €</div>
+          <div class="text-[.78rem] text-suave">{f(c.n_bootstrap, 0)} remuestreos</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Ancho</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-tinta">{f(c.ancho, 2)} €</div>
+          <div class="text-[.78rem] text-suave">{f((100 * c.ancho) / c.media, 1)} % del valor</div>
+        </div>
+      </div>
+      <p class="mt-4">
+        El ticket medio es {f(c.media, 2)} € con un margen de <strong>unos {f(margen, 0)} € arriba o abajo</strong>.
+        El intervalo completo mide {f(c.ancho, 2)} €, un {f((100 * c.ancho) / c.media, 1)} % del valor, y sale
+        estrecho porque se apoya en {f(c.n, 0)} ventas.
+      </p>
+      <Callout tipo="ok" titulo="Cómo se usa el intervalo">
+        Cualquier ticket medio entre {f(c.ic95_bajo, 0)} y {f(c.ic95_alto, 0)} € es compatible con estas
+        ventas. Para compararlo con otra medición del mismo tamaño no basta con mirar si cae fuera: la otra
+        también tiene su margen, y con los dos juntos la diferencia tiene que superar unos {f(umbral2, 0)} €.
+        Uno de {f(fuera, 0)} € la supera y sería un cambio real que investigar. Uno de {f(justo, 0)} € queda
+        fuera del intervalo y aun así no la supera. Para comparar un mes o un año concretos hay que calcular el
+        intervalo de ese periodo, que tendrá menos ventas y será más ancho.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Para publicar cualquier indicador junto a su margen. La página del <a href="/senal-ruido/margen-kpi" class="text-acento no-underline hover:underline">margen
+        de la facturación mensual</a> aplica el mismo cálculo a la facturación media mensual.
+      </p>
+      <p>
+        También sirve para decidir si una mejora existe. Si el intervalo es más ancho que la diferencia que se
+        quiere presentar como mejora, los datos todavía no permiten afirmarla.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Método del percentil sobre {f(c.n_bootstrap, 0)} remuestreos con reemplazo, generador de semilla 42.
+        No supone que el importe siga una distribución normal. Esa ventaja importa aquí porque el importe de esta empresa
+        tiene <a href="/senal-ruido/bootstrap-vs-normal" class="text-acento no-underline hover:underline">unas pocas ventas muy grandes que alargan su reparto</a>.
+      </p>
+      <Code titulo="Ver el remuestreo" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/inferencia.json" class="text-acento no-underline hover:underline"><code>inferencia.json</code></a>, campo <code>f5_intervalo_confianza</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

@@ -1,0 +1,136 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import AvisoCorreo from '../../components/AvisoCorreo.astro';
+import seg from '../../data/segmentacion.json';
+
+const k = seg.h2_h3_kmeans;
+const f = (v, d = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+const madre = { slug: '/segmentacion', t: '15 · ¿Se pueden segmentar los clientes?' };
+const max = Math.max(...k.por_k.map((x) => x.inercia));
+
+const code = `for k in [2, 3, 4, 5, 6]:
+    km = KMeans(n_clusters=k, n_init=10, random_state=42).fit(X)
+    inercia = km.inertia_                       # siempre baja al subir k
+    sil = silhouette_score(X[muestra], km.labels_[muestra])   # esta si opina`;
+---
+<Layout current="/segmentacion/elegir-k" title="Cuántos grupos hay · TechSoluciones Analytics">
+  <Concepto
+    ficha="H2 · H3"
+    madre={madre}
+    titulo="La inercia baja siempre, así que por sí sola no dice cuántos grupos elegir"
+    pregunta="¿Cuántos grupos pedirle a k-means, si ese número es justo lo que no se sabe?"
+  >
+    <Fragment slot="problema">
+      <p>
+        Con una tabla descrita por recencia, frecuencia y valor, agrupar es una línea de código. El problema es
+        el número: k-means exige indicar cuántos grupos se quieren antes de empezar. Ese número es justo lo que no se sabe.
+      </p>
+      <p>
+        La respuesta habitual es mirar la inercia, que mide lo compactos que quedan los grupos, y buscar el
+        codo de la curva.
+      </p>
+      <AvisoCorreo que="cómo se elige k" />
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        La inercia <strong>siempre</strong> baja al subir k. Con tantos grupos como puntos vale cero, porque
+        cada uno es su propio grupo y es totalmente compacto. Por eso la curva no tiene mínimo y el codo se
+        elige a simple vista.
+      </p>
+      <p>
+        Aquí cae un <strong>{f(k.caida_inercia_2_a_6, 1)} %</strong> de k=2 a k=6 sin ningún escalón claro. Dos
+        personas que miran la misma curva pueden elegir números distintos.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="La silueta">
+        Por cada punto compara lo cerca que está de su grupo con lo cerca que está del grupo vecino. Va de -1 a
+        1. Cerca de 1, el punto está bien asignado. Cerca de 0, está en la frontera y podría pertenecer a cualquiera de los dos grupos.
+      </Callout>
+      <p>
+        A diferencia de la inercia, la silueta <em>puede empeorar</em> al subir k. Por eso sí sirve para elegir.
+      </p>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Calcular las dos para cada k y mirarlas juntas. La inercia indica lo compactos que son los grupos y la
+        silueta indica si son grupos separados o trozos de una nube continua.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full border-collapse text-[.86rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">k</th>
+              <th class="py-2 pr-3 text-right font-semibold">Inercia</th>
+              <th class="py-2 pr-3 font-semibold">&nbsp;</th>
+              <th class="py-2 pr-3 text-right font-semibold">Silueta</th>
+              <th class="py-2 font-semibold">Tamaños</th>
+            </tr>
+          </thead>
+          <tbody>
+            {k.por_k.map((x) => (
+              <tr class="border-b border-linea/60">
+                <td class="py-2 pr-3 font-semibold">{x.k}</td>
+                <td class="py-2 pr-3 text-right tabular-nums">{f(x.inercia, 0)}</td>
+                <td class="py-2 pr-3">
+                  <span class="block h-2 rounded bg-acento-claro" style={`width:${(100 * x.inercia) / max}px`}></span>
+                </td>
+                <td class={`py-2 pr-3 text-right tabular-nums ${x.k === k.k_por_silueta ? 'font-bold text-acento-deep' : ''}`}>
+                  {f(x.silueta, 4)}
+                </td>
+                <td class="py-2 text-[.78rem] text-suave">{x.tamanos.map((n) => f(n, 0)).join(' · ')}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4">
+        La mejor silueta sale en <strong>k = {k.k_por_silueta}</strong>, con {f(k.mejor_silueta, 4)}. Lo
+        importante es ese valor: <strong>ninguna de las cinco llega a 0,5</strong>.
+      </p>
+      <Callout tipo="warn" titulo={`Lo que dice una silueta de ${f(k.mejor_silueta, 2)}`}>
+        Por convención, de 0,7 arriba los grupos están bien separados y por debajo de 0,5 la estructura es
+        débil. Aquí no aparecen grupos bien separados. Además, la frecuencia solo toma unos pocos valores
+        enteros, y eso crea escalones que el algoritmo puede recortar sin que sean grupos de clientes.
+      </Callout>
+      <p>
+        Que la silueta mejore al subir k también es una señal de alerta. Cuando el mejor k es el mayor de los
+        probados, puede que el algoritmo esté recortando trozos de la nube en lugar de encontrar grupos.
+      </p>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Para no presentar como hallazgo un corte arbitrario. Con una cartera real, los grupos se pueden usar igualmente,
+        porque cortarla en tramos de valor es útil aunque los tramos no sean naturales. Lo que no se puede afirmar
+        es que esos grupos estaban en los datos.
+      </p>
+      <p>
+        La <a href="/segmentacion/mezclas" class="text-acento no-underline hover:underline">página de mezclas
+        gaussianas</a> mira lo mismo por otro camino, con probabilidades en lugar de fronteras.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        k-means con 10 arranques y semilla 42 sobre las tres variables RFM calculadas por correo y tipificadas. Tipificar es obligatorio,
+        {' '}<a href="/segmentacion/escalado" class="text-acento no-underline hover:underline">por lo que pasa si
+        no se hace</a>. La silueta se calcula sobre una muestra de {f(k.muestra_silueta, 0)} correos de los
+        {' '}{f(k.n, 0)}, porque exige todas las distancias contra todas.
+      </p>
+      <Code titulo="Ver las dos medidas" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/segmentacion.json" class="text-acento no-underline hover:underline"><code>segmentacion.json</code></a>, campo <code>h2_h3_kmeans</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

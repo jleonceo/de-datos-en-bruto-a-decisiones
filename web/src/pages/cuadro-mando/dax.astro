@@ -1,0 +1,100 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import Kpi from '../../components/Kpi.astro';
+import eda from '../../data/eda.json';
+
+const k = eda.kpis;
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/cuadro-mando', t: '17 · Cuadro de mando' };
+const ticketSinFiltro = k.facturacion_registrada / k.n_ventas;
+
+const dax = `Ticket medio sin filtro =
+    AVERAGE ( Ventas[importe] )
+
+Ticket medio válido =
+    CALCULATE (
+        AVERAGE ( Ventas[importe] ),
+        Ventas[anomalia] = 0
+    )`;
+
+const py = `ticket_sin_filtro = ventas["importe"].mean()
+ticket_valido     = ventas.loc[ventas["anomalia"] == 0, "importe"].mean()`;
+---
+<Layout current="/cuadro-mando/dax" title="La medida DAX y su gemela en script · TechSoluciones Analytics">
+  <Concepto
+    ficha="J7"
+    madre={madre}
+    titulo="La misma cifra, calculada por dos caminos independientes"
+    pregunta="¿Cómo se comprueba que el número del panel de Power BI es el correcto?"
+  >
+    <Fragment slot="problema">
+      <p>
+        En Power BI las cifras de un panel salen de medidas escritas en DAX. Se calculan en el momento, cambian
+        con cada filtro que se pulsa y no quedan guardadas en ninguna tabla. Si una medida está mal, el panel
+        la muestra igual.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Una medida DAX parece una fórmula de Excel y se comporta de otra manera: su resultado depende de los
+        filtros activos en ese momento. Dos personas pueden escribir «el ticket medio» y obtener dos cifras
+        distintas sin que ninguna fórmula esté equivocada, porque cada una filtra otra cosa.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Cada medida del panel se calcula también fuera de él">
+        Se calcula la misma cifra con un script independiente, sobre los mismos datos y con los mismos
+        filtros escritos de forma explícita. Si las dos coinciden al céntimo, la medida hace lo que dice. Si no, una
+        de las dos filtra algo que la otra no.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Escribir cada medida en los dos lenguajes, con el filtro explícito en ambos, y comparar el resultado
+        antes de publicar el panel.
+      </p>
+      <Code titulo="La medida en DAX" code={dax} lang="dax" />
+      <Code titulo="Su gemela en Python" code={py} lang="python" />
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Kpi valor={`${f(ticketSinFiltro, 2)} €`} etiqueta="ticket medio sin filtro" sub={`${f(k.n_ventas)} ventas registradas`} />
+        <Kpi valor={`${f(k.ticket_medio, 2)} €`} etiqueta="ticket medio válido" sub={`${f(k.n_validas)} ventas, sin las ${f(k.n_anomalias)} anomalías`} />
+      </div>
+      <p class="mt-4">
+        Las {f(k.n_anomalias)} ventas imposibles suben el ticket medio unos {f(ticketSinFiltro - k.ticket_medio, 0)} €.
+        La diferencia es pequeña y por eso pasa desapercibida en el panel, pero todos los objetivos
+        calculados a partir de ese ticket estarían inflados.
+      </p>
+      <p>
+        El script de esta web da el ticket válido de la página 17. Una medida DAX que no lleve el filtro de
+        anomalías daría el otro. La comparación con su gemela lo detecta en la primera
+        revisión.
+      </p>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        En cualquier panel que alguien vaya a usar para decidir: antes de publicarlo y cada vez que se toca
+        una medida. Una discrepancia de pocos euros entre panel y script es la forma más sencilla de descubrir que un
+        filtro no hace lo que se cree.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        El ticket sin filtro se calcula en la página dividiendo la facturación registrada entre las ventas
+        registradas; el válido es <code>kpis.ticket_medio</code>. Las medidas DAX se escriben aquí como se
+        escribirían en el modelo: esta web no tiene fichero de Power BI.
+      </p>
+      <p class="mt-3">Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/eda.json" class="text-acento no-underline hover:underline"><code>eda.json</code></a>, campo <code>kpis</code>.</p>
+    </Fragment>
+  </Concepto>
+</Layout>

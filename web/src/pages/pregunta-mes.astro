@@ -1,0 +1,118 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import BarList from '../components/BarList.astro';
+import eda from '../data/eda.json';
+import robustez from '../data/robustez.json';
+const p1 = eda.p1_mes_mayores_ventas;
+const rob = robustez.p1_estacionalidad;
+const MES = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const Mes = (m) => MES[m].charAt(0).toUpperCase() + MES[m].slice(1);
+const nombreAm = (am) => `${MES[Number(am.slice(5))]} de ${am.slice(0, 4)}`;
+const nf = (v, d = 0) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: d }).format(v);
+const fp = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+const medias = Object.entries(eda.estacionalidad_mes).map(([m, v]) => ({ label: Mes(Number(m)), value: v.media_mensual }));
+const nMeses = p1.por_que_no_se_suma_por_mes.meses_por_mes_del_anio;
+const conMas = Object.entries(nMeses).filter(([, n]) => n === Math.max(...Object.values(nMeses))).map(([m]) => MES[Number(m)]);
+const pctAzar = Math.round(rob.p_valor_permutacion * 100);
+---
+<Layout current="/pregunta-mes" title="¿El mes de mayores ventas? · TechSoluciones Analytics">
+  <p class="eyebrow">Parte IV · Las preguntas de negocio</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">11 · ¿Cuál fue el mes de mayores ventas?</h1>
+
+  <Callout tipo="info" titulo="Respuesta directa">
+    El mes con mayores ventas fue <strong>{nombreAm(p1.anio_mes_top)}</strong>, con
+    <strong>{nf(p1.facturacion)} €</strong> de facturación válida. El segundo, {nombreAm(p1.segundo.anio_mes)},
+    se quedó en {nf(p1.segundo.facturacion)} €. Es el máximo en euros: en número de ventas el mes más alto fue
+    {nombreAm(p1.top_por_n_ventas.anio_mes)} ({p1.top_por_n_ventas.n}) y en unidades {nombreAm(p1.top_por_unidades.anio_mes)}
+    ({p1.top_por_unidades.unidades}).
+  </Callout>
+
+  <p class="mt-5 max-w-2xl text-tinta-soft">
+    El encargo pregunta por un mes concreto. Esa es la respuesta. Detrás viene otra
+    pregunta: ¿hay un mes del año que venda más, uno en el que convenga reforzar la campaña? Para
+    contestarla hay que evitar dos errores que la primera versión de esta página cometió.
+  </p>
+
+  <h2 class="mt-8 font-display text-[1.25rem] font-bold">No se pueden sumar meses con distinto número de años</h2>
+  <p class="mt-2 max-w-2xl text-tinta-soft">
+    Los datos van de enero de 2019 a {nombreAm(eda.kpis.periodo[1].slice(0, 7))}, que está a medias. Así,
+    {conMas.length > 1 ? `${conMas.slice(0, -1).join(', ')} y ${conMas[conMas.length - 1]}` : conMas[0]} tienen {Math.max(...Object.values(nMeses))} años completos y el resto
+    {Math.min(...Object.values(nMeses))}. Si se suma la facturación por mes del año, ganaría
+    {MES[p1.por_que_no_se_suma_por_mes.mes_top_si_se_suma]} solo por tener un año más de datos. Lo
+    correcto es comparar la <strong>media</strong> de cada mes sobre sus meses completos.
+  </p>
+
+  <h2 class="mt-6 font-display text-[1.25rem] font-bold">Las ventas que parecen errores se dejan fuera</h2>
+  <p class="mt-2 max-w-2xl text-tinta-soft">
+    {eda.anomalias.n} ventas del fichero rompen las reglas del catálogo (<a href="/atipicos" class="lnk">se ven aquí</a>) y
+    suman {nf(eda.anomalias.importe_total)} €. Una sola de ellas puede mover la facturación de su mes en más de cien
+    mil euros. Se dejan fuera de la comparación.
+  </p>
+
+  <div class="tarjeta mt-5 p-4">
+    <h3 class="text-[.9rem] font-semibold text-tinta">Media de facturación mensual por mes del año (€, meses completos, ventas válidas)</h3>
+    <div class="mt-3"><BarList items={medias} unit=" €" /></div>
+  </div>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    Con esa base, el mes del año con la media más alta es <strong>{MES[p1.mes_calendario_top_media]}</strong>:
+    {nf(p1.media_mes_calendario_top)} € de media, un {fp(p1.pct_sobre_media)} % por encima de la media de los
+    {p1.n_meses_completos} meses completos ({nf(p1.media_de_los_meses_completos)} €).
+  </p>
+
+  <Callout tipo="warn" titulo={`${Mes(p1.mes_calendario_top_media)} no destaca más de lo que produce el azar`}>
+    Algún mes tenía que salir el primero. Para saber si {MES[p1.mes_calendario_top_media]} destaca más de lo
+    que haría el azar, se barajan {nf(robustez.n_permutaciones)} veces las etiquetas de mes entre los {rob.n_meses} meses completos y
+    se mide cada vez lo mismo que arriba: <strong>la media más alta de un mes del año</strong>. Resultado:
+    <strong>p = {fp(rob.p_valor_permutacion)}</strong>. En el {pctAzar} % de los barajados el mejor mes del
+    azar iguala o supera al real. {Mes(p1.mes_calendario_top_media)} no destaca: <strong>no hay evidencia de
+    estacionalidad</strong>. Con solo {Math.min(...Object.values(nMeses))} u {Math.max(...Object.values(nMeses))} años por
+    mes, el test solo vería diferencias grandes; una estacionalidad suave podría existir sin que el test la detecte.
+  </Callout>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    Tampoco {nombreAm(p1.anio_mes_top)} es un mes extraordinario. Está {fp(p1.z_del_top_entre_meses_completos)} desviaciones por
+    encima de la media de los meses completos. Con {p1.n_meses_completos} meses, el test de Grubbs solo lo
+    llamaría atípico a partir de {fp(p1.grubbs_critico_alfa_005)}. Es el más alto, pero no llega a ser un pico.
+  </p>
+
+  <h2 class="mt-8 font-display text-[1.2rem] font-bold">El mejor mes de cada año cambia sin pauta</h2>
+  <div class="mt-3 overflow-x-auto">
+    <table class="w-full border-collapse text-[.84rem]">
+      <caption class="sr-only">Mes con más facturación válida de cada año</caption>
+      <thead>
+        <tr class="border-b border-linea text-left text-suave">
+          <th scope="col" class="py-2 pr-3 font-semibold">Año</th>
+          <th scope="col" class="py-2 pr-3 font-semibold">Mejor mes</th>
+          <th scope="col" class="py-2 pr-3 font-semibold">Facturación</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.entries(p1.mejor_mes_por_anio).map(([a, v]) => (
+          <tr class="border-b border-linea/60">
+            <td class="py-2 pr-3 tabular-nums">{a}</td>
+            <td class="py-2 pr-3 text-tinta-soft">{MES[Number(v.anio_mes.slice(5))]}</td>
+            <td class="py-2 pr-3 tabular-nums">{nf(v.facturacion)} €</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <Callout tipo="idea" titulo="Por qué la versión anterior decía mayo">
+    Sumaba las {nf(eda.n)} ventas por mes del año: con las {eda.anomalias.n} anomalías dentro, con mayo de
+    {eda.kpis.periodo[1].slice(0, 4)} a medias y con enero a mayo contando un año más que el resto. Y el test
+    que la acompañaba medía cuánto varía el <em>ticket medio</em> entre meses, que no es la facturación. El
+    ganador salía de una suma desigual y lo respaldaba un test que medía otra cosa.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Por qué al ganador se le compara con el mejor mes del azar en lugar de con la media:
+    <a href="/senal-ruido/doce-meses" class="lnk">el ganador de doce meses</a>.
+  </p>
+
+  <p class="mt-3 text-[.9rem] text-suave">
+    Siguiente: <a href="/pregunta-region" class="lnk font-semibold">¿qué región crece más en satisfacción? →</a>
+  </p>
+</Layout>

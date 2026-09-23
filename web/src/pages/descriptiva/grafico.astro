@@ -1,0 +1,108 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import eda from '../../data/eda.json';
+
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/descriptiva', t: '7 · Estadística descriptiva' };
+const par = eda.extra_pareto.productos;
+const cat = eda.por_categoria;
+const totalCat = Object.values(cat).reduce((a, x) => a + x.facturacion, 0);
+const pctHw = (100 * cat.Hardware.facturacion) / totalCat;
+const cp = eda.p3_correlacion_ventas_satisfaccion.cant_vs_satisfaccion_pearson;
+
+const filas = [
+  { m: `${par.n_para_80pct} de los ${par.de_total} productos hacen el 80 % de la facturación`, g: 'Barras ordenadas de mayor a menor', p: 'Compara elementos de una sola dimensión y el orden deja ver dónde se corta el 80 %.', en: '/segmentos', t: 'página 10' },
+  { m: 'La facturación mensual sube y baja sin un mes que destaque', g: 'Línea', p: 'Es una magnitud que cambia en el tiempo. La línea muestra su evolución. Unas barras por mes la partirían en valores sueltos.', en: '/series', t: 'página 9' },
+  { m: `El hardware se lleva el ${f(pctHw, 1)} % de lo facturado`, g: 'Circular, o una barra partida', p: 'Solo dos trozos y muy desiguales, que es el único caso en que una tarta se lee bien.', en: '/segmentos', t: 'página 10' },
+  { m: `La cantidad y la satisfacción no se mueven juntas (r = ${f(cp.r, 4)})`, g: 'Dispersión', p: 'Son dos medidas a la vez. Si no hay relación, la nube de puntos no tiene inclinación, algo que un gráfico de barras no puede mostrar.', en: '/pregunta-correlacion', t: 'página 13' },
+  { m: 'Dónde y cuándo se concentra la facturación', g: 'Mapa de calor provincia por año', p: 'Dos categorías cruzadas y una magnitud. El color hace que destaquen las casillas con valores fuera de lo normal.', en: '/cuadro-mando', t: 'página 17' },
+  { m: `Las ${f(eda.anomalias.n)} ventas imposibles, una a una`, g: 'Tabla', p: 'Alguien tiene que revisarlas fila a fila. Cuando el lector va a buscar un dato concreto, una tabla es más útil que cualquier gráfico.', en: '/cuadro-mando', t: 'página 17' },
+];
+---
+<Layout current="/descriptiva/grafico" title="Qué gráfico para qué pregunta · TechSoluciones Analytics">
+  <Concepto
+    ficha="D8"
+    madre={madre}
+    titulo="El tipo de gráfico se elige según la conclusión que tiene que mostrar"
+    pregunta="¿Cómo se decide qué gráfico usar?"
+  >
+    <Fragment slot="problema">
+      <p>
+        Con los datos delante, cualquier herramienta dibuja lo que se le pida en un segundo: barras, tartas,
+        líneas, burbujas. Es fácil elegir por costumbre o por lo que queda más vistoso en la
+        diapositiva.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Un gráfico mal elegido no da ningún error. Una tarta de ocho porciones parecidas se dibuja igual de
+        bien que una de dos, pero no se puede leer. Una línea que une provincias sugiere una continuidad entre
+        ellas que no existe. En los dos casos, la impresión que se lleva el lector depende del formato elegido
+        y no de los datos.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Primero la conclusión, después el gráfico">
+        Se escribe la conclusión en una frase. Lo que esa frase compara (elementos, tiempo, partes de un
+        todo, dos medidas, dos categorías cruzadas) decide el tipo de gráfico.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Barras para comparar elementos. Línea para lo que cambia en el tiempo. Tarta solo con dos o tres
+        trozos muy distintos. Dispersión para dos medidas a la vez. Mapa de calor para dos categorías
+        cruzadas. Y una tabla cuando el lector va a buscar un número concreto.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <p>Seis frases que esta web cuenta, cada una con el gráfico que le toca:</p>
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full border-collapse text-[.85rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">La frase</th>
+              <th class="py-2 pr-3 font-semibold">El gráfico</th>
+              <th class="py-2 pr-3 font-semibold">Por qué</th>
+              <th class="py-2 font-semibold">Dónde se cuenta</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filas.map((x) => (
+              <tr class="border-b border-linea/60 align-top">
+                <td class="py-2 pr-3">{x.m}</td>
+                <td class="py-2 pr-3 font-semibold whitespace-nowrap">{x.g}</td>
+                <td class="py-2 pr-3 text-tinta-soft">{x.p}</td>
+                <td class="py-2 whitespace-nowrap"><a href={x.en} class="text-acento no-underline hover:underline">{x.t}</a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Callout tipo="warn" titulo="Una tarta de muchas porciones iguales no se puede leer">
+        La facturación por provincia tiene {eda.kpis.n_regiones} barras. Una tarta con esos {eda.kpis.n_regiones} trozos se dibuja sin problema y,
+        como el reparto es casi uniforme, sale un círculo de porciones casi iguales del que no se saca
+        ninguna conclusión. Unas barras ordenadas o un mapa muestran lo mismo y sí se pueden leer.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Antes de cada gráfico de un informe o de un panel. Y para revisar uno ajeno: si no se puede escribir la
+        frase que resume, el gráfico no aporta información.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Las cifras de las frases salen de <code>eda.json</code>: <code>extra_pareto</code>, <code>por_categoria</code>,
+        {' '}<code>p3_correlacion_ventas_satisfaccion</code> y <code>anomalias</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

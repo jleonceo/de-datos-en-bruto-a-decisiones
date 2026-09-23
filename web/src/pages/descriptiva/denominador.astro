@@ -1,0 +1,127 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import ak from '../../data/atipicos_kpi.json';
+
+const d = ak.d12_denominador;
+const f = (v, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(v);
+const madre = { slug: '/descriptiva', t: '7 · Estadística descriptiva' };
+
+const code = `por_total = datos.groupby("reg")["importe"].sum()    # cuanto trae
+por_venta = datos.groupby("reg")["importe"].mean()   # cuanto trae CADA operacion`;
+---
+<Layout current="/descriptiva/denominador" title="El denominador olvidado · TechSoluciones Analytics">
+  <Concepto
+    ficha="D12"
+    madre={madre}
+    titulo={`${d.mayores_saltos[0].reg} es la ${d.mayores_saltos[0].puesto_por_total}.ª provincia por facturación y la ${d.mayores_saltos[0].puesto_por_venta}.ª por venta`}
+    pregunta="¿Qué provincia va primera, la que más factura en total o la que más factura por venta?"
+  >
+    <Fragment slot="problema">
+      <p>
+        Un cuadro de mando ordena las {d.n_provincias} provincias por facturación y arriba queda
+        {' '}<strong>{d.lider_por_total}</strong>. Con esa tabla se reparten comerciales, presupuesto de
+        campaña y objetivos del año.
+      </p>
+      <p>
+        La misma tabla, ordenada por lo que deja cada operación, deja en primer lugar a
+        {' '}<strong>{d.lider_por_venta}</strong>.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Un total premia al que tiene más operaciones. Si una provincia vende el doble de veces, factura más
+        aunque cada venta suya valga menos.
+      </p>
+      <p>
+        Para medir volumen, el total es la cifra correcta. El problema aparece cuando se usa para afirmar
+        que cada venta de esa provincia deja más importe. Esa afirmación habla de cada venta, así que exige
+        dividir la facturación entre el número de operaciones.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="El denominador es parte de la pregunta">
+        Un total contesta «cuánto». Una tasa contesta «cuánto por cada». Elegir mal el denominador cambia el
+        ganador sin que ningún número esté equivocado.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Ordenar las provincias de las dos formas, por facturación total y por facturación por venta, y
+        comparar el puesto de cada una en las dos listas. Cuando una provincia sube o baja muchos puestos,
+        como {d.mayores_saltos[0].reg}, que pasa del {d.mayores_saltos[0].puesto_por_total}.º al
+        {' '}{d.mayores_saltos[0].puesto_por_venta}.º, el informe tiene que decir cuál de las dos listas usa,
+        porque cada una lleva a una conclusión distinta sobre esa provincia.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full max-w-xl border-collapse text-[.88rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">Provincia</th>
+              <th class="py-2 pr-3 text-right font-semibold">Por total</th>
+              <th class="py-2 pr-3 text-right font-semibold">Por venta</th>
+              <th class="py-2 text-right font-semibold">Salto</th>
+            </tr>
+          </thead>
+          <tbody>
+            {d.mayores_saltos.map((x) => (
+              <tr class="border-b border-linea/60">
+                <td class="py-2 pr-3">{x.reg}</td>
+                <td class="py-2 pr-3 text-right tabular-nums">{x.puesto_por_total}.º</td>
+                <td class="py-2 pr-3 text-right tabular-nums">{x.puesto_por_venta}.º</td>
+                <td class="py-2 text-right tabular-nums font-semibold text-acento-deep">{x.salto}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4">
+        <strong>{d.mayores_saltos[0].reg}</strong> es la {d.mayores_saltos[0].puesto_por_total}.ª por
+        facturación y la {d.mayores_saltos[0].puesto_por_venta}.ª por lo que deja cada operación:
+        {' '}<strong>{d.mayores_saltos[0].salto} puestos</strong> de diferencia con los mismos datos.
+      </p>
+      <p>
+        El movimiento va en los dos sentidos. {d.mayores_saltos[2].reg} sube del puesto
+        {' '}{d.mayores_saltos[2].puesto_por_total} al {d.mayores_saltos[2].puesto_por_venta}, porque vende
+        poco y caro.
+      </p>
+      <Callout tipo="ok" titulo="Cuál de las dos tablas usar">
+        Depende de la decisión. Para repartir stock, comerciales o presupuesto, el total, porque siguen al
+        volumen. Para comparar cuánto deja cada operación, por ejemplo al fijar el objetivo de ticket de un
+        comercial, el de por venta. Y antes de sacar conclusiones de un ticket alto, conviene pasar por
+        {' '}<a href="/senal-ruido/simpson" class="text-acento no-underline hover:underline">la paradoja de
+        Simpson</a>, porque un ticket medio alto puede deberse solo a la mezcla de productos.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        En cualquier clasificación de elementos de tamaño distinto, como provincias, comerciales, tiendas o
+        campañas. En todas hay que comprobar si la cifra está dividida y si lo está por lo que corresponde.
+      </p>
+      <p>
+        Pasa igual con las tasas de conversión sobre visitas distintas, con el coste por cliente de
+        delegaciones de distinto tamaño y con los índices de siniestralidad por población.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Sobre las ventas válidas, sin las ventas marcadas como anomalía, agrupadas por las {d.n_provincias} provincias. El
+        salto es la diferencia de puesto entre los dos ordenamientos.
+      </p>
+      <Code titulo="Ver las dos tablas" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/atipicos_kpi.json" class="text-acento no-underline hover:underline"><code>atipicos_kpi.json</code></a>, campo <code>d12_denominador</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

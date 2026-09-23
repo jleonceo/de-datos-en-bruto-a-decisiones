@@ -1,0 +1,124 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import inf from '../../data/inferencia.json';
+
+const r = inf.f13_correlacion_parcial;
+const f = (v, d = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+const madre = { slug: '/senal-ruido', t: '14 · La lección: señal frente a ruido' };
+
+const code = `# Correlacion parcial: se quita de las dos variables lo que explica la tercera
+medias = d.groupby("prod")[["importe", "satisfaccion"]].transform("mean")
+rx = d["importe"] - medias["importe"]             # lo que sobra del importe
+ry = d["satisfaccion"] - medias["satisfaccion"]   # lo que sobra de la satisfaccion
+
+r_parcial, p_parcial = pearsonr(rx, ry)           # correlacion de los restos`;
+---
+<Layout current="/senal-ruido/correlacion-parcial" title="Correlación parcial · TechSoluciones Analytics">
+  <Concepto
+    ficha="F13"
+    madre={madre}
+    titulo="Descontar el efecto del producto tampoco hace aparecer una relación"
+    pregunta="¿Y si el producto estaba tapando la relación entre importe y satisfacción?"
+  >
+    <Fragment slot="problema">
+      <p>
+        La <a href="/pregunta-correlacion" class="text-acento no-underline hover:underline">página 13</a> concluyó
+        que entre lo que se factura y lo satisfecho que queda el cliente no hay relación, con una
+        correlación de <strong>{f(r.r_bruta, 4)}</strong> sobre {f(r.n, 0)} ventas.
+      </p>
+      <p>
+        Queda una objeción con fundamento. Cada producto tiene su precio y su nivel de satisfacción, así que
+        mezclar todos los productos puede estar ocultando una relación que sí existe dentro de cada uno.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Una tercera variable puede alterar una correlación de dos formas, que llevan a error por igual.
+      </p>
+      <p>
+        Puede <strong>crear</strong> una correlación donde no la hay, que es el caso famoso de los helados
+        y los ahogamientos, unidos por el verano. Y puede <strong>enmascarar</strong> una que sí existe, cuando
+        empuja a las dos variables en direcciones contrarias. Lo segundo es menos conocido.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Correlación parcial">
+        Es la correlación entre dos variables una vez restado lo que una tercera explica de cada una. Responde
+        a «dentro del mismo producto, ¿se mueven juntas?».
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        A cada venta se le resta la media de su producto, en las dos variables. Lo que queda son los residuos: de
+        cuánto se desvía esa venta del importe típico de su producto y de cuánto se desvía su satisfacción de
+        la típica del mismo producto.
+      </p>
+      <p>
+        Después se correlacionan los restos. Si el producto era lo único que unía a las dos variables, la
+        correlación baja mucho. Si estaba ocultando una relación, esta aparece.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Correlación bruta</div>
+          <div class="mt-1 font-display text-[1.4rem] font-bold text-tinta">r = {f(r.r_bruta, 4)}</div>
+          <div class="text-[.78rem] text-suave">p = {f(r.p_bruta, 4)}</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Controlando el producto</div>
+          <div class="mt-1 font-display text-[1.4rem] font-bold text-acento-deep">r = {f(r.r_parcial_controlando_producto, 4)}</div>
+          <div class="text-[.78rem] text-suave">p = {f(r.p_parcial, 4)}</div>
+        </div>
+      </div>
+      <p class="mt-4">
+        La correlación <strong>sube</strong>, de {f(r.r_bruta, 4)} a {f(r.r_parcial_controlando_producto, 4)}. Al descontar
+        el producto, la correlación sale {f(r.r_parcial_controlando_producto / r.r_bruta, 1)} veces mayor que la
+        bruta, pero las dos son casi cero.
+      </p>
+      <p>
+        Aun así, no es significativa. Con {f(r.n, 0)} ventas detrás, un <em>p</em> de {f(r.p_parcial, 4)} se queda fuera
+        del umbral y una correlación de {f(r.r_parcial_controlando_producto, 4)} explica solo el
+        {' '}{f(100 * r.r_parcial_controlando_producto ** 2, 3)} % de la variación. La conclusión de la página 13
+        se mantiene.
+      </p>
+      <Callout tipo="ok" titulo="Por qué merece la pena contar este resultado">
+        Una objeción razonable se contesta
+        midiéndola. Ahora la conclusión es más completa: tampoco al comparar dentro de producto aparece una
+        relación lineal. Es una medida conjunta, no producto a producto, así que no descarta que en algún
+        producto concreto haya una relación que otra compense.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Siempre que alguien defiende un hallazgo diciendo «pero si separas por segmento». El desglose puede
+        cambiarlo todo, como en <a href="/senal-ruido/simpson" class="text-acento no-underline hover:underline">la
+        paradoja de Simpson</a>, o puede no cambiar nada. Solo el cálculo lo puede decir.
+      </p>
+      <p>
+        Es también el primer paso de cualquier análisis causal, porque obliga a nombrar qué tercera
+        variable se sospecha antes de tocar los datos.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Correlación de Pearson sobre los residuos de restar la media por producto, que con una sola variable
+        categórica de control equivale a la parcial clásica. Entran las {f(r.n, 0)} ventas válidas que tienen
+        satisfacción, es decir, el {f(100 * r.n / inf.f5_intervalo_confianza.n, 0)} % del total.
+      </p>
+      <Code titulo="Ver el cálculo" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/inferencia.json" class="text-acento no-underline hover:underline"><code>inferencia.json</code></a>, campo <code>f13_correlacion_parcial</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

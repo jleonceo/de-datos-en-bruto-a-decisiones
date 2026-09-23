@@ -1,0 +1,142 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import BarList from '../../components/BarList.astro';
+import ak from '../../data/atipicos_kpi.json';
+import eda from '../../data/eda.json';
+const imp = eda.descriptivos.importe;
+
+const d = ak.d3_d11_forma;
+const v = d.variables;
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/descriptiva', t: '7 · Estadística descriptiva' };
+const nombres = { importe: 'Importe', precio: 'Precio', cant: 'Cantidad', satisfaccion: 'Satisfacción' };
+const barras = d.histograma_importe.map((h) => ({ label: `${f(h.desde)} a ${f(h.hasta)} €`, value: h.ventas }));
+
+const code = `from scipy.stats import skew, kurtosis
+for col in ["importe", "precio", "cant", "satisfaccion"]:
+    x = ventas[col].dropna()
+    print(col, skew(x), kurtosis(x))   # kurtosis de scipy ya resta el 3 de la normal`;
+---
+<Layout current="/descriptiva/forma" title="La forma de una variable · TechSoluciones Analytics">
+  <Concepto
+    ficha="D3"
+    madre={madre}
+    titulo="La media y la desviación no dicen cómo se reparten los valores"
+    pregunta="¿Qué dice la forma de una variable que no dicen su media y su desviación?"
+  >
+    <Fragment slot="problema">
+      <p>
+        La tabla de la página 7 da, para cada variable, su media, su mediana, su desviación, su mínimo y su máximo.
+        Con ella se contesta cuánto vale una venta típica sin preguntarse cómo están repartidos los
+        valores que hay detrás.
+      </p>
+      <p>
+        El reparto importa porque dos variables con cifras de resumen parecidas pueden estar hechas de manera
+        opuesta: una con los valores concentrados en el centro y otra con casi todo en un extremo y unas
+        pocas ventas muy grandes que suben la media.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Una variable tiene <strong>cola larga</strong> cuando la mayoría de sus valores son pequeños y unos
+        pocos son mucho más grandes, de modo que al dibujar cuántas ventas hay de cada importe el reparto se
+        alarga hacia un lado. En el importe de estas ventas, la mitad no pasa de {f(imp.mediana)} € y la
+        mayor llega a {f(imp.max)} €. En los textos de estadística se llama también asimetría positiva o
+        a la derecha. No es lo mismo que tener mucha variabilidad: una variable puede variar
+        mucho y repartirse por igual a los dos lados de su centro.
+      </p>
+      <p>
+        Media y desviación resumen bien una variable con forma de campana simétrica. Cuando la variable tiene
+        una cola larga, las dos se desplazan hacia ella, y quien lee la media como la venta típica se imagina
+        una venta que no se parece a la mayoría de las reales.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Antes de resumir, mirar la forma">
+        La asimetría dice hacia qué lado se estira la distribución y la curtosis cuánto peso llevan las
+        colas. Si alguna de las dos se aleja de cero, las cifras de centro y dispersión no bastan
+        solas.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Calcular las dos medidas para cada variable antes de resumirla y dibujar su histograma. Es un paso
+        rápido que decide si en el informe va la media o la mediana, si el rango intercuartílico sirve para
+        detectar atípicos o si conviene escalar la variable antes de meterla en un modelo.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full max-w-xl border-collapse text-[.88rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">Variable</th>
+              <th class="py-2 pr-3 text-right font-semibold">Asimetría</th>
+              <th class="py-2 pr-3 text-right font-semibold">Curtosis</th>
+              <th class="py-2 text-right font-semibold">Media / mediana</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(v).map(([k, x]) => (
+              <tr class="border-b border-linea/60">
+                <td class="py-2 pr-3">{nombres[k]}</td>
+                <td class={`py-2 pr-3 text-right tabular-nums ${Math.abs(x.asimetria) > 1 ? 'font-semibold text-acento-deep' : ''}`}>{f(x.asimetria, 2)}</td>
+                <td class="py-2 pr-3 text-right tabular-nums">{f(x.curtosis_exceso, 2)}</td>
+                <td class="py-2 text-right tabular-nums">{f(x.media, 2)} / {f(x.mediana, 2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4">
+        Cantidad y satisfacción salen con asimetría casi nula ({f(v.cant.asimetria, 3)} y
+        {' '}{f(v.satisfaccion.asimetria, 3)}) y curtosis negativa, lo propio de una variable repartida
+        casi por igual entre sus valores posibles. El importe es lo contrario: asimetría de
+        {' '}<strong>{f(v.importe.asimetria, 2)}</strong> y curtosis de {f(v.importe.curtosis_exceso, 2)}, con
+        la cola hacia las ventas caras.
+      </p>
+      <BarList items={barras} unit=" ventas" />
+      <p class="mt-4">
+        En el histograma se ve de dónde sale esa cola. Casi la mitad de las ventas cae por debajo de mil
+        euros y los tramos vacíos entre medias aparecen porque el importe es cantidad por precio de ocho
+        productos y solo puede tomar unos pocos valores. El {f(d.pct_facturacion_del_10pct_mayor, 1)} % de la
+        facturación lo hace el 10 % de ventas más caras.
+      </p>
+      <Callout tipo="ok" titulo="Lo que cambia en el resto de la web">
+        La forma del importe explica decisiones de otras páginas: por qué el
+        {' '}<a href="/atipicos/z-score" class="text-acento no-underline hover:underline">z-score deja escapar
+        atípicos</a>, por qué hace falta un
+        {' '}<a href="/segmentacion/escalado" class="text-acento no-underline hover:underline">escalado
+        robusto</a> y por qué la venta típica se cuenta con
+        {' '}<a href="/descriptiva/media-mediana" class="text-acento no-underline hover:underline">la mediana y
+        no con la media</a>.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Muchas variables de dinero o de tiempo tienen esta forma, como las facturas, los salarios, el tamaño
+        de un pedido o el tiempo de resolución de una incidencia. Mirarla primero evita presentar una media que no representa a ninguna venta real y elegir
+        un detector de atípicos que no funciona con colas largas.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Asimetría de Fisher y curtosis en exceso, que vale cero para la normal. Sobre las
+        {' '}{f(v.importe.n)} ventas válidas; la satisfacción, sobre las {f(v.satisfaccion.n)} que la tienen.
+        La cantidad hace de control: si su asimetría saliera como la del importe, el cálculo estaría
+        midiendo otra cosa.
+      </p>
+      <Code titulo="Medir la forma" code={code} lang="python" />
+      <p class="mt-3">Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/atipicos_kpi.json" class="text-acento no-underline hover:underline"><code>atipicos_kpi.json</code></a>, campo <code>d3_d11_forma</code>.</p>
+    </Fragment>
+  </Concepto>
+</Layout>

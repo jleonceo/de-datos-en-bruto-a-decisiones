@@ -1,0 +1,142 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import ak from '../../data/atipicos_kpi.json';
+
+const m = ak.j9_mapa;
+const d12 = ak.d12_denominador;
+const f = (v, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(v);
+const madre = { slug: '/cuadro-mando', t: '17 · Cuadro de mando' };
+const porTotal = [...m.provincias].sort((a, b) => b.importe - a.importe).slice(0, 8);
+const porTicket = [...m.provincias].sort((a, b) => b.ticket - a.ticket).slice(0, 8);
+const maxT = porTotal[0].importe;
+const maxK = porTicket[0].ticket;
+const comunes = porTotal.filter((a) => porTicket.some((b) => b.reg === a.reg)).length;
+
+const code = `g = val.groupby("reg").agg(
+    ventas=("id_venta", "size"),
+    importe=("importe", "sum"),     # lo que pintaria un mapa ingenuo
+    ticket=("importe", "mean"),     # lo que suele querer saber quien lo mira
+    satisfaccion=("satisfaccion", "mean"),
+)`;
+---
+<Layout current="/cuadro-mando/mapa" title="El mapa por provincia · TechSoluciones Analytics">
+  <Concepto
+    ficha="J9"
+    madre={madre}
+    titulo="Un mapa de totales mide el tamaño de cada provincia, no lo que deja cada venta"
+    pregunta={`¿Qué magnitud se representa en un mapa de las ${m.n_provincias} provincias?`}
+  >
+    <Fragment slot="problema">
+      <p>
+        El cuadro de mando pide un mapa. Es una visualización que se entiende sin explicación y una de las
+        que más se piden en un panel comercial.
+      </p>
+      <p>
+        Hay datos suficientes: las {m.n_provincias} provincias tienen ventas, con facturaciones que van de
+        {' '}{f(m.importe_min, 0)} a {f(m.importe_max, 0)} €.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Lo más directo es representar la facturación total. Pero un total crece con el número de ventas, así
+        que el color mide sobre todo cuánto se vende en cada provincia. En una empresa real eso suele coincidir
+        con dónde hay más clientes.
+      </p>
+      <p>
+        Esa es la versión geográfica del
+        {' '}<a href="/descriptiva/denominador" class="text-acento no-underline hover:underline">denominador
+        olvidado</a>. El mapa es correcto, pero responde a «dónde se vende más en total». Para saber en qué
+        provincias deja más importe cada venta hace falta otro mapa, el de la facturación por venta.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Un mapa de intensidad necesita una tasa">
+        Lo que se representa con color debe estar dividido por algo: por venta, por cliente o por habitante. Si es
+        un total absoluto, el color mide tamaño.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Calcular las cuatro magnitudes por provincia y dejar que quien mira el panel elija. Con la misma tabla
+        se obtienen cuatro mapas distintos. Mostrarlos juntos no cuesta más que mostrar uno.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <p>Las ocho primeras de cada criterio, sobre la misma tabla.</p>
+      <div class="mt-3 grid gap-4 sm:grid-cols-2">
+        <div>
+          <div class="text-[.8rem] font-semibold text-suave">Por facturación total</div>
+          <ul class="mt-2 space-y-1.5">
+            {porTotal.map((x) => (
+              <li class="text-[.82rem]">
+                <div class="flex justify-between gap-2">
+                  <span>{x.reg}</span>
+                  <span class="tabular-nums text-suave">{f(x.importe / 1000, 0)} k€</span>
+                </div>
+                <span class="mt-[2px] block h-1.5 rounded bg-acento-claro" style={`width:${(100 * x.importe) / maxT}%`}></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <div class="text-[.8rem] font-semibold text-suave">Por ticket medio</div>
+          <ul class="mt-2 space-y-1.5">
+            {porTicket.map((x) => (
+              <li class="text-[.82rem]">
+                <div class="flex justify-between gap-2">
+                  <span>{x.reg}</span>
+                  <span class="tabular-nums text-suave">{f(x.ticket, 2)} €</span>
+                </div>
+                <span class="mt-[2px] block h-1.5 rounded bg-acento-claro" style={`width:${(100 * x.ticket) / maxK}%`}></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <p class="mt-4">
+        Solo {comunes} de las 8 provincias aparecen en las dos listas. <strong>{d12.lider_por_total}</strong>
+        encabeza la de la izquierda y <strong>{d12.lider_por_venta}</strong> la de la derecha, así que el mapa
+        cambia mucho según cuál se elija.
+      </p>
+      <Callout tipo="warn" titulo="Tres avisos antes de hacer el mapa">
+        <p>Provincias con pocas ventas dan tasas inestables: una sola operación grande cambia su color.</p>
+        <p class="mt-1">La escala de color no es neutral. Con siete tramos o con cinco, los mismos números se
+        leen de forma distinta.</p>
+        <p class="mt-1">Un mapa de ticket medio arrastra la mezcla de producto, así que antes hay que pasar por
+        {' '}<a href="/senal-ruido/simpson" class="text-acento no-underline hover:underline">Simpson</a>.</p>
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        El mapa es una de las visualizaciones que más convencen. Que una provincia salga oscura invita a
+        enviar más comerciales allí, cuando a veces la única razón es que allí se hacen más ventas, no que
+        cada una deje más.
+      </p>
+      <p>
+        La pregunta que hay que hacerle a cualquier mapa ajeno es qué magnitud representa el color y entre qué
+        se ha dividido.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Las cuatro magnitudes por provincia salen de las ventas válidas. La satisfacción se promedia solo
+        sobre el 80 % de ventas que la tienen. Conviene decirlo en la leyenda del mapa. Faltan las
+        geometrías de las provincias, que son un fichero aparte y no están en este dataset.
+      </p>
+      <Code titulo="Ver la agregación" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/atipicos_kpi.json" class="text-acento no-underline hover:underline"><code>atipicos_kpi.json</code></a>, campo <code>j9_mapa</code>, con las
+        {' '}{m.n_provincias} provincias y sus cuatro magnitudes.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

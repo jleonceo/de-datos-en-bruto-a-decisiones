@@ -1,0 +1,104 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import Kpi from '../../components/Kpi.astro';
+import eda from '../../data/eda.json';
+import robustez from '../../data/robustez.json';
+
+const p1 = eda.p1_mes_mayores_ventas;
+const r = robustez.p1_estacionalidad;
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/senal-ruido', t: '14 · La lección: señal frente a ruido' };
+const MES = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const ganador = MES[p1.mes_calendario_top_media];
+
+const code = `# meses: una fila por mes completo, con su facturacion y su mes del anio (1 a 12)
+real = meses.groupby("mes_del_anio")["factura"].mean().max()   # el mejor de los doce
+azar = []
+for _ in range(${robustez.n_permutaciones}):
+    etiquetas = rng.permutation(meses["mes_del_anio"])         # se barajan las etiquetas
+    azar.append(meses["factura"].groupby(etiquetas).mean().max())
+p = (np.array(azar) >= real).mean()`;
+---
+<Layout current="/senal-ruido/doce-meses" title="El ganador de doce meses · TechSoluciones Analytics">
+  <Concepto
+    ficha="F7"
+    madre={madre}
+    titulo="Entre doce meses siempre hay uno que queda primero, aunque ninguno venda más"
+    pregunta={`¿Vende más ${ganador}, o ha quedado primero por azar entre doce?`}
+  >
+    <Fragment slot="problema">
+      <p>
+        La página 11 busca el mes que más vende. Con los meses completos, el de media más alta es
+        {' '}<strong>{ganador}</strong>, un {f(p1.pct_sobre_media, 2)} % por encima de la media. Es la clase de
+        cifra con la que se decide cuándo lanzar una campaña o reforzar el almacén.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Comparar el ganador con la media es comparar al mejor de doce con un mes normal. Aunque los meses
+        no tuvieran ninguna diferencia real, la variación normal haría que uno quedara el primero. Ese mes
+        estaría siempre por encima de la media, porque precisamente por eso se le ha elegido.
+      </p>
+      <p>
+        Es el mismo error que premiar al comercial con mejor trimestre entre doce: alguno lo tiene, aunque
+        todos vendan igual.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Al ganador se le compara con el ganador del azar">
+        Si el resultado se escogió entre varios, la prueba tiene que hacer la misma elección. Se baraja el
+        dato, se busca el mejor mes del barajado y se repite muchas veces. El mes real solo destaca si
+        supera a esos mejores meses generados por el azar.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Es el test del máximo y es el que la página 11 ya aplica sin nombrarlo: en cada barajado se toma
+        el mayor de los doce en lugar de un mes cualquiera.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <Kpi valor={`${f(r.media_observada)} €`} etiqueta={`media mensual de ${ganador}`} sub="el ganador real" />
+        <Kpi valor={`${f(r.null_max_media)} €`} etiqueta="el ganador medio del azar" sub={`en ${f(robustez.n_permutaciones)} barajados`} />
+        <Kpi valor={f(r.p_valor_permutacion, 3)} etiqueta="p del test del máximo" />
+      </div>
+      <p class="mt-4">
+        El mejor mes que produce el azar vende de media {f(r.null_max_media)} €, más que {ganador}. En el
+        {' '}{f(100 * r.p_valor_permutacion, 1)} % de los barajados el ganador del azar iguala o supera al real,
+        así que {ganador} no se distingue de lo que produce el azar.
+      </p>
+      <Callout tipo="warn" titulo="Lo que habría dicho la comparación simple">
+        Frente a la media de los {f(p1.n_meses_completos)} meses, {ganador} está {f(p1.pct_sobre_media, 2)} %
+        arriba. Contado así parece un efecto de temporada. Es la conclusión que queda en un informe si nadie se
+        pregunta cuántos candidatos había.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Siempre que se elige el mejor de varios: el mes, la provincia, el comercial, la campaña, la versión
+        de una página web. La página de
+        {' '}<a href="/senal-ruido/comparaciones-multiples" class="text-acento no-underline hover:underline">comparaciones
+        múltiples</a> hace lo mismo con muchas pruebas a la vez y enseña las dos formas de corregirlas.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Estadístico: la media más alta de facturación mensual entre los doce meses del año, sobre meses completos y sin anomalías. {f(robustez.n_permutaciones)} permutaciones con semilla
+        {' '}{robustez.semilla} sobre los {f(r.n_meses)} meses completos.
+      </p>
+      <Code titulo="El test del máximo" code={code} lang="python" />
+      <p class="mt-3">Fuentes: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/robustez.json" class="text-acento no-underline hover:underline"><code>robustez.json</code></a>, campo <code>p1_estacionalidad</code> y
+      {' '}<a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/eda.json" class="text-acento no-underline hover:underline"><code>eda.json</code></a>, campo <code>p1_mes_mayores_ventas</code>.</p>
+    </Fragment>
+  </Concepto>
+</Layout>

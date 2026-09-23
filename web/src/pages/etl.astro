@@ -1,0 +1,86 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import Code from '../components/Code.astro';
+import Kpi from '../components/Kpi.astro';
+import log from '../data/etl_log.json';
+const T = Object.fromEntries(log.transformaciones.map((t) => [t.paso, t]));
+const nf = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: 0 }).format(v);
+const dup = T.duplicados_exactos_eliminados;
+const em = T.email_normalizado.detalle;
+const an = T.anomalias_marcadas;
+const etlCode = `# Estandarización de fechas: por FORMATO, no genérica
+FORMATOS = [
+    (r"^\\d{4}-\\d{2}-\\d{2}$", "%Y-%m-%d"),
+    (r"^\\d{4}/\\d{2}/\\d{2}$", "%Y/%m/%d"),
+    (r"^\\d{2}-\\d{2}-\\d{4}$", "%d-%m-%Y"),
+    (r"^\\d{2}/\\d{2}/\\d{2}$", "%m/%d/%y"),   # formato US, año de 2 dígitos
+]
+
+# Email: sin espacios, en minúsculas y sin tildes
+def sin_tildes(s):
+    return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
+df["email"] = df["email"].str.replace(" ", "").str.lower().map(sin_tildes)
+
+# Paso 11: marcar (no borrar) lo que rompe las reglas del negocio
+precio_catalogo = df.groupby("prod")["precio"].agg(lambda s: s.mode().iloc[0])
+fuera_cant = (df["cant"] < 1) | (df["cant"] > 5)
+fuera_precio = df["precio"] != df["prod"].map(precio_catalogo)
+df["anomalia"] = (fuera_cant | fuera_precio).astype(int)`;
+---
+<Layout current="/etl" title="Limpieza y estandarización · TechSoluciones Analytics">
+  <p class="eyebrow">Parte II · Preparación</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">4 · Limpieza y estandarización</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    Cada transformación está escrita en un script y queda anotada en un registro con el número de filas
+    que afecta. Los cálculos los hace <strong>el script y no la IA</strong>, porque un script da siempre la
+    misma salida con la misma entrada y cualquiera puede repetirlo para comprobar el resultado.
+  </p>
+
+  <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <Kpi valor={nf(dup.despues)} etiqueta="ventas distintas" sub={`de ${nf(dup.antes)} filas: ${nf(dup.detalle.eliminadas)} eran copia exacta de otra`} />
+    <Kpi valor={`${nf(T.producto_canonicalizado.despues)} y ${nf(T.region_canonicalizada.despues)}`} etiqueta="productos y provincias" sub={`aparecían con ${nf(T.producto_canonicalizado.antes)} y ${nf(T.region_canonicalizada.antes)} nombres, porque algunos estaban escritos de dos formas (con y sin tilde, Gerona y Girona)`} />
+    <Kpi valor={nf(T.email_normalizado.antes)} etiqueta="correos corregidos" sub={`de las ${nf(dup.despues)} ventas sin copias: ${nf(em.emails_con_tilde_corregidos)} con tilde y ${nf(em.emails_con_espacio_corregidos)} con espacios, ${nf(em.emails_con_los_dos_defectos)} de ellos con los dos defectos`} />
+    <Kpi valor={nf(dup.despues - an.despues)} etiqueta="ventas válidas" sub={`las ${nf(dup.despues)} menos ${nf(an.despues)} marcadas como anomalía, que se conservan en el fichero`} />
+  </div>
+
+  <h2 class="mt-8 font-display text-[1.3rem] font-bold">Qué se hizo, paso a paso</h2>
+  <ol class="mt-3 ml-4 list-decimal space-y-2 text-[.9rem] text-tinta-soft">
+    <li><strong>Duplicados exactos:</strong> {nf(dup.detalle.eliminadas)} filas idénticas eliminadas (se conserva la primera).</li>
+    <li><strong>Fechas:</strong> cada formato se lee con su regla y pasa a ISO <code>AAAA-MM-DD</code>, más año, mes y trimestre.</li>
+    <li><strong>Texto:</strong> productos y provincias a su forma canónica.</li>
+    <li><strong>Correos:</strong> sin espacios, en minúsculas y sin tildes, como pide el encargo. Quedan {nf(em.emails_distintos)} direcciones distintas.</li>
+    <li><strong>Numéricos:</strong> tipos correctos e <code>importe = cant × precio</code>.</li>
+    <li><strong>Satisfacción:</strong> escala de 1 a 10. Los valores ausentes se dejan vacíos para no inventarlos.</li>
+    <li><strong>Anomalías:</strong> {nf(an.detalle.por_cantidad)} ventas con cantidad fuera de 1-5, {nf(an.detalle.por_precio)} de ellas también con precio fuera de catálogo. Se marcan con su motivo en dos columnas nuevas, <code>anomalia</code> y <code>motivo_anomalia</code>. <a href="/atipicos" class="lnk">Se estudian aquí</a>.</li>
+  </ol>
+
+  <Code titulo="Ver el código de estandarización (Python)" code={etlCode} lang="python" />
+
+  <Callout tipo="ok" titulo="El script se puede ejecutar las veces que haga falta y el resultado no cambia">
+    <p>
+      Muchas correcciones estropean el dato si se aplican dos veces. Un paso que divide el precio entre
+      100 para pasar de céntimos a euros deja bien el fichero la primera vez. Si se vuelve a lanzar sobre
+      ese mismo fichero ya corregido, lo divide otra vez y todos los precios quedan cien veces más bajos.
+      Es lo que ocurre cuando alguien limpia a mano un fichero que ya había limpiado otra persona.
+    </p>
+    <p class="mt-2">
+      Para evitarlo, el script nunca lee el fichero limpio. Parte siempre del fichero en bruto, que no se
+      modifica, y escribe el limpio desde cero. Ejecutarlo una vez o diez da exactamente el mismo
+      resultado. Esta propiedad se llama <strong>idempotencia</strong>.
+    </p>
+  </Callout>
+
+  <Callout tipo="info" titulo="Dos decisiones: no imputar y no corregir">
+    Falta uno de cada cinco valores de satisfacción. Rellenarlos con la media supondría inventar datos,
+    así que se dejan ausentes y el análisis usa los casos disponibles. Con las anomalías se sigue el mismo
+    criterio. El valor verdadero de esas ventas no se conoce, de modo que se marcan y se apartan en lugar
+    de corregirlas.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Con el dato limpio, ya se puede describir cada campo. Siguiente:
+    <a href="/diccionario" class="lnk font-semibold">el diccionario de datos →</a>
+  </p>
+</Layout>

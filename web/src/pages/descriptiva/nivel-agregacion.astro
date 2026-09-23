@@ -1,0 +1,131 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import ak from '../../data/atipicos_kpi.json';
+import eda from '../../data/eda.json';
+
+const g = ak.d6_nivel_agregacion;
+const f = (v, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(v);
+const madre = { slug: '/descriptiva', t: '7 · Estadística descriptiva' };
+const MESES = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const aUlt = eda.kpis.periodo[1].slice(0, 4);
+const mesFin = MESES[Number(eda.kpis.periodo[1].slice(5, 7))];
+
+const code = `# Tres agregaciones de la MISMA columna, tres respuestas
+por_venta = d.groupby("reg")["importe"].mean()
+por_mes   = d.groupby(["reg", mes])["importe"].sum().groupby("reg").mean()
+por_anio  = d.groupby(["reg", anio])["importe"].sum().groupby("reg").mean()`;
+---
+<Layout current="/descriptiva/nivel-agregacion" title="El nivel de agregación · TechSoluciones Analytics">
+  <Concepto
+    ficha="D6"
+    madre={madre}
+    titulo="La misma pregunta cambia de ganador según se mida por venta o por periodo"
+    pregunta="¿Qué provincia va primera en la lista?"
+  >
+    <Fragment slot="problema">
+      <p>
+        La dirección pide la lista de provincias ordenada de la primera a la última. Para ordenarla hay que decidir antes qué se compara:
+        el importe medio de cada venta, lo que factura la provincia en un mes o lo que factura en un año.
+        Cada una de esas opciones es un nivel de agregación distinto.
+      </p>
+      <p>
+        Si el informe no dice qué nivel se ha usado, quien lo lee no puede saber que con otro nivel el
+        orden de las provincias sería distinto.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Las tres agregaciones son correctas y responden a preguntas distintas. La media por venta mide
+        cuánto deja cada operación. La facturación mensual o anual mide cuánto vende la provincia en total.
+      </p>
+      <p>
+        Si las tres se presentan con el mismo rótulo, «lo que factura la provincia», el lector no tiene
+        forma de saber cuál se usó ni de que las otras darían otro orden.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="El nivel de agregación lo decide la pregunta que se quiere contestar">
+        Cada nivel de agregación contesta una pregunta distinta. El que hay que usar es el de la decisión que
+        se va a tomar con el número.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Calcular los tres y ponerlos uno al lado del otro. Si coinciden, la respuesta no depende del nivel
+        de agregación y se puede usar cualquiera. Si no coinciden, hay que indicar cuál se usa y por qué.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Por venta</div>
+          <ol class="mt-2 space-y-1 text-[.86rem]">
+            {g.por_venta_top3.map((x, i) => (
+              <li class={i === 0 ? 'font-semibold text-acento-deep' : ''}>{i + 1}. {x.reg}</li>
+            ))}
+          </ol>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Por mes</div>
+          <ol class="mt-2 space-y-1 text-[.86rem]">
+            {g.por_mes_top3.map((x, i) => (
+              <li class={i === 0 ? 'font-semibold text-acento-deep' : ''}>{i + 1}. {x.reg}</li>
+            ))}
+          </ol>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Por año</div>
+          <ol class="mt-2 space-y-1 text-[.86rem]">
+            {g.por_anio_top3.map((x, i) => (
+              <li class={i === 0 ? 'font-semibold text-acento-deep' : ''}>{i + 1}. {x.reg}</li>
+            ))}
+          </ol>
+        </div>
+      </div>
+      <p class="mt-4">
+        Gana <strong>{g.por_venta_top3[0].reg}</strong> por venta y
+        {' '}<strong>{g.por_mes_top3[0].reg}</strong> por mes y por año.
+      </p>
+      <p>
+        Las dos últimas coinciden porque las dos suman todo lo que vende la provincia. La que cambia es la primera, que divide por el número de operaciones.
+        Ahí está <a href="/descriptiva/denominador" class="text-acento no-underline hover:underline">el
+        denominador</a>.
+      </p>
+      <Callout tipo="warn" titulo="Los periodos incompletos distorsionan la agregación por mes o por año">
+        Agregar por mes o por año exige que todos los periodos estén completos. Un mes en curso o un año a
+        medias bajan la media aunque las ventas no hayan bajado. Es uno de los errores que la página 11 ya tuvo
+        que corregir. Por eso las tres clasificaciones de esta página usan solo los años completos, de
+        {g.anio_inicio} a {g.anio_fin}, y dejan fuera {aUlt}, que llega hasta {mesFin}.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Antes de escribir el primer <code>groupby</code> de cualquier análisis. Dejar por escrito qué representa
+        cada fila del resultado evita discusiones posteriores sobre qué mide la cifra.
+      </p>
+      <p>
+        En un modelo de datos, el nivel de detalle de cada fila de la tabla de hechos se llama granularidad.
+        Fijarlo mal obliga a rehacer el modelo entero cuando ya hay informes construidos sobre él.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Sobre las {f(g.ventas_usadas)} ventas válidas de {g.anio_inicio} a {g.anio_fin}. Por venta es la media del importe. Por mes y por año son las sumas del
+        periodo, promediadas después entre los periodos de cada provincia.
+      </p>
+      <Code titulo="Ver las tres agregaciones" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/atipicos_kpi.json" class="text-acento no-underline hover:underline"><code>atipicos_kpi.json</code></a>, campo <code>d6_nivel_agregacion</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

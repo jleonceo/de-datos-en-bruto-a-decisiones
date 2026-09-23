@@ -1,0 +1,153 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import Code from '../components/Code.astro';
+import anon from '../data/anonimizacion.json';
+const i = anon.interno;
+const p = anon.publico;
+const NOMBRE = { anio: 'año', reg: 'provincia', satisfaccion: 'satisfacción', anomalia: 'marca de anomalía' };
+const lista = (xs) => { const n = xs.map((x) => NOMBRE[x] ?? x); return n.length > 1 ? `${n.slice(0, -1).join(', ')} y ${n[n.length - 1]}` : n[0]; };
+const rr = anon.riesgo_si_se_publicara;
+const nf = (v, d = 0) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: d }).format(v);
+const filas = [
+  { qi: 'año + provincia', pub: true, k: p.k_min, l: p.l_min, unicas: 0, pct: 0 },
+  { qi: '+ categoría', pub: false, k: rr.con_categoria.k_min, l: rr.con_categoria.l_min, unicas: rr.con_categoria.ventas_unicas, pct: rr.con_categoria.pct_ventas_en_grupos_menores_de_5 },
+  { qi: '+ categoría + producto', pub: false, k: rr.con_producto.k_min, l: null, unicas: rr.con_producto.ventas_unicas, pct: rr.con_producto.pct_ventas_en_grupos_menores_de_5 },
+  { qi: '+ categoría + producto + cantidad', pub: false, k: rr.con_producto_y_cantidad.k_min, l: null, unicas: rr.con_producto_y_cantidad.ventas_unicas, pct: rr.con_producto_y_cantidad.pct_ventas_en_grupos_menores_de_5 },
+];
+const anonCode = `# Pseudónimo aleatorio por PERSONA: nombre + teléfono
+# (el email lo comparten varias personas y el nombre tiene homónimos)
+clave = df["nombre_completo"] + "|" + df["telefono"]
+personas = list(dict.fromkeys(clave))
+numeros = np.random.default_rng(42).permutation(len(personas))
+df["cliente_id"] = clave.map({p: f"CLI-{numeros[i]:05d}" for i, p in enumerate(personas)})
+
+# Fichero público: solo año, provincia, satisfacción y la marca de anomalía
+qi = ["anio", "reg"]
+tam = df.groupby(qi)["id_venta"].transform("size")
+publico = df.loc[tam >= 5, qi + ["satisfaccion", "anomalia"]]   # suprime grupos pequeños
+k = pd.read_csv("..._publico.csv").groupby(qi).size().min()      # medido sobre lo publicado`;
+---
+<Layout current="/anonimizacion" title="PII y anonimización · TechSoluciones Analytics">
+  <p class="eyebrow">Parte II · Preparación</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">6 · PII y anonimización</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    Aunque estos datos son sintéticos, se tratan como si fueran reales. El nombre, el correo y el teléfono
+    identifican directamente a una persona. La fecha, la provincia y el producto no lo hacen por separado,
+    pero combinados pueden identificarla. Por eso se generan <strong>dos ficheros</strong> con usos
+    distintos y la privacidad se mide sobre el que se publica.
+  </p>
+
+  <h2 class="mt-8 font-display text-[1.3rem] font-bold">Cómo se generan los dos ficheros</h2>
+  <p class="mt-3 max-w-2xl text-tinta-soft">
+    Los genera el script <code>04_anonimizacion.py</code>. Su entrada es el fichero limpio que deja la
+    <a href="/etl" class="lnk">limpieza</a>, con las {nf(anon.registros)} ventas y todos los datos personales
+    en claro. Ese fichero limpio se queda en la máquina de quien hace el análisis. El script lo lee una vez
+    y escribe los dos ficheros de salida en la misma ejecución.
+  </p>
+  <ol class="mt-3 ml-4 list-decimal space-y-2 max-w-2xl text-[.9rem] text-tinta-soft">
+    <li>
+      <strong>Fichero interno.</strong> Copia las ventas, retira el nombre y sustituye cada persona por un
+      código del tipo <code>CLI-00001</code>. Del correo deja solo la primera letra y el dominio, y del
+      teléfono las dos primeras cifras y las dos últimas. El resto de columnas se conserva tal cual.
+    </li>
+    <li>
+      <strong>Fichero público.</strong> De las mismas ventas se queda solo con {lista(p.columnas)}. Después
+      cuenta cuántas ventas comparten cada combinación de año y provincia y quita las que estén en un
+      grupo de menos de {p.k_objetivo}. Aquí no hubo que quitar ninguna, así que el fichero conserva las
+      {nf(p.registros)} filas.
+    </li>
+    <li>
+      <strong>Medida de la privacidad.</strong> El script vuelve a leer de disco el fichero público recién
+      escrito y calcula sobre él la k-anonimidad y la l-diversidad de la tabla de abajo. Se mide lo que
+      se ha escrito, para que un fallo al guardar no quede oculto.
+    </li>
+  </ol>
+  <p class="mt-3 max-w-2xl text-tinta-soft">
+    Como el pseudónimo se baraja con una semilla fija, ejecutar el script otra vez produce los mismos
+    códigos y los mismos dos ficheros.
+  </p>
+
+  <div class="mt-6 grid gap-3 sm:grid-cols-2">
+    <div class="tarjeta p-4">
+      <h3 class="text-[.95rem] font-semibold text-tinta">Interno · <code class="text-[.8rem]">{i.fichero.split('/').pop()}</code></h3>
+      <p class="mt-1.5 text-[.84rem] text-tinta-soft">
+        Sirve para el análisis. No lleva el nombre, el correo y el teléfono van enmascarados y cada persona
+        tiene un pseudónimo <strong>aleatorio</strong>. Hay {nf(i.clientes_unicos_pseudonimizados)} personas
+        distintas para {nf(anon.registros)} ventas, porque ninguna combinación de nombre y teléfono se repite.
+        Conserva la fecha, el producto y el importe. Por eso no se publica.
+      </p>
+    </div>
+    <div class="tarjeta p-4 ring-1 ring-acento/30">
+      <h3 class="text-[.95rem] font-semibold text-tinta">Público · <code class="text-[.8rem]">{p.fichero.split('/').pop()}</code></h3>
+      <p class="mt-1.5 text-[.84rem] text-tinta-soft">
+        Sirve para compartir y contiene {lista(p.columnas)}. Las cifras de venta se publican
+        agregadas en el cuadro de mando y nunca venta a venta.
+      </p>
+    </div>
+  </div>
+
+  <Code titulo="Ver el código de anonimización" code={anonCode} lang="python" />
+
+  <Callout tipo="info" titulo="Por qué el pseudónimo va por nombre y teléfono y es aleatorio">
+    Varias personas comparten correo (<a href="/segmentacion" class="lnk">se mide aquí</a>) y los nombres que
+    aparecen dos veces llevan teléfonos distintos, así que son personas distintas con el mismo nombre. Un
+    pseudónimo por correo o por nombre juntaría a varias personas bajo el mismo código. Además, numerar por
+    orden de aparición permitiría a quien tenga el fichero original deducir quién es quién. Barajar los
+    números con una semilla fija lo impide y mantiene el resultado reproducible.
+  </Callout>
+
+  <h2 class="mt-8 font-display text-[1.3rem] font-bold">Cuánto protege el fichero público</h2>
+  <p class="mt-3 max-w-2xl text-tinta-soft">
+    La <strong>k-anonimidad</strong> es el tamaño del grupo más pequeño que comparte los mismos
+    cuasi-identificadores: con k = 1 hay una persona que no se confunde con nadie. La <strong>l-diversidad</strong> es cuántos valores
+    distintos del dato sensible, aquí la satisfacción, hay en el grupo que menos tiene. Con l = 1, saber a qué grupo
+    pertenece alguien revela su dato sensible. La tabla mide el fichero publicado y lo que pasaría si llevara más columnas.
+  </p>
+
+  <div class="mt-4 overflow-x-auto">
+    <table class="w-full border-collapse text-[.84rem]">
+      <caption class="sr-only">k-anonimidad y l-diversidad según las columnas publicadas</caption>
+      <thead>
+        <tr class="border-b border-linea text-left text-suave">
+          <th scope="col" class="py-2 pr-3 font-semibold">Columnas que identifican</th>
+          <th scope="col" class="py-2 pr-3 font-semibold">k mínima</th>
+          <th scope="col" class="py-2 pr-3 font-semibold">l mínima</th>
+          <th scope="col" class="py-2 pr-3 font-semibold">Ventas únicas</th>
+          <th scope="col" class="py-2 pr-3 font-semibold">Ventas en grupos &lt; 5</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filas.map((f) => (
+          <tr class={`border-b border-linea/60 ${f.pub ? 'bg-acento-claro' : ''}`}>
+            <td class="py-2 pr-3 text-tinta-soft">{f.qi}{f.pub ? ' (lo publicado)' : ' (no se publica)'}</td>
+            <td class="py-2 pr-3 tabular-nums font-semibold text-tinta">{f.k}</td>
+            <td class="py-2 pr-3 tabular-nums text-suave">{f.l ?? '·'}</td>
+            <td class="py-2 pr-3 tabular-nums text-suave">{nf(f.unicas)}</td>
+            <td class="py-2 pr-3 tabular-nums text-suave">{nf(f.pct, 2)} %</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <Callout tipo="ok" titulo="Qué protege el fichero público y qué cuesta">
+    <p>
+      El fichero público cumple <strong>k = {p.k_min}</strong> y <strong>l = {p.l_min}</strong> con año y provincia,
+      sin suprimir ninguna venta. Para llegar ahí se retiró más de lo que parece necesario: la categoría baja k a
+      {rr.con_categoria.k_min} y el producto la baja a {rr.con_producto.k_min}, con {nf(rr.con_producto.ventas_unicas)} ventas
+      solas en su grupo.
+    </p>
+    <p class="mt-2">
+      El producto no se puede esconder dejando el precio o el importe, porque cada producto tiene un único precio de
+      catálogo y cualquiera de esas columnas lo revela. Por eso el fichero público no lleva ninguna. Cada columna
+      que se quita aumenta la privacidad y reduce la utilidad del fichero. La tabla mide ese intercambio.
+    </p>
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Con el dato limpio y protegido empieza el análisis. Siguiente:
+    <a href="/descriptiva" class="lnk font-semibold">la estadística descriptiva →</a>
+  </p>
+</Layout>

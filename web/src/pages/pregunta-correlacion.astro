@@ -1,0 +1,56 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import eda from '../data/eda.json';
+const p3 = eda.p3_correlacion_ventas_satisfaccion;
+const pe = p3.importe_vs_satisfaccion_pearson;
+const sp = p3.importe_vs_satisfaccion_spearman;
+const cp = p3.cant_vs_satisfaccion_pearson;
+const nf = (v, d) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+---
+<Layout current="/pregunta-correlacion" title="¿Ventas y satisfacción se relacionan? · TechSoluciones Analytics">
+  <p class="eyebrow">Parte IV · Las preguntas de negocio</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">13 · ¿Se relacionan ventas y satisfacción?</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    ¿Compran más quienes están más satisfechos? Se mide con dos coeficientes de correlación sobre las ventas
+    válidas que tienen satisfacción: Pearson (relación lineal) y Spearman (relación por orden). Ambos van de
+    −1 a +1; cerca de 0 significa «sin relación».
+  </p>
+
+  <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+    <div class="tarjeta p-4 text-center">
+      <div class="font-display text-[1.8rem] font-bold text-acento">{nf(pe.r, 4)}</div>
+      <div class="mt-1 text-[.8rem] text-tinta-soft">Pearson (importe ~ satisfacción)</div>
+    </div>
+    <div class="tarjeta p-4 text-center">
+      <div class="font-display text-[1.8rem] font-bold text-acento">{nf(sp.r, 4)}</div>
+      <div class="mt-1 text-[.8rem] text-tinta-soft">Spearman (importe ~ satisfacción)</div>
+    </div>
+    <div class="tarjeta p-4 text-center">
+      <div class="font-display text-[1.8rem] font-bold text-acento">{pe.n.toLocaleString('es-ES', { useGrouping: true })}</div>
+      <div class="mt-1 text-[.8rem] text-tinta-soft">ventas válidas con satisfacción</div>
+    </div>
+  </div>
+
+  <Callout tipo="warn" titulo="No hay relación">
+    Con r = {nf(pe.r, 4)} sobre {pe.n.toLocaleString('es-ES', { useGrouping: true })} ventas, la relación es <strong>prácticamente
+    nula</strong> y el contraste lo respalda (p = {nf(pe.p, 2)}: la pequeña relación observada entra de sobra en
+    lo que produce el azar). La satisfacción de este dataset no acompaña a lo que se factura.
+  </Callout>
+
+  <Callout tipo="idea" titulo="Con las unidades sale un resultado significativo sin importancia práctica">
+    Entre unidades y satisfacción sale r = {nf(cp.r, 4)} con p = {nf(cp.p, 3)}, por debajo de 0,05. Con
+    {cp.n.toLocaleString('es-ES', { useGrouping: true })} casos, cualquier relación mínima llega a ser «estadísticamente distinta de
+    cero». Lo que decide es el tamaño: esa r explica el {nf(100 * cp.r * cp.r, 2)} % de la variación de la
+    satisfacción. Y se han hecho tres contrastes sobre el mismo dato, lo que multiplica la probabilidad de que
+    uno salga por azar. Ninguno de los dos resultados sirve para tomar una decisión de negocio. Las dos ideas se desarrollan en
+    <a href="/senal-ruido/tamano-efecto" class="lnk">significativo no es importante</a> y
+    <a href="/senal-ruido/comparaciones-multiples" class="lnk">comparaciones múltiples</a>.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Las tres preguntas terminan igual: lo que parecía un hallazgo no supera al azar. La parte siguiente explica por qué ocurre. Siguiente:
+    <a href="/senal-ruido" class="lnk font-semibold">señal frente a ruido →</a>
+  </p>
+</Layout>

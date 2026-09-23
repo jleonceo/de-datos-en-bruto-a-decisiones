@@ -1,0 +1,226 @@
+/* ============================================================
+   Hazlo Tuyo: sistema visual v3 (web_nueva)
+   Tailwind 4 + DaisyUI.
+   Cambios v3 (des-IA-izar + firma propia):
+   - el "eyebrow" deja de ir en MAYÚSCULAS (era el tic visual nº1 de
+     las landings generadas): ahora es sentence-case, sin trazo delante.
+   - titulares en serif editorial (Iowan/Palatino/Georgia, sin fuentes externas)
+   - utilidades para el manifiesto, la demo "antes/después" y el ascenso de niveles
+   Mismos NOMBRES de token que antes (bg-crema, text-tinta, text-acento…)
+   para que el asistente clonado (paso1-3, resultado) siga funcionando intacto.
+   ============================================================ */
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  /* Tinta y grises */
+  --color-tinta: #1c212b;
+  --color-tinta-soft: #39414f;
+  --color-suave: #5b6472;
+
+  /* Fondo blanco minimalista; "crema" pasa a gris neutro para rellenos sutiles */
+  --color-crema: #f6f6f4;
+  --color-crema-deep: #eeeeeb;
+  --color-papel: #ffffff;
+
+  /* Acento verde pino (sustituye al terracota, que era el color de Claude) */
+  --color-acento: #2e6a57;
+  --color-acento-deep: #245446;
+  --color-acento-claro: #e3efe9;
+
+  /* Líneas neutras y verde de "sí" (alineado al acento) */
+  --color-linea: #e6e6e2;
+  --color-verde: #2e6a57;
+
+  /* Tipografía: cuerpo en sans del sistema; titulares en serif editorial */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+}
+
+/* ---------- Base ---------- */
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  background: #ffffff;
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+}
+::selection { background: var(--color-acento-claro); color: var(--color-acento-deep); }
+
+/* ---------- Skip link (RAG_UI regla 45) ----------
+   Enlace "saltar al contenido" oculto hasta que recibe foco con el tabulador.
+   Permite a quien usa teclado saltarse la navegación de la cabecera. */
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 60;
+  background: var(--color-acento);
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: top .15s ease;
+}
+.skip-link:focus { top: 12px; }
+
+/* ---------- Foco de teclado visible (RAG_UI regla 28 · Alta) ----------
+   Anillo de acento en TODOS los interactivos para quien navega con teclado.
+   Se usa :focus-visible para no molestar al clic de ratón. El ratón no
+   dispara el anillo; el tabulador sí. Cubre <a>, <button>, <input>,
+   <textarea>, <summary> y los elementos con role de botón (.demo-tab, .chip).
+   Sobre fondo oscuro (.bg-tinta) el anillo cambia a tono claro para contraste. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible,
+.demo-tab:focus-visible,
+.chip:focus-visible,
+.btn-acento:focus-visible {
+  outline: 3px solid var(--color-acento);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+/* En secciones oscuras el acento terracota pierde contraste: anillo claro */
+.bg-tinta a:focus-visible,
+.bg-tinta button:focus-visible,
+.bg-tinta input:focus-visible,
+.bg-tinta [tabindex]:focus-visible {
+  outline-color: #7ec8ad;
+}
+/* Reserva: en navegadores sin :focus-visible, no dejar nunca a nadie sin foco */
+a:focus,
+button:focus,
+input:focus,
+textarea:focus,
+summary:focus { outline-color: var(--color-acento); }
+
+/* Titulares con serif editorial: el carácter más visible de la marca */
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  letter-spacing: -.015em;
+}
+
+/* ---------- Jerarquía de encabezados en el contenido (fix 01/07) ----------
+   Problema: el título de página (h1) y los subapartados (h2) se distinguían poco
+   Mismo serif, mismo color, tamaños próximos (2rem vs 1.2rem). Se refuerza el
+   contraste sin tocar las 22 páginas: el selector `main hN.font-display` gana en
+   especificidad al tamaño inline `text-[…]`, así que reescala desde un solo sitio.
+   - h1: más grande y claramente dominante.
+   - h2: algo más grande, con un filete de acento inferior y aire arriba → lee como
+     "inicio de sección" y se separa tanto del h1 como del cuerpo. */
+main h1.font-display { font-size: 2.35rem; line-height: 1.12; }
+main h2.font-display {
+  font-size: 1.5rem;
+  margin-top: 2.75rem;
+  padding-bottom: .32rem;
+  border-bottom: 2px solid var(--color-acento-claro);
+}
+
+/* ---------- Firma: el trazo de acento ---------- */
+/* El "eyebrow" ya NO es uppercase, y desde el 23/09/2026 tampoco lleva trazo delante. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-acento-deep);
+}
+/* 23/09/2026: retirado el trazo que iba delante (.eyebrow::before). Juan lo leía como una raya
+   larga y no la quiere en la web. */
+.eyebrow.eyebrow-c { flex-direction: column; gap: .5rem; }
+
+/* ---------- Salvaguarda de contraste (RAG_UI regla 36 · Alta) ----------
+   --color-acento-deep (#245446) sobre fondo oscuro (.bg-tinta #1c212b) no
+   pasa AA (4.5:1). Hoy no se usa así, pero esta regla impide que pueda
+   hacerlo por descuido: cualquier texto con color acento dentro de una
+   sección oscura se reescribe al tono claro #7ec8ad (verde claro, ~8.7:1
+   sobre la tinta), que sí contrasta. Es un cinturón de seguridad. */
+.bg-tinta .text-acento-deep,
+.bg-tinta .text-acento { color: #7ec8ad !important; }
+
+/* ---------- Botón de acción principal ---------- */
+.btn-acento {
+  display: inline-block;
+  background: var(--color-acento);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 15px 30px;
+  text-decoration: none;
+  box-shadow: 0 8px 22px rgba(46, 106, 87, .20);
+  transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.btn-acento:hover { transform: translateY(-2px); background: var(--color-acento-deep); box-shadow: 0 12px 26px rgba(36, 84, 70, .24); }
+
+/* Enlace de texto con subrayado de acento al pasar */
+.lnk { color: var(--color-suave); text-decoration: none; font-weight: 500; transition: color .15s ease; }
+.lnk:hover { color: var(--color-acento); text-decoration: underline; text-underline-offset: 4px; }
+
+/* ---------- Tarjeta base ---------- */
+.tarjeta {
+  background: var(--color-papel);
+  border: 1px solid var(--color-linea);
+  border-radius: 8px;
+  box-shadow: 0 10px 34px rgba(28, 33, 43, .05);
+}
+
+/* ---------- Manifiesto: número grande en serif ---------- */
+.credo-n {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-acento);
+  line-height: 1;
+}
+
+/* ---------- Demo antes/después: transición al cambiar de caso ---------- */
+.demo-panel { transition: opacity .25s ease; }
+.demo-panel.fading { opacity: 0; }
+/* botón de caso activo */
+.demo-tab[aria-pressed="true"] {
+  background: var(--color-tinta);
+  color: #fff;
+  border-color: var(--color-tinta);
+}
+/* Objetivo táctil ≥44px (RAG_UI regla 22 · Alta). La pastilla era ~30×14.
+   min-height da el alto; el flex centra el texto sin cambiar el aspecto. */
+.demo-tab {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ---------- Ascenso de niveles: la línea que sube ---------- */
+.nivel-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-acento);
+}
+
+/* ---------- Scroll-reveal (activado desde Layout) ---------- */
+/* Solo se ocultan si hay JS (html.js). Sin JS, el contenido se ve igual. */
+html.js .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1);
+}
+html.js .reveal.is-visible { opacity: 1; transform: none; }
+
+/* Grano sutil para secciones oscuras (SVG data-uri, sin dependencias) */
+.grano {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+}
+
+/* Respeto a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+  .btn-acento, .demo-panel { transition: none; }
+}

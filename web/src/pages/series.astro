@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import LineChart from '../components/LineChart.astro';
+import BarList from '../components/BarList.astro';
+import eda from '../data/eda.json';
+const am = Object.entries(eda.ventas_por_anio_mes)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([x, y]) => ({ x, y }));
+const anios = Object.entries(eda.ventas_por_anio).map(([a, v]) => ({ label: a, value: v.facturacion }));
+const k = eda.kpis;
+const a0 = k.periodo[0].slice(0, 4);
+const a1 = k.periodo[1].slice(0, 4);
+const fd = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: 'exceptZero' }).format(v);
+const topSube = Object.entries(k.crecimiento_interanual_pct).sort((a, b) => b[1] - a[1])[0];
+---
+<Layout current="/series" title="Series y estacionalidad · TechSoluciones Analytics">
+  <p class="eyebrow">Parte III · Análisis exploratorio</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">9 · Series y estacionalidad</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    ¿Crecen las ventas? ¿Hay meses fuertes? La serie mensual de facturación da una primera
+    respuesta a simple vista. Conviene mirarla antes de afirmar cualquier tendencia. Las cifras son de ventas válidas, sin las
+    {k.n_anomalias} anomalías; el último punto, {['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][Number(k.periodo[1].slice(5, 7))]} de {k.periodo[1].slice(0, 4)}, es un mes incompleto.
+  </p>
+
+  <div class="tarjeta mt-6 p-4">
+    <h3 class="text-[.9rem] font-semibold text-tinta">Facturación mensual, {a0}-{a1} (€)</h3>
+    <div class="mt-3"><LineChart points={am} label={`Facturación mensual de ${a0} a ${a1}, en euros`} /></div>
+  </div>
+
+  <h2 class="mt-8 font-display text-[1.2rem] font-bold">Facturación por año (€)</h2>
+  <div class="mt-3"><BarList items={anios} unit=" €" /></div>
+
+  <Callout tipo="idea" titulo={`Sin tendencia y con ${a1} incompleto`}>
+    De {a0} a {Number(a1) - 1} la facturación válida se mueve en una banda estrecha, sin tendencia: entre el primer y el
+    último año completo cambia un {fd(k.crecimiento_2019_2025_pct)} %. El año que más sube es {topSube[0]}
+    ({fd(topSube[1])} %) y el siguiente es el que más baja ({fd(k.crecimiento_interanual_pct[Number(topSube[0]) + 1])} %).
+    {a1} aparece más bajo porque el año está incompleto. La Parte IV comprueba si algún mes del año vende
+    más de forma estable, y ninguno lo hace.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Siguiente: <a href="/segmentos" class="lnk font-semibold">producto, categoría y región →</a>
+  </p>
+</Layout>

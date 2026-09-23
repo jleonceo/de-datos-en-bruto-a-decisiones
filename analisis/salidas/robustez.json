@@ -1,0 +1,40 @@
+{
+  "n_permutaciones": 2000,
+  "semilla": 42,
+  "generador": "uno por test, cada uno con semilla 42",
+  "base": "ventas validas (sin las 16 anomalias)",
+  "p1_estacionalidad": {
+    "estadistico": "maxima media de facturacion mensual por mes del anio (meses completos, sin anomalias)",
+    "n_meses": 88,
+    "mes_observado": 8,
+    "media_observada": 565549.29,
+    "null_max_media": 576674.97,
+    "null_max_p95": 595547.79,
+    "p_valor_permutacion": 0.866,
+    "veredicto": "RUIDO (ningun mes destaca mas que el azar)",
+    "lectura": "p = fraccion de barajados en que el mejor mes del azar iguala o supera al mejor mes real"
+  },
+  "p2_region_satisfaccion": {
+    "base": "validas con satisfaccion, 2019-2026",
+    "estadistico": "maxima pendiente de la satisfaccion media anual entre provincias",
+    "region_observada": "Navarra",
+    "slope_observado_max": 0.1798,
+    "null_max_media": 0.1947,
+    "null_max_p95": 0.2712,
+    "p_valor_permutacion": 0.603,
+    "veredicto": "RUIDO (no distinguible del azar)"
+  },
+  "p2_region_satisfaccion_sin_2026": {
+    "base": "validas con satisfaccion, 2019-2025",
+    "estadistico": "maxima pendiente de la satisfaccion media anual entre provincias",
+    "region_observada": "Madrid",
+    "slope_observado_max": 0.2095,
+    "null_max_media": 0.1983,
+    "null_max_p95": 0.2725,
+    "p_valor_permutacion": 0.3595,
+    "veredicto": "RUIDO (no distinguible del azar)"
+  },
+  "p3_correlacion": {
+    "nota": "se contrasta en 05_eda.py con pearsonr y spearmanr de scipy (p exacto)"
+  }
+}

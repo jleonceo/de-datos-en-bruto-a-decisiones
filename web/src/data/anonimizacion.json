@@ -1,0 +1,114 @@
+{
+  "registros": 20000,
+  "interno": {
+    "fichero": "data/techsoluciones_ventas_anon.csv",
+    "uso": "interno (analisis); conserva fecha, producto e importe y no se publica",
+    "columnas": [
+      "id_venta",
+      "fecha",
+      "anio",
+      "mes",
+      "anio_mes",
+      "trimestre",
+      "cliente_id",
+      "email_masc",
+      "telefono_masc",
+      "reg",
+      "cat",
+      "prod",
+      "cant",
+      "precio",
+      "importe",
+      "satisfaccion",
+      "anomalia"
+    ],
+    "clientes_unicos_pseudonimizados": 20000,
+    "clave_cliente": "nombre_completo + telefono",
+    "motivo_clave": "el email lo comparten personas distintas y el nombre tiene homonimos",
+    "pseudonimo_aleatorio": true,
+    "semilla": 42,
+    "tecnica": "cliente_id con numeracion barajada; email y telefono enmascarados; nombre retirado"
+  },
+  "publico": {
+    "fichero": "data/techsoluciones_ventas_publico.csv",
+    "columnas": [
+      "anio",
+      "reg",
+      "satisfaccion",
+      "anomalia"
+    ],
+    "retiradas": [
+      "id_venta",
+      "fecha",
+      "mes",
+      "anio_mes",
+      "trimestre",
+      "nombre_completo",
+      "email",
+      "telefono",
+      "cliente_id",
+      "cat",
+      "prod",
+      "cant",
+      "precio",
+      "importe"
+    ],
+    "motivo_retirada_producto": "cada producto tiene un precio de catalogo unico: producto, precio, cantidad o importe por venta revelan el producto",
+    "qi": [
+      "anio",
+      "reg"
+    ],
+    "k_objetivo": 5,
+    "filas_suprimidas": 0,
+    "pct_suprimido": 0.0,
+    "registros": 20000,
+    "k_min": 10,
+    "grupos": 416,
+    "l_min": 5,
+    "sensible": "satisfaccion",
+    "cifras_de_venta": "se publican agregadas (eda.json), no por venta"
+  },
+  "riesgo_si_se_publicara": {
+    "con_categoria": {
+      "qi": [
+        "anio",
+        "reg",
+        "cat"
+      ],
+      "k_min": 4,
+      "grupos": 832,
+      "ventas_unicas": 0,
+      "ventas_en_grupos_menores_de_5": 12,
+      "pct_ventas_en_grupos_menores_de_5": 0.06,
+      "l_min": 2
+    },
+    "con_producto": {
+      "qi": [
+        "anio",
+        "reg",
+        "cat",
+        "prod"
+      ],
+      "k_min": 1,
+      "grupos": 3266,
+      "ventas_unicas": 169,
+      "ventas_en_grupos_menores_de_5": 3550,
+      "pct_ventas_en_grupos_menores_de_5": 17.75
+    },
+    "con_producto_y_cantidad": {
+      "qi": [
+        "anio",
+        "reg",
+        "cat",
+        "prod",
+        "cant"
+      ],
+      "k_min": 1,
+      "grupos": 10949,
+      "ventas_unicas": 5522,
+      "ventas_en_grupos_menores_de_5": 18178,
+      "pct_ventas_en_grupos_menores_de_5": 90.89
+    },
+    "lectura": "medido sobre las 20.000 ventas: si el fichero publico llevara el producto, quien sepa que compro alguien, en que anio y en que provincia encontraria su venta sola en su grupo y leeria su satisfaccion. Por eso el producto no se publica por venta."
+  }
+}

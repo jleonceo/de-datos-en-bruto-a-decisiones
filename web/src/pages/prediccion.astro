@@ -1,0 +1,67 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import Kpi from '../components/Kpi.astro';
+import ml from '../data/ml.json';
+import eda from '../data/eda.json';
+const pr = ml.prediccion_satisfaccion;
+const an = ml.anomalias;
+const R = pr.resultados;
+const nf = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: 0 }).format(v);
+const f2 = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v === 0 ? 0 : v);
+const normales = Object.entries(an.marcadas_normales_por_producto);
+import IndiceSub from '../components/IndiceSub.astro';
+---
+<Layout current="/prediccion" title="¿Se puede predecir? Y las anomalías · TechSoluciones Analytics">
+  <p class="eyebrow">Parte V · Machine Learning</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">16 · ¿Se puede predecir? Y las anomalías</h1>
+
+  <h2 class="mt-4 font-display text-[1.2rem] font-bold">Dos modelos contra la media</h2>
+  <p class="mt-2 max-w-2xl text-tinta-soft">
+    Se entrenan dos modelos, una regresión lineal y un bosque aleatorio, para predecir la satisfacción a partir del resto de variables, sobre las ventas
+    válidas. La métrica es el R² sobre datos no vistos: <strong>1 sería perfecto; 0, no explicar nada; por
+    debajo de 0, peor que quedarse siempre con la media</strong>. Se compara contra una línea base que siempre
+    predice la media.
+  </p>
+
+  <div class="mt-5 grid grid-cols-3 gap-3">
+    <Kpi valor={f2(R.baseline_media.r2_test)} etiqueta="Línea base (media)" />
+    <Kpi valor={f2(R.regresion_lineal.r2_test)} etiqueta="Regresión lineal" />
+    <Kpi valor={f2(R.random_forest.r2_test)} etiqueta="Random Forest" />
+  </div>
+
+  <Callout tipo="warn" titulo="El machine learning no encuentra lo que no está en los datos">
+    Ningún modelo mejora a la predicción de la media. Un R² ligeramente <strong>negativo</strong> no es un error:
+    significa que el modelo acierta <em>menos</em> que responder siempre «la media». Con estas variables la
+    satisfacción <strong>no se puede predecir</strong> y decirlo es parte del resultado.
+  </Callout>
+
+  <h2 class="mt-8 font-display text-[1.2rem] font-bold">Una regla de negocio comparada con un algoritmo que no la conoce</h2>
+  <p class="mt-2 max-w-2xl text-tinta-soft">
+    En la Parte III las anomalías las marcó una regla de negocio: cantidad fuera de 1-5 o precio fuera de
+    catálogo. Para contrastarla se lanza <strong>IsolationForest</strong> sobre las {nf(eda.n)}
+    ventas registradas, sin decirle cuáles son. El algoritmo aísla lo que se aleja del resto mirando importe, cantidad y
+    precio a la vez.
+  </p>
+
+  <div class="mt-5 grid grid-cols-3 gap-3">
+    <Kpi valor={nf(an.isolationforest_n)} etiqueta="ventas que marca IsolationForest" />
+    <Kpi valor={`${an.anomalias_regla_cazadas} de ${an.anomalias_regla_n}`} etiqueta="anomalías de la regla que detecta" />
+    <Kpi valor={nf(an.marcadas_que_no_son_anomalia_de_regla)} etiqueta="marcadas que son ventas normales" />
+  </div>
+
+  <Callout tipo="info" titulo="Qué sale del contraste">
+    IsolationForest encuentra {an.anomalias_regla_cazadas} de las {an.anomalias_regla_n} anomalías sin conocer la
+    regla, lo que confirma que también son valores raros para un método que no sabe qué está prohibido. Se le escapa
+    {an.anomalias_regla_no_cazadas.map((x) => `${x.id_venta} (${x.cant} uds. de ${x.prod}, ${nf(x.importe)} €)`).join(', ')},
+    cuyo importe es bajo porque el producto es barato. Y marca además {nf(an.marcadas_que_no_son_anomalia_de_regla)}
+    ventas normales: {normales.map(([p, n]) => `${nf(n)} de ${p}`).join(', ')}, el producto más caro. El algoritmo
+    sirve para proponer candidatas; decidir qué es un error lo hace la regla de negocio.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Siguiente: <a href="/cuadro-mando" class="lnk font-semibold">el cuadro de mando →</a>
+  </p>
+  <IndiceSub slug="/prediccion" titulo="Qué se comprueba antes de dar por bueno un modelo" entrada="Esta página muestra que ningún modelo predice la satisfacción mejor que la media. Las páginas siguientes explican tres comprobaciones que evitan dar por bueno un resultado falso: separar los datos de entrenamiento y de prueba, buscar fugas de información y comparar con un modelo sencillo." />
+
+</Layout>

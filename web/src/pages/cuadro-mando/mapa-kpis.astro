@@ -1,0 +1,122 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import eda from '../../data/eda.json';
+import dic from '../../data/diccionario.json';
+
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/cuadro-mando', t: '17 · Cuadro de mando' };
+const k = eda.kpis;
+const anios = Object.keys(k.crecimiento_interanual_pct);
+const ultimo = anios[anios.length - 1];
+const runRate = eda.ventas_por_anio[ultimo].facturacion;
+
+const mapa = [
+  { dep: 'Finanzas', kpi: 'Margen', pide: 'el coste de cada venta', ok: false },
+  { dep: 'Finanzas', kpi: 'Facturación anual', pide: 'importe y fecha', ok: true, v: `${f(runRate)} € en ${ultimo}` },
+  { dep: 'Finanzas', kpi: 'Consumo de caja', pide: 'los gastos del mes', ok: false },
+  { dep: 'Ventas', kpi: 'Ticket medio', pide: 'importe de cada venta válida', ok: true, v: `${f(k.ticket_medio, 2)} €` },
+  { dep: 'Ventas', kpi: 'Coste de captar un cliente', pide: 'gasto comercial y clientes nuevos', ok: false },
+  { dep: 'Ventas', kpi: 'Valor de vida del cliente', pide: 'una clave de cliente', ok: false },
+  { dep: 'Ventas', kpi: 'Conversión', pide: 'las ofertas o visitas que no acabaron en venta', ok: false },
+  { dep: 'Producto', kpi: 'Clientes que se van', pide: 'una clave de cliente', ok: false },
+  { dep: 'Producto', kpi: 'Satisfacción', pide: 'una nota por venta', ok: true, v: `${f(k.satisfaccion_media, 1)} / 10, con el ${f(k.pct_satisfaccion_disponible, 1)} % respondido` },
+  { dep: 'Operaciones', kpi: 'Plazo de entrega', pide: 'la fecha de entrega', ok: false },
+];
+const posibles = mapa.filter((x) => x.ok).length;
+---
+<Layout current="/cuadro-mando/mapa-kpis" title="Mapa de KPIs y North Star · TechSoluciones Analytics">
+  <Concepto
+    ficha="J2"
+    madre={madre}
+    titulo={`De ${mapa.length} KPIs habituales, con esta tabla solo se pueden calcular ${posibles}`}
+    pregunta="¿Qué debería medir cada departamento y cuál es la cifra principal?"
+  >
+    <Fragment slot="problema">
+      <p>
+        Cada área de una empresa tiene sus propios indicadores. Finanzas mira el margen y la caja, ventas mira
+        cuánto cuesta captar un cliente y cuánto deja, producto mira cuántos clientes se pierden. Un panel de dirección
+        tiende a querer enseñarlos todos.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Si la lista de KPIs se copia de un manual y se da por hecho que los datos la cubren, luego se descubre que
+        la mitad no se puede calcular y el hueco se cubre con la cifra que hay disponible, aunque no mida lo mismo. La
+        satisfacción media ocupa el sitio del NPS, que es otra pregunta, y el número de ventas el de los
+        clientes.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Cada KPI necesita un dato concreto y una cifra es la principal">
+        Antes de incluir un indicador en el panel se escribe qué columna necesita. Además, se elige una
+        North Star, la cifra que mejor resume el valor que el cliente recibe y la que orienta a todo el equipo.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Hacer el mapa por departamento con tres columnas: el KPI, el dato que pide y si ese dato existe. Lo que
+        no se puede medir no se sustituye por otra cosa: se anota como dato que hay que empezar a recoger.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <p>
+        La tabla de TechSoluciones tiene {dic.n_campos} columnas: la venta, la fecha, el cliente sin clave, la
+        provincia, el producto, cantidad, precio, importe y satisfacción. Con eso:
+      </p>
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full border-collapse text-[.85rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">Área</th>
+              <th class="py-2 pr-3 font-semibold">KPI</th>
+              <th class="py-2 pr-3 font-semibold">Qué dato pide</th>
+              <th class="py-2 font-semibold">Aquí</th>
+            </tr>
+          </thead>
+          <tbody>
+            {mapa.map((x) => (
+              <tr class="border-b border-linea/60 align-top">
+                <td class="py-2 pr-3 text-suave">{x.dep}</td>
+                <td class="py-2 pr-3 font-semibold">{x.kpi}</td>
+                <td class="py-2 pr-3 text-tinta-soft">{x.pide}</td>
+                <td class={`py-2 ${x.ok ? 'text-acento-deep' : 'text-suave'}`}>{x.ok ? x.v : 'no se puede'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4">
+        Salen {posibles} de {mapa.length}. Los que faltan piden sobre todo dos cosas que la tabla no tiene: los
+        costes y una clave de cliente. Es la misma conclusión a la que llega la
+        {' '}<a href="/segmentacion/rfm" class="text-acento no-underline hover:underline">página del RFM</a> por
+        otro camino.
+      </p>
+      <Callout tipo="warn" titulo="La North Star posible y la que convendría">
+        Con estos datos, la candidata es la facturación válida de cada mes, porque resume lo que se vende sin
+        las ventas imposibles. La que indicaría si el cliente recibe valor es cuántos clientes vuelven a comprar.
+        Esa cifra hoy no existe. Declararla North Star aunque todavía no se pueda medir, con el dato que
+        falta anotado al lado, es la forma de que alguien empiece a recogerlo.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Al diseñar un panel desde cero y al heredar uno. El mapa enseña en una pantalla qué se mide
+        directamente, qué se mide con un sustituto y qué no se mide en absoluto.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Las columnas salen de <code>diccionario.json</code> y las cifras de
+        {' '}<code>eda.json</code> (<code>kpis</code> y <code>ventas_por_anio</code>).
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

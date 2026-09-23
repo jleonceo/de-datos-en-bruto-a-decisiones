@@ -1,0 +1,60 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import perfilado from '../data/perfilado.json';
+import eda from '../data/eda.json';
+const nf = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true }).format(v);
+const per = eda.kpis.periodo;
+const familias = [
+  { c: 'F1', t: 'Esquema y metadatos', ej: 'Nombres opacos (reg, cat, prod), sin diccionario, tipos mal declarados.', aqui: true },
+  { c: 'F2', t: 'Valores y sintaxis', ej: 'Acentos incoherentes, emails con espacios, tildes y mayúsculas, formatos numéricos.', aqui: true },
+  { c: 'F3', t: 'Registros y duplicados', ej: `${nf(perfilado.diagnostico_suciedad.filas_identicas_duplicadas)} filas idénticas y un mismo correo para varias personas.`, aqui: true },
+  { c: 'F4', t: 'Integridad relacional', ej: 'Claves que no casan entre tablas. (Aquí no aplica: tabla única.)', aqui: false },
+  { c: 'F5', t: 'Temporal', ej: `Cuatro formatos de fecha en la misma columna. Ninguna fecha cae fuera del periodo ${per[0].slice(0, 4)}-${per[1].slice(0, 4)}.`, aqui: true },
+  { c: 'F6', t: 'Semántica de negocio', ej: 'Valores que las reglas del dominio no permiten. Aquí: cada producto tiene un precio de catálogo y se vende de 1 a 5 unidades y hay ventas que rompen las dos reglas.', aqui: true },
+  { c: 'F7', t: 'Para machine learning', ej: 'Fugas, desbalanceo, escalas. Se vigila al modelar.', aqui: false },
+  { c: 'F8', t: 'Gobernanza y PII', ej: 'Datos personales sin proteger; falta de anonimización.', aqui: true },
+];
+---
+<Layout current="/calidad-datos" title="Teoría de la calidad de datos · TechSoluciones Analytics">
+  <p class="eyebrow">Parte I · El problema y los datos</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">3 · La teoría de la calidad de datos</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    Los errores de un fichero de datos se repiten de un caso a otro y por eso se pueden catalogar.
+    Este trabajo clasifica los errores en <strong>ocho familias</strong>, recogidas en un catálogo de patrones.
+    Con él, la limpieza consiste en revisar el fichero familia por familia hasta completar la lista, de modo
+    que el resultado no depende de lo que a cada persona se le ocurra mirar.
+  </p>
+
+  <Callout tipo="idea" titulo="Qué recoge el catálogo">
+    De cada patrón recoge tres cosas: cómo se introduce el error
+    en unos datos de prueba, cómo se <em>detecta</em> y cómo se <em>limpia</em>. En esta página sirve para
+    clasificar los errores de este fichero.
+  </Callout>
+
+  <h2 class="mt-8 font-display text-[1.3rem] font-bold">Las ocho familias y en cuáles cae este fichero</h2>
+  <div class="mt-4 grid gap-3 sm:grid-cols-2">
+    {familias.map((f) => (
+      <div class={`tarjeta p-4 ${f.aqui ? 'ring-1 ring-acento/30' : 'opacity-80'}`}>
+        <div class="flex items-center gap-2">
+          <span class="rounded bg-acento-claro px-1.5 py-0.5 text-[.72rem] font-bold text-acento-deep">{f.c}</span>
+          <h3 class="text-[.95rem] font-semibold text-tinta">{f.t}</h3>
+          {f.aqui && <span class="ml-auto text-[.68rem] font-semibold text-acento">presente aquí</span>}
+        </div>
+        <p class="mt-2 text-[.82rem] text-suave">{f.ej}</p>
+      </div>
+    ))}
+  </div>
+
+  <p class="mt-6 max-w-2xl text-tinta-soft">
+    {(() => { const n = ['cero', 'una', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho'][familias.filter((f) => f.aqui).length]; return n[0].toUpperCase() + n.slice(1); })()} de las ocho familias aparecen en este fichero. La F6 es la que
+    más cuesta ver, porque sus valores tienen el formato correcto: solo aparece al mirar el rango de cada
+    variable dentro de su producto. Con esta clasificación, la limpieza sigue un orden
+    previsto y no depende de ir encontrando problemas sobre la marcha.
+  </p>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Siguiente: <a href="/etl" class="lnk font-semibold">ejecutar la limpieza →</a>
+  </p>
+</Layout>

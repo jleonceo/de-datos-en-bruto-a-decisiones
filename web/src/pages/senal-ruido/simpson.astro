@@ -1,0 +1,169 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import inf from '../../data/inferencia.json';
+
+const s = inf.f9_simpson;
+const e = inf.f15_emparejamiento;
+const tickets = s.detalle_por_producto.flatMap((r) => [r.media_alto, r.media_bajo]);
+const f = (v, d = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+const madre = { slug: '/senal-ruido', t: '14 · La lección: señal frente a ruido' };
+
+const code = `# El ticket medio por region, con y sin desglosar por producto
+agregado = val.groupby("reg")["importe"].mean()          # lo que ve el cuadro de mando
+dentro   = val.groupby(["reg", "prod"])["importe"].mean()  # lo que ve quien desglosa
+
+# La mezcla, que es la causa: que parte de cada region es el producto caro
+mix = val.assign(c=val["prod"] == "${s.producto_caro}").groupby("reg")["c"].mean()`;
+---
+<Layout current="/senal-ruido/simpson" title={`La paradoja de Simpson · TechSoluciones Analytics`}>
+  <Concepto
+    ficha="F9"
+    madre={madre}
+    titulo={`${s.region_agregado_alto} factura más por venta, pero su ticket es más bajo en ${s.productos_invertidos} de los ${s.productos_comparados} productos`}
+    pregunta={`¿Cada venta de ${s.region_agregado_alto} deja más importe que las de ${s.region_agregado_bajo}, o ${s.region_agregado_alto} vende productos más caros?`}
+  >
+    <Fragment slot="problema">
+      <p>
+        Si se ordenan las provincias por lo que factura cada venta, {s.region_agregado_alto} queda arriba con
+        <strong> {f(s.media_alto, 2)} €</strong>, mientras {s.region_agregado_bajo} cierra la tabla con
+        <strong> {f(s.media_bajo, 2)} €</strong>. Un <strong>{f(s.brecha_pct, 1)} %</strong> de diferencia.
+        La lectura inmediata es que en esa provincia cada venta se cierra por más importe y que conviene copiar su forma de trabajar.
+      </p>
+      <p>
+        Antes de copiar nada, conviene mirar la misma comparación producto a producto.
+      </p>
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full border-collapse text-[.84rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-1.5 pr-3 font-semibold">Producto</th>
+              <th class="py-1.5 pr-3 text-right font-semibold">{s.region_agregado_alto}</th>
+              <th class="py-1.5 pr-3 text-right font-semibold">{s.region_agregado_bajo}</th>
+              <th class="py-1.5 font-semibold">Quién gana</th>
+            </tr>
+          </thead>
+          <tbody>
+            {s.detalle_por_producto.map((r) => (
+              <tr class="border-b border-linea/60">
+                <td class="py-1.5 pr-3">{r.producto}</td>
+                <td class="py-1.5 pr-3 text-right tabular-nums">{f(r.media_alto, 0)} €</td>
+                <td class="py-1.5 pr-3 text-right tabular-nums">{f(r.media_bajo, 0)} €</td>
+                <td class={`py-1.5 ${r.se_invierte ? 'font-semibold text-acento-deep' : 'text-suave'}`}>
+                  {r.se_invierte ? s.region_agregado_bajo : s.region_agregado_alto}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        {s.region_agregado_bajo} gana en <strong>{s.productos_invertidos} de los {s.productos_comparados}</strong>{' '}
+        productos, aunque en varios la diferencia es de pocos euros. La provincia que perdía por un
+        {' '}{f(s.brecha_pct, 1)} % en el total queda, producto a producto, muy cerca de la otra, unas veces por
+        encima y otras por debajo.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Los dos números son correctos. Lo que engaña es que el promedio de arriba mezcla cosas que no se
+        parecen.
+      </p>
+      <p>
+        El ticket medio de cada producto va de <strong>{f(Math.min(...tickets), 0)} €</strong> a
+        <strong> {f(Math.max(...tickets), 0)} €</strong> por venta. Por eso el ticket medio de una provincia depende
+        menos de cómo venda que de <em>qué</em> venda. La causa está en la mezcla: el {s.producto_caro} es el
+        <strong> {f(s.peso_producto_caro_alto_pct, 1)} %</strong> de las ventas de {s.region_agregado_alto} y solo el
+        <strong> {f(s.peso_producto_caro_bajo_pct, 1)} %</strong> de las de {s.region_agregado_bajo}.
+      </p>
+      <p>
+        Que el producto caro pese unas dos veces y media más en una provincia que en la otra basta para dar la
+        vuelta a la tabla, aunque en {s.productos_invertidos} de los {s.productos_comparados} productos cada venta de
+        {' '}{s.region_agregado_bajo} deje algo más de importe.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="La paradoja de Simpson">
+        Una relación que se ve en el conjunto puede invertirse dentro de cada grupo. Cuando eso pasa, el
+        número agregado mide la <strong>mezcla</strong> y deja de medir lo que parece.
+      </Callout>
+      <p>
+        Antes de comparar dos grupos, hay que preguntarse si están compuestos igual.
+      </p>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Desglosar. Se elige la variable que se sospecha que descompensa la mezcla, aquí el producto, y se repite
+        la comparación dentro de cada uno de sus valores. Si el orden se mantiene, la diferencia era real. Si se
+        da la vuelta, la diferencia venía de la composición.
+      </p>
+      <p>
+        Hay una segunda forma de verlo, que es <a href="/senal-ruido/emparejamiento" class="text-acento no-underline hover:underline">emparejar</a>:
+        comparar solo ventas del mismo producto, una contra una.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Diferencia en el agregado</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-tinta">{f(e.diferencia_bruta, 2)} €</div>
+          <div class="text-[.78rem] text-suave">a favor de {s.region_agregado_alto}</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Emparejando por producto</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-acento-deep">{f(e.diferencia_emparejada, 2)} €</div>
+          <div class="text-[.78rem] text-suave">{f(e.pares_formados, 0)} pares del mismo producto</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Cuánto se encoge la diferencia</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-tinta">{f(e.reduccion_pct, 1)} %</div>
+          <div class="text-[.78rem] text-suave">en tamaño</div>
+        </div>
+      </div>
+      <p class="mt-4">
+        La ventaja de {f(e.diferencia_bruta, 2)} € por venta se queda en <strong>{f(e.diferencia_emparejada, 2)} €</strong> al
+        comparar el mismo producto contra el mismo producto. La mezcla explica
+        <strong>prácticamente toda</strong> la ventaja: al quitarla, la diferencia se encoge un {f(e.reduccion_pct, 1)} %.
+        Lo poco que queda es tan pequeño que su signo depende de qué ventas entren en la selección al azar, así
+        que no favorece a ninguna.
+      </p>
+      <Callout tipo="warn" titulo="Qué habría pasado sin desglosar">
+        Un plan comercial que replicase «el modelo {s.region_agregado_alto}» en {s.region_agregado_bajo} partiría de
+        un error: a igualdad de producto no se ve diferencia. Lo que distingue a las dos provincias es qué parte
+        de su cartera es el producto más caro. Si eso se debe a la gestión comercial o a la demanda de cada
+        zona, estos datos no lo dicen.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Es la comprobación que hay que hacer antes de sacar conclusiones de una clasificación. Cada vez que
+        una clasificación compara grupos con composición distinta, hay que comprobar si el orden se mantiene
+        dentro de cada segmento.
+      </p>
+      <p>
+        Pasa con el ticket medio por provincia, con la tasa de conversión por canal, con el coste por cliente
+        de dos delegaciones y con la nota media de dos colegios.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Se comparan las provincias con al menos 200 ventas válidas, sin las ventas marcadas como anomalía. El emparejamiento de
+        la tercera tarjeta toma, para cada producto, el mismo número de ventas de cada provincia, elegidas con
+        su propio generador, derivado de la semilla 42 del script <code>08_inferencia.py</code>.
+      </p>
+      <Code titulo="Ver el cálculo" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/inferencia.json" class="text-acento no-underline hover:underline"><code>inferencia.json</code></a>, campos <code>f9_simpson</code> y <code>f15_emparejamiento</code>.
+        Ninguna cifra de esta página está escrita a mano.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

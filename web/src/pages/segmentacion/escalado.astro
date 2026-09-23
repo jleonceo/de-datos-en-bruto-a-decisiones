@@ -1,0 +1,131 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import AvisoCorreo from '../../components/AvisoCorreo.astro';
+import seg from '../../data/segmentacion.json';
+
+const e = seg.h8_escalado;
+const rb = seg.h13_escalado_robusto;
+const f = (v, d = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+const madre = { slug: '/segmentacion', t: '15 · ¿Se pueden segmentar los clientes?' };
+
+const code = `# La misma llamada, cambiando solo si las variables van tipificadas
+KMeans(n_clusters=4, random_state=42).fit(rfm[["R", "F", "M"]])           # crudas
+KMeans(n_clusters=4, random_state=42).fit(StandardScaler().fit_transform(rfm))  # tipificadas`;
+---
+<Layout current="/segmentacion/escalado" title="Escalar antes de agrupar · TechSoluciones Analytics">
+  <Concepto
+    ficha="H8 · H13"
+    madre={madre}
+    titulo="Sin escalar, el importe en euros domina a las otras dos variables"
+    pregunta="¿Por qué hay que tipificar antes de agrupar y con qué escalador?"
+  >
+    <Fragment slot="problema">
+      <p>
+        Las tres variables RFM se miden en unidades muy distintas. La recencia va en días, la
+        frecuencia en compras y el valor en euros.
+      </p>
+      <AvisoCorreo que="qué hace la escala con un agrupamiento" />
+      <p>
+        Sus recorridos tampoco se parecen. La recencia abarca {f(e.rango_de_cada_variable.R, 0)} días, la
+        frecuencia {f(e.rango_de_cada_variable.F, 0)} compras y el valor
+        {' '}<strong>{f(e.rango_de_cada_variable.M, 0)} €</strong>. El de euros es
+        {' '}<strong>{f(e.veces_que_M_aplasta_a_F, 0)} veces</strong> más largo que el de compras.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        k-means no tiene en cuenta las unidades: suma diferencias al cuadrado. Un punto que gastó mil euros más queda,
+        en esa cuenta, muy lejos. Uno que compró una vez más queda casi en el mismo sitio.
+      </p>
+      <p>
+        Por eso el algoritmo acaba agrupando por euros y las otras dos variables apenas cuentan. El código
+        funciona y devuelve sus grupos, pero no se ve que dos de las tres variables no han influido.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Todo algoritmo que mida distancias necesita variables comparables">
+        Vale para k-means, para los vecinos más cercanos y para cualquier cosa que calcule una distancia. No
+        vale para los árboles, que miran cada variable por separado y no les afecta la escala.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Tipificar: restar la media y dividir por la desviación, de forma que las tres queden en la misma
+        escala. Es una línea de código y cambia todo el resultado.
+      </p>
+      <p>
+        Cuando unos pocos valores son mucho más grandes que el resto, lo que se llama <a href="/descriptiva/forma" class="text-acento no-underline hover:underline">cola larga</a>, hay una segunda opción, el escalador robusto, que usa la mediana y
+        el rango intercuartílico en lugar de la media y la desviación. Como no le afectan los extremos, no
+        deja al resto de valores amontonados.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <p>Los mismos correos, el mismo k, el mismo generador. Lo único que cambia es la tipificación.</p>
+      <div class="mt-3 grid gap-3 sm:grid-cols-2">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Sin escalar</div>
+          <div class="mt-1 font-display text-[1.05rem] font-bold text-tinta">{e.sin_escalar.tamanos.map((n) => f(n, 0)).join(' · ')}</div>
+          <div class="mt-2 text-[.78rem] text-suave">
+            un grupo se lleva {f((100 * e.sin_escalar.tamanos[0]) / e.sin_escalar.tamanos.reduce((a, b) => a + b, 0), 0)} % del total
+          </div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Tipificado</div>
+          <div class="mt-1 font-display text-[1.05rem] font-bold text-acento-deep">{e.escalado.tamanos.map((n) => f(n, 0)).join(' · ')}</div>
+          <div class="mt-2 text-[.78rem] text-suave">
+            el mayor se queda en {f((100 * e.escalado.tamanos[0]) / e.escalado.tamanos.reduce((a, b) => a + b, 0), 0)} %
+          </div>
+        </div>
+      </div>
+      <p class="mt-4">
+        Sin escalar sale un grupo gigante con {f(e.sin_escalar.tamanos[0], 0)} correos y tres grupos pequeños, el
+        patrón típico de agrupar por una sola variable. Tipificando, los cuatro grupos quedan repartidos.
+      </p>
+
+      <h3 class="mt-7 font-display text-[1.02rem] font-bold">Cuál de los dos escaladores usar</h3>
+      <p class="mt-2">
+        El valor acumulado tiene asimetría <strong>{f(rb.asimetria, 2)}</strong>, así que la pregunta es
+        pertinente. Con el estándar, el {f(rb.estandar.pct_dentro_de_mas_menos_1, 1)} % de los correos cae
+        dentro de más menos uno y el mayor llega a {f(rb.estandar.max, 1)}. Con el robusto, dentro queda el
+        {' '}{f(rb.robusto.pct_dentro_de_mas_menos_1, 1)} % y el mayor sube hasta {f(rb.robusto.max, 1)}.
+      </p>
+      <Callout tipo="ok" titulo="Los dos cambian el peso, no la forma">
+        Los dos restan un centro y dividen por una escala, así que dentro del importe no cambian ni el orden ni
+        las distancias relativas. Lo que cambia es el tamaño que toma el importe frente a la recencia y la
+        frecuencia: con el robusto, los que más gastan quedan más lejos y pesan más al agrupar. Aquí no se
+        comprobó cuál de los dos agrupa mejor, y las páginas de este bloque usan el estándar.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Es una comprobación rápida antes de cualquier agrupamiento: mirar los rangos de las variables
+        que entran y ver si alguna domina a las demás.
+      </p>
+      <p>
+        Cuando un k-means devuelve un grupo enorme y varios diminutos, lo primero que hay que descartar es
+        la escala. El número de grupos se mira después.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        k=4 con 10 arranques y semilla 42 en las dos ramas. Los centros de la rama tipificada se devuelven a
+        unidades originales con la transformación inversa, para que se puedan leer. El escalador robusto usa
+        mediana y rango intercuartílico.
+      </p>
+      <Code titulo="Ver las dos llamadas" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/segmentacion.json" class="text-acento no-underline hover:underline"><code>segmentacion.json</code></a>, campos <code>h8_escalado</code> y
+        {' '}<code>h13_escalado_robusto</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

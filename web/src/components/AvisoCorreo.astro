@@ -1,0 +1,12 @@
+---
+/* Aviso común de las técnicas de agrupamiento: se enseñan sobre la tabla agrupada por correo, que no
+   identifica clientes (página del RFM). Una sola redacción para las cuatro subpáginas. */
+import Callout from './Callout.astro';
+const { que = 'cómo se comporta el método' } = Astro.props;
+---
+<Callout tipo="warn" titulo="Estos datos sirven para ver el método">
+  La tabla no tiene clave de cliente, como explica la
+  {' '}<a href="/segmentacion/rfm" class="text-acento no-underline hover:underline">página del RFM</a>. Esta
+  página agrupa por correo, que lo comparten personas distintas, así que cada punto es un correo y no un
+  cliente. Lo que la página enseña es {que}.
+</Callout>

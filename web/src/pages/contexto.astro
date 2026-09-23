@@ -1,0 +1,56 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import Kpi from '../components/Kpi.astro';
+import eda from '../data/eda.json';
+import perfilado from '../data/perfilado.json';
+const k = eda.kpis;
+const nf = (v, d = 0) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: d }).format(v);
+const anios = `${k.periodo[0].slice(0, 4)}-${k.periodo[1].slice(0, 4)}`;
+---
+<Layout current="/contexto" title="Contexto y misión · TechSoluciones Analytics">
+  <p class="eyebrow">Parte I · El problema y los datos</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">1 · Contexto y misión</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    <strong>TechSoluciones S.L.</strong> es una pyme que vende software y hardware a otras empresas. Su
+    dirección conserva un histórico de ventas de {anios} y quiere usarlo para tomar mejores decisiones.
+    El fichero llega con una
+    calidad que el propio encargo califica de «cuestionable».
+  </p>
+
+  <Callout tipo="info" titulo="El encargo en tres objetivos">
+    <ul class="ml-4 list-disc space-y-1">
+      <li>Identificar oportunidades de mejora en las ventas.</li>
+      <li>Detectar patrones ocultos, como productos estrella o regiones que crecen.</li>
+      <li>Automatizar el análisis para decidir con datos en lugar de por intuición.</li>
+    </ul>
+  </Callout>
+
+  <p class="mt-5 max-w-2xl text-tinta-soft">
+    Para llegar a esos objetivos hay que pasar por cuatro etapas. Primero se <strong>prepara</strong> el
+    dato, que incluye limpiarlo, unificar sus formatos y anonimizarlo. Después se <strong>explora</strong>
+    con estadística descriptiva y búsqueda de anomalías. Con el dato ya conocido se <strong>responden</strong>
+    las preguntas de negocio. Al final se <strong>comunica</strong> el resultado en un cuadro de mando.
+    Cada página de esta web corresponde a un paso de ese recorrido y explica el método que se ha seguido.
+  </p>
+
+  <h2 class="mt-9 font-display text-[1.3rem] font-bold">Los datos de partida</h2>
+  <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <Kpi valor={nf(perfilado.n_filas)} etiqueta="filas en bruto" sub="antes de limpiar" />
+    <Kpi valor={nf(perfilado.columnas.length)} etiqueta="columnas" sub="venta, cliente, producto…" />
+    <Kpi valor={anios} etiqueta="periodo" />
+    <Kpi valor={nf(k.n_regiones) + ' + ' + nf(k.n_productos)} etiqueta="provincias y productos" />
+  </div>
+
+  <Callout tipo="idea" titulo="Qué pretende este trabajo">
+    Además de responder al encargo, enseña cómo se responde. Cada decisión va justificada y los cálculos los
+    hace un programa que da el mismo resultado cada vez que se ejecuta. Las cifras principales se han
+    recalculado desde el fichero en bruto por otro camino, sin usar los programas del proyecto. Cuando los datos no permiten sacar una conclusión, la página lo explica en lugar
+    de forzar una.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Siguiente: <a href="/inspeccion" class="lnk font-semibold">primer contacto con los datos →</a>
+  </p>
+</Layout>

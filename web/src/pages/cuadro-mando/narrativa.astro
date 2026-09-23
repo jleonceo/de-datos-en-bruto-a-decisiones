@@ -1,0 +1,111 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import eda from '../../data/eda.json';
+import rob from '../../data/robustez.json';
+
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/cuadro-mando', t: '17 · Cuadro de mando' };
+const MES = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const p1 = eda.p1_mes_mayores_ventas;
+const r1 = rob.p1_estacionalidad;
+const r2 = rob.p2_region_satisfaccion;
+const c = eda.p3_correlacion_ventas_satisfaccion.cant_vs_satisfaccion_pearson;
+const mes = MES[p1.mes_calendario_top_media];
+
+const frases = [
+  {
+    dice: `${mes[0].toUpperCase() + mes.slice(1)} es el mes más fuerte del año, un ${f(p1.pct_sobre_media, 2)} % por encima de la media.`,
+    pasa: `Entre doce meses siempre hay uno que queda primero. Contra el mejor mes del azar da p = ${f(r1.p_valor_permutacion, 3)}, así que no destaca.`,
+    en: '/senal-ruido/doce-meses',
+  },
+  {
+    dice: `${r2.region_observada} es la provincia donde más crece la satisfacción.`,
+    pasa: `Con ${eda.kpis.n_regiones} provincias alguna tiene que salir primera. El azar produce algo igual o más llamativo en el ${f(100 * r2.p_valor_permutacion, 0)} % de los barajados.`,
+    en: '/pregunta-region',
+  },
+  {
+    dice: `Los clientes que compran más unidades están más satisfechos (p = ${f(c.p, 3)}).`,
+    pasa: `Es significativo y explica el ${f(100 * c.r * c.r, 2)} % de la satisfacción. En la práctica no cambia nada.`,
+    en: '/senal-ruido/tamano-efecto',
+  },
+];
+---
+<Layout current="/cuadro-mando/narrativa" title="La narrativa automática del panel · TechSoluciones Analytics">
+  <Concepto
+    ficha="J8"
+    madre={madre}
+    titulo="Un resumen automático del panel presenta como hallazgo todo lo que el panel muestra"
+    pregunta="¿Es fiable el resumen que una IA escribe sobre el cuadro de mando?"
+  >
+    <Fragment slot="problema">
+      <p>
+        Power BI y otras herramientas ya escriben solas un párrafo que resume el panel y lo rehacen cada vez
+        que se cambia un filtro. Para quien no tiene tiempo de mirar gráficos, ese párrafo puede acabar siendo el informe.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        El resumen describe lo que se ve: el mes más alto, la provincia que más sube, la relación con p menor
+        que 0,05. No sabe que esas tres cosas no superaron la prueba contra el azar, porque esa prueba no
+        está en el panel. Y lo escribe con la misma seguridad con que escribiría un dato cierto.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="La narrativa automática es un borrador y se marca como tal">
+        Cada frase que afirme algo se comprueba antes de enviar el texto a nadie. Además, el lector tiene que saber que
+        lo escribió una máquina, para leerlo con la cautela necesaria.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Limitar el texto a lo que el panel mide sin discusión, como la facturación o el número de alertas, y
+        quitar cualquier «el mejor», «el que más crece» o «está relacionado con» que no tenga una prueba al
+        lado. Encima del párrafo va una línea que diga que es texto generado.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <p>
+        Tres frases que un resumen automático sacaría de las cifras de esta web leyéndolas tal cual. Están
+        escritas para esta página como ejemplo del tipo de frase. Ninguna sale de una herramienta concreta.
+      </p>
+      <div class="mt-3 space-y-3">
+        {frases.map((x) => (
+          <div class="tarjeta p-4">
+            <p class="text-[.92rem] text-tinta line-through decoration-acento/60">«{x.dice}»</p>
+            <p class="mt-2 text-[.88rem] text-tinta-soft">{x.pasa} <a href={x.en} class="text-acento no-underline hover:underline">Ver la prueba →</a></p>
+          </div>
+        ))}
+      </div>
+      <p class="mt-4">
+        Las tres se descartan. Lo que se mantiene del panel son las cifras que se miden sin elegir un ganador:
+        {' '}{f(eda.kpis.facturacion_valida)} € válidos y {f(eda.anomalias.n)} ventas imposibles por revisar.
+      </p>
+      <Callout tipo="warn" titulo="Hay que indicar que lo escribió una máquina">
+        El Reglamento europeo de IA pide en su artículo 50 que se sepa cuándo un contenido lo ha generado una
+        IA, en los casos que ese artículo recoge. En un panel interno, marcar el párrafo como generado es la
+        forma más sencilla de cumplir con el espíritu de la norma y de evitar que se lea como un análisis.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        En cualquier panel con resumen automático y en los informes que alguien redacta pegando lo que dice
+        la IA. La comprobación es la misma: cada frase con «más», «mejor» o «relacionado» necesita su contraste.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        La función de Power BI que escribe estos resúmenes se llama Smart Narrative. Las cifras de las frases
+        salen de <code>eda.json</code> (<code>p1_mes_mayores_ventas</code> y
+        {' '}<code>p3_correlacion_ventas_satisfaccion</code>) y sus pruebas de <code>robustez.json</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

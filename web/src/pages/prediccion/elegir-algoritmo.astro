@@ -1,0 +1,135 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import ml from '../../data/ml.json';
+
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/prediccion', t: '16 · ¿Se puede predecir? Y las anomalías' };
+const pr = ml.prediccion_satisfaccion;
+const nombres = { baseline_media: 'Predecir siempre la media', regresion_lineal: 'Regresión lineal', random_forest: 'Bosque aleatorio' };
+const modelos = Object.entries(pr.resultados);
+const an = ml.anomalias;
+
+const criterios = [
+  { c: 'Hay que explicar cada decisión a alguien', d: 'Descarta lo que no se puede leer. Quedan la regresión, un árbol poco profundo o una regla escrita.' },
+  { c: 'Las variables tienen escalas muy distintas', d: 'Lo que mide distancias (k-means, vecinos) exige escalar antes. Los árboles no lo necesitan.' },
+  { c: 'Hay atípicos o valores extremos', d: 'La regresión lineal y k-means se distorsionan. Los árboles y los bosques aguantan mejor.' },
+  { c: 'Lo que se busca es muy raro', d: 'Hay que mirar la precisión antes que el acierto global y ver si una regla lo resuelve sin modelo.' },
+  { c: 'Muchas filas y poco tiempo', d: 'Pesan la velocidad de entrenamiento y de predicción y los modelos sencillos van primero.' },
+];
+---
+<Layout current="/prediccion/elegir-algoritmo" title="Cómo se elige un algoritmo · TechSoluciones Analytics">
+  <Concepto
+    ficha="H9"
+    madre={madre}
+    titulo="Primero se descarta lo que no cumple una condición obligatoria y después se comparan los que quedan"
+    pregunta="¿Cómo se decide qué algoritmo usar?"
+  >
+    <Fragment slot="problema">
+      <p>
+        Hay decenas de algoritmos y cada artículo recomienda el suyo. Es fácil acabar eligiendo el que está
+        de moda o el que ya se sabe usar, y el más complejo tiende a parecer el más fiable.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Un algoritmo más flexible saca mejor nota sobre los datos con los que aprende. Esa nota se toma a
+        menudo como prueba de que es mejor. Además, cuando el dato no tiene señal, ningún algoritmo la crea: la complejidad añadida
+        solo cuesta tiempo y hace el modelo más difícil de explicar.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Dos pasos: descartar y comparar">
+        Primero se identifica la condición obligatoria del caso, que descarta candidatos.
+        Después se prueban los dos o tres que quedan, siempre junto a un modelo de referencia muy simple, y se
+        comparan sobre datos que no han visto.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full border-collapse text-[.86rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">Si en el caso…</th>
+              <th class="py-2 font-semibold">…eso descarta o pide</th>
+            </tr>
+          </thead>
+          <tbody>
+            {criterios.map((x) => (
+              <tr class="border-b border-linea/60 align-top">
+                <td class="py-2 pr-3 font-semibold">{x.c}</td>
+                <td class="py-2 text-tinta-soft">{x.d}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <p>
+        La página 16 predice la satisfacción con dos modelos y con la referencia de predecir siempre la media,
+        y los mide sobre
+        {' '}{f(pr.n_test)} ventas apartadas:
+      </p>
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full max-w-lg border-collapse text-[.88rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">Modelo</th>
+              <th class="py-2 pr-3 text-right font-semibold">R² de prueba</th>
+              <th class="py-2 text-right font-semibold">Error medio</th>
+            </tr>
+          </thead>
+          <tbody>
+            {modelos.map(([k, x]) => (
+              <tr class="border-b border-linea/60">
+                <td class="py-2 pr-3">{nombres[k] ?? k}</td>
+                <td class="py-2 pr-3 text-right tabular-nums">{f(x.r2_test + 0, 3)}</td>
+                <td class="py-2 text-right tabular-nums">{f(x.mae_test, 3)} puntos</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4">
+        Los tres resultados empatan. El bosque no mejora a predecir la media para todas las ventas, así que el algoritmo
+        correcto aquí es el más simple y la conclusión útil es que estas variables no explican la satisfacción.
+        Sin el modelo de referencia en la tabla, el bosque se habría presentado solo y nadie habría visto que
+        no aporta.
+      </p>
+      <p>
+        Con las anomalías ocurre algo parecido. El IsolationForest detecta {an.anomalias_regla_cazadas}
+        {' '}de las {an.anomalias_regla_n} ventas imposibles y marca además {f(an.marcadas_que_no_son_anomalia_de_regla)}
+        {' '}normales. La regla del catálogo las encuentra todas sin modelo, porque sabe qué está mal. El algoritmo
+        propone candidatas y la regla decide.
+      </p>
+      <Callout tipo="ok" titulo="La tabla del principio, aplicada a esta web">
+        Agrupar exigía escalar y por eso existe la página de
+        {' '}<a href="/segmentacion/escalado" class="text-acento no-underline hover:underline">escalado</a>.
+        Detectar valores raros pedía mirar la precisión, que es la página de
+        {' '}<a href="/atipicos/falsos-positivos" class="text-acento no-underline hover:underline">falsos positivos</a>.
+        Y como no había señal que predecir, cada modelo tenía que compararse con uno de referencia.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        En cualquier proyecto con un modelo, antes de escribir código. Y al revisar uno ajeno, la primera
+        pregunta es contra qué modelo simple se comparó.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Los modelos de la tabla están en <code>07_ml.py</code>, con partición 80/20 y
+        semilla 42.
+      </p>
+      <p class="mt-3">Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/ml.json" class="text-acento no-underline hover:underline"><code>ml.json</code></a>, campos <code>prediccion_satisfaccion</code> y <code>anomalias</code>.</p>
+    </Fragment>
+  </Concepto>
+</Layout>

@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import BarList from '../components/BarList.astro';
+import eda from '../data/eda.json';
+const prod = Object.entries(eda.por_producto).map(([label, v]) => ({ label, value: v.facturacion }));
+const cat = Object.entries(eda.por_categoria).map(([label, v]) => ({ label, value: v.facturacion }));
+const reg = Object.entries(eda.por_region).slice(0, 12).map(([label, v]) => ({ label, value: v.facturacion }));
+const par = eda.extra_pareto;
+const tres = reg.slice(0, 3).map((r) => r.label);
+---
+<Layout current="/segmentos" title="Producto, categoría y región · TechSoluciones Analytics">
+  <p class="eyebrow">Parte III · Análisis exploratorio</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">10 · Producto, categoría y región</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    ¿De dónde sale la facturación? Esta página la desglosa por las tres dimensiones de negocio. Como
+    los precios difieren mucho entre productos, «facturar más» no siempre es «vender más unidades». Todas las
+    cifras son de las {eda.n_validas.toLocaleString('es-ES', { useGrouping: true })} ventas válidas.
+  </p>
+
+  <div class="mt-6 grid gap-5 lg:grid-cols-2">
+    <div class="tarjeta p-4">
+      <h3 class="text-[.9rem] font-semibold text-tinta">Facturación por producto (€)</h3>
+      <div class="mt-3"><BarList items={prod} unit=" €" /></div>
+    </div>
+    <div class="tarjeta p-4">
+      <h3 class="text-[.9rem] font-semibold text-tinta">Top 12 provincias por facturación (€)</h3>
+      <div class="mt-3"><BarList items={reg} unit=" €" /></div>
+    </div>
+  </div>
+
+  <div class="tarjeta mt-5 p-4">
+    <h3 class="text-[.9rem] font-semibold text-tinta">Por categoría (€)</h3>
+    <div class="mt-3"><BarList items={cat} unit=" €" color="var(--color-tinta-soft)" /></div>
+  </div>
+
+  <Callout tipo="info" titulo="¿Regla del 80/20?">
+    Concentración moderada: <strong>{par.productos.n_para_80pct} de {par.productos.de_total}</strong>
+    productos acumulan el 80 % de la facturación (los de mayor precio unitario). Entre provincias, en
+    cambio, la facturación está repartida: tres provincias, {tres[0]}, {tres[1]} y {tres[2]},
+    facturan bastante más que la cuarta, y el resto va escalonado sin saltos grandes. La curva
+    entera, por producto, por provincia y por venta, está en
+    <a href="/descriptiva/pareto" class="lnk">la página del 80/20</a>.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Con los datos ya explorados, se pasa a las preguntas concretas del negocio. Siguiente:
+    <a href="/pregunta-mes" class="lnk font-semibold">¿cuál fue el mes de mayores ventas? →</a>
+  </p>
+</Layout>

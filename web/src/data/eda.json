@@ -1,0 +1,1540 @@
+{
+  "n": 20000,
+  "n_validas": 19984,
+  "base": "valida (sin las 16 anomalias) salvo donde se diga registrada",
+  "descriptivos": {
+    "importe": {
+      "n": 19984,
+      "media": 2405.41,
+      "mediana": 1200.0,
+      "desv": 3336.1,
+      "min": 45.0,
+      "max": 17500.0,
+      "q1": 560.0,
+      "q3": 2850.0
+    },
+    "cant": {
+      "n": 19984,
+      "media": 2.99,
+      "mediana": 3.0,
+      "desv": 1.4,
+      "min": 1.0,
+      "max": 5.0,
+      "q1": 2.0,
+      "q3": 4.0
+    },
+    "precio": {
+      "n": 19984,
+      "media": 806.23,
+      "mediana": 300.0,
+      "desv": 956.53,
+      "min": 45.0,
+      "max": 3500.0,
+      "q1": 280.0,
+      "q3": 950.0
+    },
+    "satisfaccion": {
+      "n": 15980,
+      "media": 5.5,
+      "mediana": 5.0,
+      "desv": 2.88,
+      "min": 1.0,
+      "max": 10.0,
+      "q1": 3.0,
+      "q3": 8.0
+    }
+  },
+  "ventas_por_anio": {
+    "2019": {
+      "facturacion": 6520215.0,
+      "n": 2709,
+      "ticket_medio": 2406.87
+    },
+    "2020": {
+      "facturacion": 6309220.0,
+      "n": 2713,
+      "ticket_medio": 2325.55
+    },
+    "2021": {
+      "facturacion": 6406050.0,
+      "n": 2629,
+      "ticket_medio": 2436.69
+    },
+    "2022": {
+      "facturacion": 6431300.0,
+      "n": 2768,
+      "ticket_medio": 2323.45
+    },
+    "2023": {
+      "facturacion": 7049985.0,
+      "n": 2748,
+      "ticket_medio": 2565.5
+    },
+    "2024": {
+      "facturacion": 6345765.0,
+      "n": 2667,
+      "ticket_medio": 2379.36
+    },
+    "2025": {
+      "facturacion": 6435010.0,
+      "n": 2643,
+      "ticket_medio": 2434.74
+    },
+    "2026": {
+      "facturacion": 2572235.0,
+      "n": 1107,
+      "ticket_medio": 2323.61
+    }
+  },
+  "ventas_por_anio_mes": {
+    "2019-01": 689080.0,
+    "2019-02": 453465.0,
+    "2019-03": 579475.0,
+    "2019-04": 514600.0,
+    "2019-05": 561910.0,
+    "2019-06": 534125.0,
+    "2019-07": 559585.0,
+    "2019-08": 555035.0,
+    "2019-09": 657885.0,
+    "2019-10": 535215.0,
+    "2019-11": 434875.0,
+    "2019-12": 444965.0,
+    "2020-01": 502495.0,
+    "2020-02": 480380.0,
+    "2020-03": 561050.0,
+    "2020-04": 428480.0,
+    "2020-05": 515020.0,
+    "2020-06": 542895.0,
+    "2020-07": 431205.0,
+    "2020-08": 588000.0,
+    "2020-09": 542155.0,
+    "2020-10": 597315.0,
+    "2020-11": 566795.0,
+    "2020-12": 553430.0,
+    "2021-01": 591920.0,
+    "2021-02": 430810.0,
+    "2021-03": 552315.0,
+    "2021-04": 577505.0,
+    "2021-05": 563655.0,
+    "2021-06": 444415.0,
+    "2021-07": 551400.0,
+    "2021-08": 524075.0,
+    "2021-09": 509975.0,
+    "2021-10": 469235.0,
+    "2021-11": 586175.0,
+    "2021-12": 604570.0,
+    "2022-01": 522335.0,
+    "2022-02": 558915.0,
+    "2022-03": 590960.0,
+    "2022-04": 450955.0,
+    "2022-05": 510105.0,
+    "2022-06": 538435.0,
+    "2022-07": 516430.0,
+    "2022-08": 570310.0,
+    "2022-09": 481985.0,
+    "2022-10": 519680.0,
+    "2022-11": 627710.0,
+    "2022-12": 543480.0,
+    "2023-01": 509110.0,
+    "2023-02": 541645.0,
+    "2023-03": 562035.0,
+    "2023-04": 594725.0,
+    "2023-05": 602205.0,
+    "2023-06": 522800.0,
+    "2023-07": 543885.0,
+    "2023-08": 640560.0,
+    "2023-09": 591035.0,
+    "2023-10": 709580.0,
+    "2023-11": 601200.0,
+    "2023-12": 631205.0,
+    "2024-01": 507110.0,
+    "2024-02": 536020.0,
+    "2024-03": 480300.0,
+    "2024-04": 616440.0,
+    "2024-05": 516470.0,
+    "2024-06": 526860.0,
+    "2024-07": 531110.0,
+    "2024-08": 515280.0,
+    "2024-09": 594935.0,
+    "2024-10": 529150.0,
+    "2024-11": 439345.0,
+    "2024-12": 552745.0,
+    "2025-01": 538230.0,
+    "2025-02": 464800.0,
+    "2025-03": 541310.0,
+    "2025-04": 549070.0,
+    "2025-05": 541260.0,
+    "2025-06": 561785.0,
+    "2025-07": 645630.0,
+    "2025-08": 565585.0,
+    "2025-09": 544190.0,
+    "2025-10": 455175.0,
+    "2025-11": 533705.0,
+    "2025-12": 494270.0,
+    "2026-01": 555050.0,
+    "2026-02": 469540.0,
+    "2026-03": 562190.0,
+    "2026-04": 544920.0,
+    "2026-05": 440535.0
+  },
+  "estacionalidad_mes": {
+    "1": {
+      "facturacion_meses_completos": 4415330.0,
+      "media_mensual": 551916.25,
+      "n_meses": 8
+    },
+    "2": {
+      "facturacion_meses_completos": 3935575.0,
+      "media_mensual": 491946.88,
+      "n_meses": 8
+    },
+    "3": {
+      "facturacion_meses_completos": 4429635.0,
+      "media_mensual": 553704.38,
+      "n_meses": 8
+    },
+    "4": {
+      "facturacion_meses_completos": 4276695.0,
+      "media_mensual": 534586.88,
+      "n_meses": 8
+    },
+    "5": {
+      "facturacion_meses_completos": 3810625.0,
+      "media_mensual": 544375.0,
+      "n_meses": 7
+    },
+    "6": {
+      "facturacion_meses_completos": 3671315.0,
+      "media_mensual": 524473.57,
+      "n_meses": 7
+    },
+    "7": {
+      "facturacion_meses_completos": 3779245.0,
+      "media_mensual": 539892.14,
+      "n_meses": 7
+    },
+    "8": {
+      "facturacion_meses_completos": 3958845.0,
+      "media_mensual": 565549.29,
+      "n_meses": 7
+    },
+    "9": {
+      "facturacion_meses_completos": 3922160.0,
+      "media_mensual": 560308.57,
+      "n_meses": 7
+    },
+    "10": {
+      "facturacion_meses_completos": 3815350.0,
+      "media_mensual": 545050.0,
+      "n_meses": 7
+    },
+    "11": {
+      "facturacion_meses_completos": 3789805.0,
+      "media_mensual": 541400.71,
+      "n_meses": 7
+    },
+    "12": {
+      "facturacion_meses_completos": 3824665.0,
+      "media_mensual": 546380.71,
+      "n_meses": 7
+    }
+  },
+  "kpis": {
+    "facturacion_registrada": 48868140.0,
+    "facturacion_valida": 48069780.0,
+    "n_ventas": 20000,
+    "n_validas": 19984,
+    "n_anomalias": 16,
+    "unidades_validas": 59696,
+    "ticket_medio": 2405.41,
+    "satisfaccion_media": 5.5,
+    "pct_satisfaccion_disponible": 79.96,
+    "crecimiento_2019_2025_pct": -1.31,
+    "crecimiento_interanual_pct": {
+      "2020": -3.24,
+      "2021": 1.53,
+      "2022": 0.39,
+      "2023": 9.62,
+      "2024": -9.99,
+      "2025": 1.41
+    },
+    "n_regiones": 52,
+    "n_productos": 8,
+    "periodo": [
+      "2019-01-01",
+      "2026-05-24"
+    ],
+    "nota_2026": "2026 llega hasta 2026-05, mes incompleto; el crecimiento se mide 2019-2025"
+  },
+  "por_producto": {
+    "Servidor Rack Xeon": {
+      "facturacion": 20258000.0,
+      "unidades": 5788,
+      "n": 1943,
+      "precio_medio": 3500.0,
+      "satisf_media": 5.5
+    },
+    "Portátil Core i7": {
+      "facturacion": 11420900.0,
+      "unidades": 12022,
+      "n": 4056,
+      "precio_medio": 950.0,
+      "satisf_media": 5.41
+    },
+    "Licencia ERP Cloud": {
+      "facturacion": 7093200.0,
+      "unidades": 5911,
+      "n": 1958,
+      "precio_medio": 1200.0,
+      "satisf_media": 5.48
+    },
+    "Módulo Nóminas": {
+      "facturacion": 3523800.0,
+      "unidades": 11746,
+      "n": 3954,
+      "precio_medio": 300.0,
+      "satisf_media": 5.54
+    },
+    "Suscripción CRM Pro": {
+      "facturacion": 2774250.0,
+      "unidades": 6165,
+      "n": 2029,
+      "precio_medio": 450.0,
+      "satisf_media": 5.49
+    },
+    "Monitor UltraWide 27": {
+      "facturacion": 1651160.0,
+      "unidades": 5897,
+      "n": 1987,
+      "precio_medio": 280.0,
+      "satisf_media": 5.53
+    },
+    "Switch Gestionable 24p": {
+      "facturacion": 1067940.0,
+      "unidades": 5933,
+      "n": 2002,
+      "precio_medio": 180.0,
+      "satisf_media": 5.51
+    },
+    "Antivirus Corporativo": {
+      "facturacion": 280530.0,
+      "unidades": 6234,
+      "n": 2055,
+      "precio_medio": 45.0,
+      "satisf_media": 5.55
+    }
+  },
+  "por_categoria": {
+    "Hardware": {
+      "facturacion": 34398000.0,
+      "n": 9988,
+      "ticket_medio": 3443.93
+    },
+    "Software": {
+      "facturacion": 13671780.0,
+      "n": 9996,
+      "ticket_medio": 1367.73
+    }
+  },
+  "por_region": {
+    "Santa Cruz de Tenerife": {
+      "facturacion": 1975270.0,
+      "n": 778,
+      "satisf_media": 5.36
+    },
+    "Lleida": {
+      "facturacion": 1726460.0,
+      "n": 706,
+      "satisf_media": 5.5
+    },
+    "Girona": {
+      "facturacion": 1702395.0,
+      "n": 720,
+      "satisf_media": 5.34
+    },
+    "Teruel": {
+      "facturacion": 1091405.0,
+      "n": 391,
+      "satisf_media": 5.61
+    },
+    "Islas Baleares": {
+      "facturacion": 1029285.0,
+      "n": 366,
+      "satisf_media": 5.42
+    },
+    "Álava": {
+      "facturacion": 1014940.0,
+      "n": 390,
+      "satisf_media": 5.64
+    },
+    "Sevilla": {
+      "facturacion": 996300.0,
+      "n": 400,
+      "satisf_media": 5.74
+    },
+    "Las Palmas": {
+      "facturacion": 978070.0,
+      "n": 385,
+      "satisf_media": 5.67
+    },
+    "Segovia": {
+      "facturacion": 974135.0,
+      "n": 376,
+      "satisf_media": 5.74
+    },
+    "Valencia": {
+      "facturacion": 972575.0,
+      "n": 370,
+      "satisf_media": 5.39
+    },
+    "Cantabria": {
+      "facturacion": 923700.0,
+      "n": 387,
+      "satisf_media": 5.35
+    },
+    "Cuenca": {
+      "facturacion": 917245.0,
+      "n": 382,
+      "satisf_media": 5.46
+    },
+    "Huesca": {
+      "facturacion": 910385.0,
+      "n": 359,
+      "satisf_media": 5.51
+    },
+    "Ávila": {
+      "facturacion": 909600.0,
+      "n": 365,
+      "satisf_media": 5.24
+    },
+    "Soria": {
+      "facturacion": 908660.0,
+      "n": 376,
+      "satisf_media": 5.63
+    },
+    "Toledo": {
+      "facturacion": 905585.0,
+      "n": 398,
+      "satisf_media": 5.32
+    },
+    "Badajoz": {
+      "facturacion": 905190.0,
+      "n": 391,
+      "satisf_media": 5.38
+    },
+    "Córdoba": {
+      "facturacion": 904305.0,
+      "n": 356,
+      "satisf_media": 5.85
+    },
+    "Pontevedra": {
+      "facturacion": 902100.0,
+      "n": 362,
+      "satisf_media": 5.15
+    },
+    "Zamora": {
+      "facturacion": 901640.0,
+      "n": 349,
+      "satisf_media": 5.7
+    },
+    "Castellón": {
+      "facturacion": 897475.0,
+      "n": 370,
+      "satisf_media": 5.32
+    },
+    "Salamanca": {
+      "facturacion": 895175.0,
+      "n": 399,
+      "satisf_media": 5.47
+    },
+    "León": {
+      "facturacion": 894320.0,
+      "n": 366,
+      "satisf_media": 5.74
+    },
+    "Guadalajara": {
+      "facturacion": 887170.0,
+      "n": 371,
+      "satisf_media": 5.23
+    },
+    "Lugo": {
+      "facturacion": 869110.0,
+      "n": 332,
+      "satisf_media": 5.3
+    },
+    "Ciudad Real": {
+      "facturacion": 862485.0,
+      "n": 375,
+      "satisf_media": 5.76
+    },
+    "Vizcaya": {
+      "facturacion": 861300.0,
+      "n": 355,
+      "satisf_media": 5.44
+    },
+    "Almería": {
+      "facturacion": 861155.0,
+      "n": 345,
+      "satisf_media": 5.4
+    },
+    "Cádiz": {
+      "facturacion": 857035.0,
+      "n": 385,
+      "satisf_media": 5.44
+    },
+    "Palencia": {
+      "facturacion": 856665.0,
+      "n": 364,
+      "satisf_media": 5.62
+    },
+    "Asturias": {
+      "facturacion": 854840.0,
+      "n": 341,
+      "satisf_media": 5.52
+    },
+    "Burgos": {
+      "facturacion": 853725.0,
+      "n": 365,
+      "satisf_media": 5.73
+    },
+    "Navarra": {
+      "facturacion": 852700.0,
+      "n": 355,
+      "satisf_media": 5.64
+    },
+    "Melilla": {
+      "facturacion": 851050.0,
+      "n": 352,
+      "satisf_media": 5.28
+    },
+    "La Coruña": {
+      "facturacion": 846005.0,
+      "n": 342,
+      "satisf_media": 5.45
+    },
+    "Tarragona": {
+      "facturacion": 845550.0,
+      "n": 342,
+      "satisf_media": 5.65
+    },
+    "Ceuta": {
+      "facturacion": 845140.0,
+      "n": 339,
+      "satisf_media": 5.46
+    },
+    "Valladolid": {
+      "facturacion": 843070.0,
+      "n": 340,
+      "satisf_media": 5.39
+    },
+    "Madrid": {
+      "facturacion": 840330.0,
+      "n": 352,
+      "satisf_media": 5.44
+    },
+    "Zaragoza": {
+      "facturacion": 825545.0,
+      "n": 387,
+      "satisf_media": 5.35
+    },
+    "Málaga": {
+      "facturacion": 822145.0,
+      "n": 354,
+      "satisf_media": 5.31
+    },
+    "Granada": {
+      "facturacion": 821410.0,
+      "n": 363,
+      "satisf_media": 5.39
+    },
+    "Alicante": {
+      "facturacion": 818265.0,
+      "n": 365,
+      "satisf_media": 5.68
+    },
+    "La Rioja": {
+      "facturacion": 811885.0,
+      "n": 360,
+      "satisf_media": 5.43
+    },
+    "Albacete": {
+      "facturacion": 806170.0,
+      "n": 353,
+      "satisf_media": 5.58
+    },
+    "Guipúzcoa": {
+      "facturacion": 801235.0,
+      "n": 344,
+      "satisf_media": 5.49
+    },
+    "Murcia": {
+      "facturacion": 775490.0,
+      "n": 375,
+      "satisf_media": 5.84
+    },
+    "Orense": {
+      "facturacion": 771745.0,
+      "n": 346,
+      "satisf_media": 5.55
+    },
+    "Jaén": {
+      "facturacion": 741890.0,
+      "n": 338,
+      "satisf_media": 5.71
+    },
+    "Huelva": {
+      "facturacion": 722965.0,
+      "n": 336,
+      "satisf_media": 5.46
+    },
+    "Barcelona": {
+      "facturacion": 720970.0,
+      "n": 335,
+      "satisf_media": 5.48
+    },
+    "Cáceres": {
+      "facturacion": 706520.0,
+      "n": 331,
+      "satisf_media": 5.56
+    }
+  },
+  "anomalias": {
+    "n": 16,
+    "importe_total": 798360.0,
+    "pct_facturacion_registrada": 1.63,
+    "regla": "cantidad fuera de 1-5 (el 99,9 % de las ventas) o precio distinto del de catalogo de su producto",
+    "por_cantidad": 16,
+    "por_precio": 12,
+    "lista": [
+      {
+        "id_venta": "V0050",
+        "fecha": "2019-10-10",
+        "prod": "Switch Gestionable 24p",
+        "cant": 44,
+        "precio": 180.0,
+        "precio_catalogo": 180.0,
+        "importe": 7920.0,
+        "motivo": "cantidad 44 fuera de 1-5"
+      },
+      {
+        "id_venta": "V0100",
+        "fecha": "2024-05-29",
+        "prod": "Portátil Core i7",
+        "cant": 44,
+        "precio": 2850.0,
+        "precio_catalogo": 950.0,
+        "importe": 125400.0,
+        "motivo": "cantidad 44 fuera de 1-5; precio x3.00 del de catalogo (950.00)"
+      },
+      {
+        "id_venta": "V0150",
+        "fecha": "2024-07-20",
+        "prod": "Módulo Nóminas",
+        "cant": 44,
+        "precio": 600.0,
+        "precio_catalogo": 300.0,
+        "importe": 26400.0,
+        "motivo": "cantidad 44 fuera de 1-5; precio x2.00 del de catalogo (300.00)"
+      },
+      {
+        "id_venta": "V0200",
+        "fecha": "2022-08-21",
+        "prod": "Módulo Nóminas",
+        "cant": 42,
+        "precio": 900.0,
+        "precio_catalogo": 300.0,
+        "importe": 37800.0,
+        "motivo": "cantidad 42 fuera de 1-5; precio x3.00 del de catalogo (300.00)"
+      },
+      {
+        "id_venta": "V0250",
+        "fecha": "2024-03-12",
+        "prod": "Suscripción CRM Pro",
+        "cant": 42,
+        "precio": 450.0,
+        "precio_catalogo": 450.0,
+        "importe": 18900.0,
+        "motivo": "cantidad 42 fuera de 1-5"
+      },
+      {
+        "id_venta": "V0300",
+        "fecha": "2022-05-06",
+        "prod": "Portátil Core i7",
+        "cant": 44,
+        "precio": 1900.0,
+        "precio_catalogo": 950.0,
+        "importe": 83600.0,
+        "motivo": "cantidad 44 fuera de 1-5; precio x2.00 del de catalogo (950.00)"
+      },
+      {
+        "id_venta": "V0350",
+        "fecha": "2023-01-19",
+        "prod": "Módulo Nóminas",
+        "cant": 43,
+        "precio": 900.0,
+        "precio_catalogo": 300.0,
+        "importe": 38700.0,
+        "motivo": "cantidad 43 fuera de 1-5; precio x3.00 del de catalogo (300.00)"
+      },
+      {
+        "id_venta": "V0400",
+        "fecha": "2020-03-15",
+        "prod": "Switch Gestionable 24p",
+        "cant": 41,
+        "precio": 540.0,
+        "precio_catalogo": 180.0,
+        "importe": 22140.0,
+        "motivo": "cantidad 41 fuera de 1-5; precio x3.00 del de catalogo (180.00)"
+      },
+      {
+        "id_venta": "V0450",
+        "fecha": "2022-06-14",
+        "prod": "Portátil Core i7",
+        "cant": 41,
+        "precio": 950.0,
+        "precio_catalogo": 950.0,
+        "importe": 38950.0,
+        "motivo": "cantidad 41 fuera de 1-5"
+      },
+      {
+        "id_venta": "V0500",
+        "fecha": "2021-05-23",
+        "prod": "Portátil Core i7",
+        "cant": 45,
+        "precio": 950.0,
+        "precio_catalogo": 950.0,
+        "importe": 42750.0,
+        "motivo": "cantidad 45 fuera de 1-5"
+      },
+      {
+        "id_venta": "V1000",
+        "fecha": "2025-12-03",
+        "prod": "Módulo Nóminas",
+        "cant": 44,
+        "precio": 900.0,
+        "precio_catalogo": 300.0,
+        "importe": 39600.0,
+        "motivo": "cantidad 44 fuera de 1-5; precio x3.00 del de catalogo (300.00)"
+      },
+      {
+        "id_venta": "V2000",
+        "fecha": "2023-11-14",
+        "prod": "Portátil Core i7",
+        "cant": 42,
+        "precio": 1900.0,
+        "precio_catalogo": 950.0,
+        "importe": 79800.0,
+        "motivo": "cantidad 42 fuera de 1-5; precio x2.00 del de catalogo (950.00)"
+      },
+      {
+        "id_venta": "V2500",
+        "fecha": "2025-10-23",
+        "prod": "Licencia ERP Cloud",
+        "cant": 43,
+        "precio": 2400.0,
+        "precio_catalogo": 1200.0,
+        "importe": 103200.0,
+        "motivo": "cantidad 43 fuera de 1-5; precio x2.00 del de catalogo (1200.00)"
+      },
+      {
+        "id_venta": "V2600",
+        "fecha": "2020-10-08",
+        "prod": "Módulo Nóminas",
+        "cant": 41,
+        "precio": 900.0,
+        "precio_catalogo": 300.0,
+        "importe": 36900.0,
+        "motivo": "cantidad 41 fuera de 1-5; precio x3.00 del de catalogo (300.00)"
+      },
+      {
+        "id_venta": "V3500",
+        "fecha": "2021-09-19",
+        "prod": "Suscripción CRM Pro",
+        "cant": 44,
+        "precio": 1350.0,
+        "precio_catalogo": 450.0,
+        "importe": 59400.0,
+        "motivo": "cantidad 44 fuera de 1-5; precio x3.00 del de catalogo (450.00)"
+      },
+      {
+        "id_venta": "V4000",
+        "fecha": "2022-09-22",
+        "prod": "Módulo Nóminas",
+        "cant": 41,
+        "precio": 900.0,
+        "precio_catalogo": 300.0,
+        "importe": 36900.0,
+        "motivo": "cantidad 41 fuera de 1-5; precio x3.00 del de catalogo (300.00)"
+      }
+    ],
+    "patron": "las 16 tienen id multiplo de 50; las cantidades son 41-45, o sea 40 + un valor normal de 1-5; los precios fuera de catalogo son exactamente x2 o x3",
+    "hipotesis": [
+      "HIPOTESIS, no confirmada: un 4 tecleado delante de la cantidad (41-45 = 40 + 1..5).",
+      "HIPOTESIS, no confirmada: precio de otra tarifa o de un pack multiplicado por 2 o por 3.",
+      "HIPOTESIS, no confirmada: errores inyectados a proposito al generar el dataset, por la regularidad de los id (multiplos de 50)."
+    ],
+    "tratamiento": "marcadas y excluidas de los KPI; no se corrigen porque el valor real no se puede saber. Se muestra la facturacion registrada al lado de la valida."
+  },
+  "atipicos": {
+    "iqr_global_importe": {
+      "limite_inf": -2875.0,
+      "limite_sup": 6285.0,
+      "n": 1588,
+      "de_ellos_anomalias": 16,
+      "por_producto": {
+        "Servidor Rack Xeon": 1572
+      },
+      "lectura": "el IQR sobre el importe mezcla productos baratos y caros: marca como atipicas ventas normales de los productos caros. No sirve para detectar errores en este dataset."
+    },
+    "iqr_por_producto_cantidad": {
+      "n": 16,
+      "coinciden_con_anomalias": 16,
+      "lectura": "dentro de cada producto la cantidad va de 1 a 5; el IQR por producto aisla justo las 16 ventas de 41-45."
+    },
+    "zscore_importe_abs_gt3": 760,
+    "zscore_de_ellos_anomalias": 15
+  },
+  "p1_mes_mayores_ventas": {
+    "anio_mes_top": "2023-10",
+    "facturacion": 709580.0,
+    "top_por_n_ventas": {
+      "anio_mes": "2022-06",
+      "n": 264
+    },
+    "top_por_unidades": {
+      "anio_mes": "2019-01",
+      "unidades": 791
+    },
+    "z_del_top_entre_meses_completos": 2.93,
+    "grubbs_critico_alfa_005": 3.34,
+    "segundo": {
+      "anio_mes": "2019-01",
+      "facturacion": 689080.0
+    },
+    "mes_calendario_top_media": 8,
+    "media_mes_calendario_top": 565549.29,
+    "media_de_los_meses_completos": 541241.42,
+    "pct_sobre_media": 4.49,
+    "n_meses_completos": 88,
+    "base": "meses completos, sin anomalias",
+    "mejor_mes_por_anio": {
+      "2019": {
+        "anio_mes": "2019-01",
+        "facturacion": 689080.0
+      },
+      "2020": {
+        "anio_mes": "2020-10",
+        "facturacion": 597315.0
+      },
+      "2021": {
+        "anio_mes": "2021-12",
+        "facturacion": 604570.0
+      },
+      "2022": {
+        "anio_mes": "2022-11",
+        "facturacion": 627710.0
+      },
+      "2023": {
+        "anio_mes": "2023-10",
+        "facturacion": 709580.0
+      },
+      "2024": {
+        "anio_mes": "2024-04",
+        "facturacion": 616440.0
+      },
+      "2025": {
+        "anio_mes": "2025-07",
+        "facturacion": 645630.0
+      },
+      "2026": {
+        "anio_mes": "2026-03",
+        "facturacion": 562190.0
+      }
+    },
+    "por_que_no_se_suma_por_mes": {
+      "meses_por_mes_del_anio": {
+        "1": 8,
+        "2": 8,
+        "3": 8,
+        "4": 8,
+        "5": 7,
+        "6": 7,
+        "7": 7,
+        "8": 7,
+        "9": 7,
+        "10": 7,
+        "11": 7,
+        "12": 7
+      },
+      "mes_top_si_se_suma": 3,
+      "lectura": "enero a abril tienen un anio mas de datos que el resto (2026) y mayo lo tendria a medias; sumando, esos meses ganan por tener mas meses, no por vender mas. Se compara la media."
+    }
+  },
+  "p2_region_crecimiento_satisfaccion": {
+    "region_top": "Navarra",
+    "detalle_top": {
+      "slope": 0.1798,
+      "primer_anio": 4.58,
+      "ultimo_anio": 6.56,
+      "delta": 1.97
+    },
+    "ranking_top5": {
+      "Navarra": {
+        "slope": 0.1798,
+        "primer_anio": 4.58,
+        "ultimo_anio": 6.56,
+        "delta": 1.97
+      },
+      "Madrid": {
+        "slope": 0.1521,
+        "primer_anio": 4.66,
+        "ultimo_anio": 5.56,
+        "delta": 0.9
+      },
+      "Pontevedra": {
+        "slope": 0.1457,
+        "primer_anio": 4.57,
+        "ultimo_anio": 5.69,
+        "delta": 1.12
+      },
+      "Granada": {
+        "slope": 0.1433,
+        "primer_anio": 5.78,
+        "ultimo_anio": 5.59,
+        "delta": -0.19
+      },
+      "Barcelona": {
+        "slope": 0.1372,
+        "primer_anio": 5.12,
+        "ultimo_anio": 5.85,
+        "delta": 0.73
+      }
+    },
+    "peor5": {
+      "Las Palmas": {
+        "slope": -0.0687,
+        "primer_anio": 6.34,
+        "ultimo_anio": 5.42,
+        "delta": -0.92
+      },
+      "Guipúzcoa": {
+        "slope": -0.0914,
+        "primer_anio": 5.37,
+        "ultimo_anio": 4.65,
+        "delta": -0.72
+      },
+      "Valencia": {
+        "slope": -0.1058,
+        "primer_anio": 5.23,
+        "ultimo_anio": 4.78,
+        "delta": -0.45
+      },
+      "Murcia": {
+        "slope": -0.1148,
+        "primer_anio": 6.36,
+        "ultimo_anio": 5.32,
+        "delta": -1.05
+      },
+      "La Coruña": {
+        "slope": -0.2482,
+        "primer_anio": 5.44,
+        "ultimo_anio": 4.05,
+        "delta": -1.39
+      }
+    },
+    "sensibilidad_sin_2026": {
+      "region_top": "Madrid",
+      "detalle_top": {
+        "slope": 0.2095,
+        "primer_anio": 4.66,
+        "ultimo_anio": 6.44,
+        "delta": 1.78
+      },
+      "misma_region": false
+    },
+    "nota": "slope = pendiente de la regresion lineal de la media anual de satisfaccion por provincia; 2026 solo tiene cuatro meses y medio, por eso se repite sin 2026"
+  },
+  "p3_correlacion_ventas_satisfaccion": {
+    "importe_vs_satisfaccion_pearson": {
+      "r": 0.0034,
+      "p": 0.6696,
+      "n": 15980,
+      "metodo": "pearson"
+    },
+    "importe_vs_satisfaccion_spearman": {
+      "r": -0.0002,
+      "p": 0.9749,
+      "n": 15980,
+      "metodo": "spearman"
+    },
+    "cant_vs_satisfaccion_pearson": {
+      "r": 0.0194,
+      "p": 0.014,
+      "n": 15980,
+      "metodo": "pearson"
+    },
+    "base": "validas con satisfaccion informada"
+  },
+  "extra_pareto": {
+    "productos": {
+      "n_para_80pct": 3,
+      "de_total": 8,
+      "pct_items": 37.5
+    },
+    "regiones": {
+      "n_para_80pct": 40,
+      "de_total": 52,
+      "pct_items": 76.92
+    }
+  },
+  "ausencia_satisfaccion": {
+    "pct_global": 20.04,
+    "chi2_por_variable": {
+      "reg": {
+        "chi2": 45.85,
+        "gl": 51,
+        "p": 0.6777
+      },
+      "anio": {
+        "chi2": 0.75,
+        "gl": 7,
+        "p": 0.9979
+      },
+      "prod": {
+        "chi2": 5.74,
+        "gl": 7,
+        "p": 0.5703
+      },
+      "cat": {
+        "chi2": 0.59,
+        "gl": 1,
+        "p": 0.4431
+      }
+    },
+    "todas_p_mayor_005": true,
+    "lectura": "si ninguna variable cambia la proporcion de ausentes, la ausencia es compatible con aleatoria (MCAR) en lo que esas variables permiten ver; no descarta que dependa de la propia nota (MNAR)"
+  },
+  "mapa_calor_provincia_anio": {
+    "Santa Cruz de Tenerife": {
+      "2019": 282625.0,
+      "2020": 231785.0,
+      "2021": 278995.0,
+      "2022": 268000.0,
+      "2023": 275625.0,
+      "2024": 252295.0,
+      "2025": 312150.0,
+      "2026": 73795.0
+    },
+    "Lleida": {
+      "2019": 286910.0,
+      "2020": 226275.0,
+      "2021": 222870.0,
+      "2022": 226670.0,
+      "2023": 250015.0,
+      "2024": 170905.0,
+      "2025": 215725.0,
+      "2026": 127090.0
+    },
+    "Girona": {
+      "2019": 263075.0,
+      "2020": 200110.0,
+      "2021": 184365.0,
+      "2022": 285280.0,
+      "2023": 226680.0,
+      "2024": 212415.0,
+      "2025": 243285.0,
+      "2026": 87185.0
+    },
+    "Teruel": {
+      "2019": 131985.0,
+      "2020": 127120.0,
+      "2021": 130535.0,
+      "2022": 136190.0,
+      "2023": 184145.0,
+      "2024": 185750.0,
+      "2025": 156040.0,
+      "2026": 39640.0
+    },
+    "Islas Baleares": {
+      "2019": 171715.0,
+      "2020": 121220.0,
+      "2021": 213435.0,
+      "2022": 109345.0,
+      "2023": 181015.0,
+      "2024": 92410.0,
+      "2025": 117005.0,
+      "2026": 23140.0
+    },
+    "Álava": {
+      "2019": 151960.0,
+      "2020": 137100.0,
+      "2021": 79015.0,
+      "2022": 201300.0,
+      "2023": 104955.0,
+      "2024": 142475.0,
+      "2025": 148615.0,
+      "2026": 49520.0
+    },
+    "Sevilla": {
+      "2019": 125635.0,
+      "2020": 123100.0,
+      "2021": 121040.0,
+      "2022": 176855.0,
+      "2023": 121135.0,
+      "2024": 108695.0,
+      "2025": 144440.0,
+      "2026": 75400.0
+    },
+    "Las Palmas": {
+      "2019": 110575.0,
+      "2020": 116010.0,
+      "2021": 115220.0,
+      "2022": 136125.0,
+      "2023": 179640.0,
+      "2024": 109525.0,
+      "2025": 149745.0,
+      "2026": 61230.0
+    },
+    "Segovia": {
+      "2019": 96905.0,
+      "2020": 128285.0,
+      "2021": 143720.0,
+      "2022": 110425.0,
+      "2023": 214970.0,
+      "2024": 123990.0,
+      "2025": 129595.0,
+      "2026": 26245.0
+    },
+    "Valencia": {
+      "2019": 126330.0,
+      "2020": 142735.0,
+      "2021": 141000.0,
+      "2022": 136875.0,
+      "2023": 103935.0,
+      "2024": 122010.0,
+      "2025": 144945.0,
+      "2026": 54745.0
+    },
+    "Cantabria": {
+      "2019": 87050.0,
+      "2020": 105280.0,
+      "2021": 137410.0,
+      "2022": 104485.0,
+      "2023": 182405.0,
+      "2024": 141170.0,
+      "2025": 93255.0,
+      "2026": 72645.0
+    },
+    "Cuenca": {
+      "2019": 141700.0,
+      "2020": 102175.0,
+      "2021": 97890.0,
+      "2022": 99875.0,
+      "2023": 210960.0,
+      "2024": 109050.0,
+      "2025": 103230.0,
+      "2026": 52365.0
+    },
+    "Huesca": {
+      "2019": 126940.0,
+      "2020": 136300.0,
+      "2021": 94430.0,
+      "2022": 83490.0,
+      "2023": 172940.0,
+      "2024": 107235.0,
+      "2025": 141660.0,
+      "2026": 47390.0
+    },
+    "Ávila": {
+      "2019": 125910.0,
+      "2020": 132260.0,
+      "2021": 107710.0,
+      "2022": 119775.0,
+      "2023": 106680.0,
+      "2024": 120320.0,
+      "2025": 132360.0,
+      "2026": 64585.0
+    },
+    "Soria": {
+      "2019": 132950.0,
+      "2020": 71220.0,
+      "2021": 79085.0,
+      "2022": 116215.0,
+      "2023": 131570.0,
+      "2024": 143350.0,
+      "2025": 165425.0,
+      "2026": 68845.0
+    },
+    "Toledo": {
+      "2019": 185115.0,
+      "2020": 95255.0,
+      "2021": 141860.0,
+      "2022": 118110.0,
+      "2023": 125630.0,
+      "2024": 107155.0,
+      "2025": 93220.0,
+      "2026": 39240.0
+    },
+    "Badajoz": {
+      "2019": 131825.0,
+      "2020": 141515.0,
+      "2021": 114375.0,
+      "2022": 121165.0,
+      "2023": 141745.0,
+      "2024": 96915.0,
+      "2025": 135925.0,
+      "2026": 21725.0
+    },
+    "Córdoba": {
+      "2019": 151355.0,
+      "2020": 152020.0,
+      "2021": 118745.0,
+      "2022": 96780.0,
+      "2023": 103950.0,
+      "2024": 127115.0,
+      "2025": 115810.0,
+      "2026": 38530.0
+    },
+    "Pontevedra": {
+      "2019": 143000.0,
+      "2020": 92045.0,
+      "2021": 164215.0,
+      "2022": 83490.0,
+      "2023": 137555.0,
+      "2024": 129205.0,
+      "2025": 106950.0,
+      "2026": 45640.0
+    },
+    "Zamora": {
+      "2019": 93080.0,
+      "2020": 173070.0,
+      "2021": 127315.0,
+      "2022": 94910.0,
+      "2023": 120895.0,
+      "2024": 77720.0,
+      "2025": 155570.0,
+      "2026": 59080.0
+    },
+    "Castellón": {
+      "2019": 130690.0,
+      "2020": 129605.0,
+      "2021": 76340.0,
+      "2022": 118125.0,
+      "2023": 159745.0,
+      "2024": 124000.0,
+      "2025": 127670.0,
+      "2026": 31300.0
+    },
+    "Salamanca": {
+      "2019": 159040.0,
+      "2020": 119850.0,
+      "2021": 120645.0,
+      "2022": 100965.0,
+      "2023": 140255.0,
+      "2024": 148070.0,
+      "2025": 73010.0,
+      "2026": 33340.0
+    },
+    "León": {
+      "2019": 110890.0,
+      "2020": 131895.0,
+      "2021": 137110.0,
+      "2022": 148555.0,
+      "2023": 102225.0,
+      "2024": 151140.0,
+      "2025": 88865.0,
+      "2026": 23640.0
+    },
+    "Guadalajara": {
+      "2019": 77090.0,
+      "2020": 121170.0,
+      "2021": 73005.0,
+      "2022": 161475.0,
+      "2023": 159040.0,
+      "2024": 164575.0,
+      "2025": 94960.0,
+      "2026": 35855.0
+    },
+    "Lugo": {
+      "2019": 120160.0,
+      "2020": 118350.0,
+      "2021": 94120.0,
+      "2022": 129095.0,
+      "2023": 125040.0,
+      "2024": 97005.0,
+      "2025": 125070.0,
+      "2026": 60270.0
+    },
+    "Ciudad Real": {
+      "2019": 95115.0,
+      "2020": 113125.0,
+      "2021": 113280.0,
+      "2022": 118735.0,
+      "2023": 117360.0,
+      "2024": 118805.0,
+      "2025": 108070.0,
+      "2026": 77995.0
+    },
+    "Vizcaya": {
+      "2019": 103280.0,
+      "2020": 127285.0,
+      "2021": 92885.0,
+      "2022": 109355.0,
+      "2023": 135825.0,
+      "2024": 90440.0,
+      "2025": 146790.0,
+      "2026": 55440.0
+    },
+    "Almería": {
+      "2019": 118815.0,
+      "2020": 103120.0,
+      "2021": 112220.0,
+      "2022": 106840.0,
+      "2023": 137025.0,
+      "2024": 130770.0,
+      "2025": 110115.0,
+      "2026": 42250.0
+    },
+    "Cádiz": {
+      "2019": 113745.0,
+      "2020": 106795.0,
+      "2021": 106725.0,
+      "2022": 136230.0,
+      "2023": 142325.0,
+      "2024": 104020.0,
+      "2025": 122345.0,
+      "2026": 24850.0
+    },
+    "Palencia": {
+      "2019": 160825.0,
+      "2020": 101745.0,
+      "2021": 87515.0,
+      "2022": 127000.0,
+      "2023": 85375.0,
+      "2024": 154450.0,
+      "2025": 83505.0,
+      "2026": 56250.0
+    },
+    "Asturias": {
+      "2019": 131720.0,
+      "2020": 134445.0,
+      "2021": 125260.0,
+      "2022": 101755.0,
+      "2023": 152880.0,
+      "2024": 74495.0,
+      "2025": 117235.0,
+      "2026": 17050.0
+    },
+    "Burgos": {
+      "2019": 136475.0,
+      "2020": 79145.0,
+      "2021": 101705.0,
+      "2022": 124655.0,
+      "2023": 116255.0,
+      "2024": 133540.0,
+      "2025": 106445.0,
+      "2026": 55505.0
+    },
+    "Navarra": {
+      "2019": 84715.0,
+      "2020": 131395.0,
+      "2021": 111730.0,
+      "2022": 104105.0,
+      "2023": 113420.0,
+      "2024": 156700.0,
+      "2025": 84980.0,
+      "2026": 65655.0
+    },
+    "Melilla": {
+      "2019": 123575.0,
+      "2020": 98210.0,
+      "2021": 116530.0,
+      "2022": 161610.0,
+      "2023": 124290.0,
+      "2024": 78730.0,
+      "2025": 104920.0,
+      "2026": 43185.0
+    },
+    "La Coruña": {
+      "2019": 113420.0,
+      "2020": 102930.0,
+      "2021": 112870.0,
+      "2022": 90170.0,
+      "2023": 144125.0,
+      "2024": 115880.0,
+      "2025": 128610.0,
+      "2026": 38000.0
+    },
+    "Tarragona": {
+      "2019": 105340.0,
+      "2020": 104715.0,
+      "2021": 192305.0,
+      "2022": 75785.0,
+      "2023": 89750.0,
+      "2024": 150460.0,
+      "2025": 80130.0,
+      "2026": 47065.0
+    },
+    "Ceuta": {
+      "2019": 105970.0,
+      "2020": 156350.0,
+      "2021": 112460.0,
+      "2022": 65155.0,
+      "2023": 72250.0,
+      "2024": 131835.0,
+      "2025": 157440.0,
+      "2026": 43680.0
+    },
+    "Valladolid": {
+      "2019": 120580.0,
+      "2020": 96410.0,
+      "2021": 107555.0,
+      "2022": 109520.0,
+      "2023": 79680.0,
+      "2024": 151855.0,
+      "2025": 133445.0,
+      "2026": 44025.0
+    },
+    "Madrid": {
+      "2019": 109565.0,
+      "2020": 125105.0,
+      "2021": 117685.0,
+      "2022": 110085.0,
+      "2023": 127115.0,
+      "2024": 87895.0,
+      "2025": 109570.0,
+      "2026": 53310.0
+    },
+    "Zaragoza": {
+      "2019": 87300.0,
+      "2020": 93240.0,
+      "2021": 110390.0,
+      "2022": 144005.0,
+      "2023": 96630.0,
+      "2024": 111920.0,
+      "2025": 143385.0,
+      "2026": 38675.0
+    },
+    "Málaga": {
+      "2019": 65350.0,
+      "2020": 121090.0,
+      "2021": 104835.0,
+      "2022": 144730.0,
+      "2023": 110400.0,
+      "2024": 97390.0,
+      "2025": 121640.0,
+      "2026": 56710.0
+    },
+    "Granada": {
+      "2019": 118720.0,
+      "2020": 106455.0,
+      "2021": 143755.0,
+      "2022": 121070.0,
+      "2023": 148170.0,
+      "2024": 90545.0,
+      "2025": 74315.0,
+      "2026": 18380.0
+    },
+    "Alicante": {
+      "2019": 115655.0,
+      "2020": 101545.0,
+      "2021": 156045.0,
+      "2022": 152720.0,
+      "2023": 124625.0,
+      "2024": 60590.0,
+      "2025": 77910.0,
+      "2026": 29175.0
+    },
+    "La Rioja": {
+      "2019": 93555.0,
+      "2020": 113395.0,
+      "2021": 169135.0,
+      "2022": 64895.0,
+      "2023": 147410.0,
+      "2024": 102985.0,
+      "2025": 93920.0,
+      "2026": 26590.0
+    },
+    "Albacete": {
+      "2019": 159945.0,
+      "2020": 136590.0,
+      "2021": 75630.0,
+      "2022": 83010.0,
+      "2023": 110460.0,
+      "2024": 102185.0,
+      "2025": 77600.0,
+      "2026": 60750.0
+    },
+    "Guipúzcoa": {
+      "2019": 66990.0,
+      "2020": 66545.0,
+      "2021": 106555.0,
+      "2022": 103850.0,
+      "2023": 132435.0,
+      "2024": 101160.0,
+      "2025": 170875.0,
+      "2026": 52825.0
+    },
+    "Murcia": {
+      "2019": 88215.0,
+      "2020": 118225.0,
+      "2021": 99115.0,
+      "2022": 108965.0,
+      "2023": 95125.0,
+      "2024": 102035.0,
+      "2025": 108920.0,
+      "2026": 54890.0
+    },
+    "Orense": {
+      "2019": 99290.0,
+      "2020": 113860.0,
+      "2021": 105175.0,
+      "2022": 107915.0,
+      "2023": 88635.0,
+      "2024": 104035.0,
+      "2025": 101970.0,
+      "2026": 50865.0
+    },
+    "Jaén": {
+      "2019": 63845.0,
+      "2020": 103410.0,
+      "2021": 126325.0,
+      "2022": 95110.0,
+      "2023": 82885.0,
+      "2024": 122350.0,
+      "2025": 81450.0,
+      "2026": 66515.0
+    },
+    "Huelva": {
+      "2019": 81610.0,
+      "2020": 107830.0,
+      "2021": 74965.0,
+      "2022": 77925.0,
+      "2023": 97645.0,
+      "2024": 93370.0,
+      "2025": 135405.0,
+      "2026": 54215.0
+    },
+    "Barcelona": {
+      "2019": 95990.0,
+      "2020": 90350.0,
+      "2021": 61975.0,
+      "2022": 87330.0,
+      "2023": 141895.0,
+      "2024": 107980.0,
+      "2025": 93185.0,
+      "2026": 42265.0
+    },
+    "Cáceres": {
+      "2019": 96100.0,
+      "2020": 80160.0,
+      "2021": 146975.0,
+      "2022": 115200.0,
+      "2023": 73245.0,
+      "2024": 104850.0,
+      "2025": 46310.0,
+      "2026": 43680.0
+    }
+  },
+  "mapa_calor_nota": "facturacion valida por provincia y anio; 2026 es parcial (hasta 2026-05)"
+}

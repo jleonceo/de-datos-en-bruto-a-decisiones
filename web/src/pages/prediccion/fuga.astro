@@ -1,0 +1,158 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import seg from '../../data/segmentacion.json';
+
+const g = seg.h7_h10_fuga_e_importancia;
+const f = (v, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(v);
+const madre = { slug: '/prediccion', t: '16 · ¿Se puede predecir? Y las anomalías' };
+const lim = (s) => s.replace('prod_', '').replace('reg_', '');
+
+const code = `# Lo que se sabe cuando hay que predecir
+antes = pd.get_dummies(d[["prod", "reg", "cat"]]); antes["mes"] = d["mes"]
+
+# Lo que NO se sabe hasta firmar: cantidad y precio final
+despues = np.hstack([antes, d[["cant", "precio"]]])
+
+# El mismo bosque, la misma particion, la misma semilla
+for X in (antes, despues):
+    a, b, ya, yb = train_test_split(X, y, test_size=0.3, random_state=42)
+    print(r2_score(yb, RandomForestRegressor(random_state=42).fit(a, ya).predict(b)))`;
+---
+<Layout current="/prediccion/fuga" title="Fuga de información · TechSoluciones Analytics">
+  <Concepto
+    ficha="H7 · H10"
+    madre={madre}
+    titulo={`Un R² de ${f(g.con_fuga.r2_prueba, 4)} indica que la respuesta se ha colado entre las variables de entrada`}
+    pregunta="¿Cuánto vale una oportunidad de venta antes de cerrarla?"
+  >
+    <Fragment slot="problema">
+      <p>
+        Es una pregunta comercial habitual. Entra un contacto que quiere un servidor en Teruel en marzo y
+        conviene saber cuánto puede valer esa operación para decidir cuánto esfuerzo le dedica el equipo.
+      </p>
+      <p>
+        El fichero de la empresa tiene {f(g.n, 0)} ventas cerradas con su importe, suficientes para entrenar un modelo.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Lo fácil es darle al modelo todas las columnas de la tabla. Entre ellas están la cantidad y el
+        precio final, que son las dos que multiplicadas dan el importe.
+        <strong> El modelo sale perfecto.</strong>
+      </p>
+      <p>
+        Pero en el momento de usarlo no sirve. Cuando entra el contacto todavía no hay cantidad ni precio
+        cerrado: esas dos columnas solo existen <em>después</em> de que pase lo que se quería predecir.
+      </p>
+      <Callout tipo="warn" titulo="Cómo se cuela la respuesta">
+        La respuesta no se mete a propósito. Se cuela por una columna calculada, por una fecha de cierre, por
+        un campo que el sistema rellena al final del proceso. La señal suele ser la misma: un resultado
+        demasiado bueno.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Fuga de información">
+        Una variable solo puede entrar en el modelo si estará disponible en el momento en que haga falta la
+        predicción. Lo que hay que preguntarse es si ese dato existe a tiempo.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Para cada variable candidata, situarse en el instante de la predicción y preguntarse si ya se conoce.
+        Aquí, de antemano se conocen el producto, la provincia, la categoría y el mes. No se conocen la cantidad ni el precio final, que no existen hasta cerrar la venta.
+      </p>
+      <p>
+        Después se entrenan las dos versiones y se comparan, para ver el tamaño del error.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Solo con lo que se sabe antes</div>
+          <div class="mt-1 font-display text-[1.5rem] font-bold text-acento-deep">R² = {f(g.sin_fuga.r2_prueba, 4)}</div>
+          <div class="text-[.78rem] text-suave">{g.sin_fuga.n_variables} variables</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Añadiendo cantidad y precio</div>
+          <div class="mt-1 font-display text-[1.5rem] font-bold text-tinta">R² = {f(g.con_fuga.r2_prueba, 4)}</div>
+          <div class="text-[.78rem] text-suave">{g.con_fuga.n_variables} variables</div>
+        </div>
+      </div>
+      <p class="mt-4">
+        El modelo sin fuga explica el <strong>{f(100 * g.sin_fuga.r2_prueba, 1)} %</strong> de la variación del
+        importe, que para una previsión comercial es bastante. El otro da
+        {' '}<strong>{f(g.con_fuga.r2_prueba, 4)}</strong>, es decir, perfecto, porque se le han dado los dos factores
+        de la multiplicación.
+      </p>
+
+      <h3 class="mt-7 font-display text-[1.02rem] font-bold">Qué mira cada uno</h3>
+      <p class="mt-2">
+        La importancia de variables del bosque lo muestra de un vistazo. Por eso conviene tener a mano un
+        modelo de árboles, aunque el modelo final sea otro.
+      </p>
+      <div class="mt-3 grid gap-3 sm:grid-cols-2">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Sin fuga</div>
+          <ul class="mt-2 space-y-1 text-[.84rem]">
+            {g.importancia_sin_fuga.map((x) => (
+              <li class="flex justify-between gap-2">
+                <span>{lim(x.variable)}</span>
+                <span class="tabular-nums text-suave">{f(100 * x.peso, 1)} %</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Con fuga</div>
+          <ul class="mt-2 space-y-1 text-[.84rem]">
+            {g.importancia_con_fuga.map((x) => (
+              <li class="flex justify-between gap-2">
+                <span>{lim(x.variable)}</span>
+                <span class="tabular-nums text-suave">{f(100 * x.peso, 1)} %</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <p class="mt-4">
+        Sin fuga, el modelo se apoya en el producto: solo la columna del {lim(g.importancia_sin_fuga[0].variable)} pesa un {f(100 * g.importancia_sin_fuga[0].peso, 1)} %.
+        Con fuga, el precio se lleva el primer puesto y el producto pasa a segundo plano. La lista de
+        importancias sirve para detectarlo: cuando una variable pesa mucho más que el resto, hay que mirar de dónde sale.
+      </p>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Es lo primero que hay que sospechar ante cualquier modelo que sale demasiado bien. Un R² de 0,99, una precisión del
+        98 % o un AUC de 0,995 hay que revisarlos como posible fuga antes de celebrarlos.
+      </p>
+      <p>
+        Y obliga a escribir el momento de la predicción antes de elegir variables, que es una disciplina que
+        sirve igual con un modelo o con una regla de negocio.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Bosque aleatorio de 80 árboles, partición {g.particion}. Las variables categóricas entran con
+        indicadores, que son las {g.sin_fuga.n_variables} columnas de la rama sin fuga.
+      </p>
+      <p class="mt-3">
+        <strong>Este caso hubo que rehacerlo.</strong> La primera versión predecía el importe
+        con cantidad y precio en las dos ramas y las dos daban 1,0000 exacto. La fuga estaba también en la
+        rama que se llamaba limpia, así que el ejemplo no demostraba nada.
+      </p>
+      <Code titulo="Ver las dos ramas" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/segmentacion.json" class="text-acento no-underline hover:underline"><code>segmentacion.json</code></a>, campo <code>h7_h10_fuga_e_importancia</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

@@ -1,0 +1,117 @@
+---
+import { marca, partes } from '../data/site.js';
+const { current = '' } = Astro.props;
+---
+<aside
+  id="sidebar"
+  class="lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto py-7 lg:pr-5 border-b border-linea lg:border-b-0 lg:border-r"
+>
+  <a href="/" class="block font-display text-[1.1rem] font-bold leading-tight text-tinta no-underline">
+    {marca.nombre}<span class="text-acento">{marca.nombreAcento}</span>
+  </a>
+  <p class="mt-1 text-[.72rem] text-suave">Caso TechSoluciones S.L.</p>
+
+  <nav class="mt-6 space-y-4" aria-label="Índice del recorrido">
+    {partes.map((p) => (
+      <div>
+        {p.titulo && (
+          <div class="mb-1 text-[.72rem] font-semibold text-suave">{p.titulo}</div>
+        )}
+        <ul class="space-y-0.5">
+          {p.items.map((it) => (
+            <li>
+              <a
+                href={it.slug}
+                aria-current={current === it.slug ? 'page' : undefined}
+                data-rama={current.startsWith(it.slug + '/') ? 'si' : undefined}
+                class={`block rounded-md px-2 py-[6px] text-[.86rem] no-underline transition ${
+                  current === it.slug || current.startsWith(it.slug + '/')
+                    ? 'bg-acento-claro font-semibold text-acento-deep'
+                    : 'text-tinta-soft hover:bg-crema hover:text-acento'
+                }`}
+              >
+                {it.t}
+              </a>
+              {it.sub && (
+                <ul class="ml-3 border-l border-linea pl-2">
+                  {it.sub.map((sb) => (
+                    <li>
+                      <a
+                        href={sb.slug}
+                        aria-current={current === sb.slug ? 'page' : undefined}
+                        class={`flex items-baseline gap-1.5 rounded-md px-2 py-[4px] text-[.78rem] no-underline transition hover:bg-crema hover:text-acento ${
+                          current === sb.slug ? 'font-semibold text-acento-deep' : 'text-suave'
+                        }`}
+                      >
+                        {sb.ficha && <span class="font-mono text-[.66rem] opacity-70">{sb.ficha}</span>}
+                        <span>{sb.t}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </nav>
+</aside>
+
+<script is:inline>
+  /* Continuidad del índice entre páginas (Astro es multipágina: cada clic recarga).
+     Guarda la posición de scroll del índice al navegar y la restaura al cargar,
+     asegurando que el ítem activo quede siempre a la vista. Solo en desktop (índice sticky). */
+  (function () {
+    var aside = document.getElementById('sidebar');
+    if (!aside) return;
+    var KEY = 'tsAnalyticsSidebarScroll';
+    var mq = window.matchMedia('(min-width: 1024px)');
+
+    function ensureActiveVisible() {
+      var active = aside.querySelector('[aria-current="page"]');
+      if (!active) return;
+      var top = active.offsetTop;
+      var bot = top + active.offsetHeight;
+      if (top < aside.scrollTop + 8 || bot > aside.scrollTop + aside.clientHeight - 8) {
+        aside.scrollTop = Math.max(0, top - aside.clientHeight / 2 + active.offsetHeight / 2);
+      }
+    }
+
+    function restore() {
+      if (!mq.matches) return;
+      var saved = sessionStorage.getItem(KEY);
+      if (saved !== null) aside.scrollTop = parseInt(saved, 10) || 0;
+      ensureActiveVisible();
+    }
+
+    function save() {
+      if (mq.matches) sessionStorage.setItem(KEY, String(aside.scrollTop));
+    }
+
+    /* Guardar antes de cualquier navegación (clic en índice, botones prev/next, back/forward). */
+    window.addEventListener('pagehide', save);
+    aside.addEventListener('click', function (e) {
+      if (e.target.closest('a')) save();
+    });
+
+    /* Esperar a que el CSS constriña el índice (sticky + h-screen → scrollable)
+       antes de medir: si se mide sin layout final, offsetTop/clientHeight salen mal
+       y el ítem activo no se centra. Reintenta unos frames hasta que desborde. */
+    var applied = false;
+    function applyWhenReady() {
+      if (applied || !mq.matches) return;
+      var tries = 0;
+      (function attempt() {
+        if (applied) return;
+        var scrollable = aside.scrollHeight > aside.clientHeight + 2;
+        if (!scrollable && tries++ < 30) { window.requestAnimationFrame(attempt); return; }
+        applied = true;
+        restore();
+      })();
+    }
+    if (document.readyState !== 'loading') applyWhenReady();
+    else document.addEventListener('DOMContentLoaded', applyWhenReady);
+    window.addEventListener('load', applyWhenReady);
+  })();
+</script>

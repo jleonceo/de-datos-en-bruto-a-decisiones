@@ -1,0 +1,20 @@
+---
+// Gráfico de barras horizontal (CSS, accesible). items = [{label, value}]
+const { items = [], unit = '', decimals = 0, color = 'var(--color-acento)', max = null } = Astro.props;
+const top = max ?? Math.max(...items.map((i) => Math.abs(i.value)), 1);
+const fmt = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: decimals }).format(v);
+---
+<ul class="space-y-2" role="list">
+  {items.map((i) => (
+    <li class="grid grid-cols-[minmax(84px,30%)_1fr_auto] items-center gap-3 text-[.84rem]">
+      <span class="truncate text-tinta-soft" title={i.label}>{i.label}</span>
+      <span class="h-[10px] rounded-full bg-crema-deep overflow-hidden">
+        <span
+          class="block h-full rounded-full"
+          style={`width:${Math.max(2, (100 * Math.abs(i.value)) / top)}%;background:${color}`}
+        ></span>
+      </span>
+      <span class="tabular-nums text-suave whitespace-nowrap">{fmt(i.value)}{unit}</span>
+    </li>
+  ))}
+</ul>

@@ -1,0 +1,137 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import inf from '../../data/inferencia.json';
+
+const e = inf.f15_emparejamiento;
+const s = inf.f9_simpson;
+const f = (v, d = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
+const madre = { slug: '/senal-ruido', t: '14 · La lección: señal frente a ruido' };
+
+const code = `# Emparejar: por cada producto, tantas ventas de una region como de la otra
+rng = np.random.default_rng(45)                            # su propio generador
+pares, dif = 0, []
+for prod, g in d.groupby("prod"):
+    ga = g[g.reg == "${e.region_a}"]["importe"].values
+    gb = g[g.reg == "${e.region_b}"]["importe"].values
+    n = min(len(ga), len(gb))                 # el grupo pequeno manda
+    sa, sb = rng.choice(ga, n, replace=False), rng.choice(gb, n, replace=False)
+    pares += n
+    dif.append((sa - sb).sum())
+emparejado = sum(dif) / pares                 # la diferencia que queda`;
+---
+<Layout current="/senal-ruido/emparejamiento" title="Emparejar antes de comparar · TechSoluciones Analytics">
+  <Concepto
+    ficha="F15"
+    madre={madre}
+    titulo={`Al comparar el mismo producto, casi toda la ventaja de ${f(e.diferencia_bruta, 0)} € desaparece`}
+    pregunta="¿Cómo se compara a dos grupos que no venden lo mismo?"
+  >
+    <Fragment slot="problema">
+      <p>
+        En la página de <a href="/senal-ruido/simpson" class="text-acento no-underline hover:underline">la paradoja de Simpson</a> quedó
+        claro que {e.region_a} factura más por venta que {e.region_b} porque vende una mezcla distinta de
+        productos. El desglose por producto lo muestra, pero deja {s.productos_comparados} comparaciones sin una
+        respuesta única.
+      </p>
+      <p>
+        La dirección necesita un solo número. ¿Cuánto vende de más {e.region_a}, una vez descontado que
+        vende otro catálogo?
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Restar las dos medias no sirve. Si el {f(s.peso_producto_caro_alto_pct, 1)} % de las ventas de {e.region_a} son
+        servidores y en {e.region_b} lo son el {f(s.peso_producto_caro_bajo_pct, 1)} %, la resta de sus medias mide la diferencia
+        de catálogo y no la de gestión comercial.
+      </p>
+      <p>
+        Tampoco vale quedarse con un solo producto, porque entonces se desaprovecha el resto de los datos. Con
+        {' '}{s.productos_comparados} productos y dos provincias, elegir uno es elegir la respuesta.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Emparejamiento">
+        Si dos grupos se diferencian en algo que no se quiere medir, se comparan solo las parejas que
+        coinciden en eso. Lo que queda después de emparejar es lo que no explica esa variable.
+      </Callout>
+      <p>
+        Es lo que hace un ensayo clínico cuando compara pacientes de la misma edad y el mismo peso. Aquí la
+        variable que hay que neutralizar es el producto.
+      </p>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Por cada uno de los {s.productos_comparados} productos se toman tantas ventas de una provincia como de la otra, elegidas
+        al azar con semilla fija. El grupo más pequeño fija el número: por ejemplo, si de un producto hay 22 ventas en una provincia y
+        55 en la otra, se usan 22 y 22.
+      </p>
+      <p>
+        Después se restan una a una y se promedia. Esa media ya no contiene mezcla, porque cada resta compara
+        el mismo producto contra el mismo producto.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Sin emparejar</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-tinta">+{f(e.diferencia_bruta, 2)} €</div>
+          <div class="text-[.78rem] text-suave">a favor de {e.region_a}</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Emparejado</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-acento-deep">{f(e.diferencia_emparejada, 2)} €</div>
+          <div class="text-[.78rem] text-suave">sobre {f(e.pares_formados, 0)} parejas</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Cuánto se encoge</div>
+          <div class="mt-1 font-display text-[1.3rem] font-bold text-tinta">{f(e.reduccion_pct, 1)} %</div>
+          <div class="text-[.78rem] text-suave">la diferencia</div>
+        </div>
+      </div>
+      <p class="mt-4">
+        Se forman <strong>{f(e.pares_formados, 0)} parejas</strong> del mismo producto. La ventaja de
+        {' '}<strong>{f(e.diferencia_bruta, 2)} €</strong> se queda en <strong>{f(e.diferencia_emparejada, 2)} €</strong>,
+        Ese resto es pequeño, y su signo depende de qué ventas entren en la selección al azar y de cómo se
+        pondere cada producto, así que no se le puede dar dirección. La diferencia bruta venía de qué se vende,
+        no de lo que deja cada producto.
+      </p>
+      <Callout tipo="ok" titulo="Cómo se lee ese resto">
+        Unos {f(Math.abs(e.diferencia_emparejada), 0)} € sobre un ticket de más de dos mil euros no son una ventaja para
+        ninguna de las dos: a igualdad de producto no se ve diferencia. Eso no prueba que vendan igual. Y si
+        vender más servidores se debe a la gestión comercial o a la demanda de cada zona, estos datos no lo dicen.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Siempre que se comparan dos grupos que de entrada no son comparables. Dos delegaciones con distinta
+        cartera, dos campañas lanzadas a públicos distintos, el antes y el después de un cambio que coincidió
+        con la temporada alta.
+      </p>
+      <p>
+        El emparejamiento por producto es el caso fácil, con una sola variable y valores discretos. Cuando las
+        variables que descompensan son varias, lo que se empareja es la <em>puntuación de propensión</em>, que
+        resume en un número la probabilidad de pertenecer a un grupo. El principio es el mismo: comparar solo lo que es comparable.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Emparejamiento exacto por producto, sin reemplazo, con su propio generador, derivado de la semilla 42 del script
+        <code> 08_inferencia.py</code>. Con una sola variable de emparejamiento y ocho valores, la puntuación
+        de propensión se reduce a esto mismo, así que se calcula directamente y se puede revisar a mano.
+      </p>
+      <Code titulo="Ver el emparejamiento" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/inferencia.json" class="text-acento no-underline hover:underline"><code>inferencia.json</code></a>, campo <code>f15_emparejamiento</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

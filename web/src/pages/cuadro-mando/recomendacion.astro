@@ -1,0 +1,131 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import eda from '../../data/eda.json';
+import dic from '../../data/diccionario.json';
+
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/cuadro-mando', t: '17 · Cuadro de mando' };
+const k = eda.kpis;
+const an = eda.anomalias;
+
+const pasos = [
+  { t: 'Datos', d: `Las ${f(k.n_validas)} ventas válidas del fichero, con sus ${dic.n_campos} columnas y la limpieza hecha.` },
+  { t: 'Contexto', d: 'Qué significa cada columna, qué es una venta imposible, qué año está incompleto, qué objetivo tiene la empresa.' },
+  { t: 'Modelo de lenguaje', d: 'Lee los datos junto con ese contexto y redacta la recomendación.' },
+  { t: 'Acción', d: 'Una persona la revisa, la firma y la ejecuta. La IA propone y la decisión es de quien la firma.' },
+];
+
+const sinContexto = [
+  {
+    ve: `${f(an.n)} ventas con importes que se salen del resto`,
+    sin: 'Son los mejores clientes: hay que cuidarlos.',
+    con: 'Son cantidades o precios fuera del catálogo. Hay que revisarlas antes de sumarlas.',
+    fuente: 'la regla de anomalía del diccionario',
+  },
+  {
+    ve: `${k.periodo[1].slice(0, 4)} factura mucho menos que el año anterior`,
+    sin: 'Las ventas se han hundido este año.',
+    con: `${k.periodo[1].slice(0, 4)} solo llega hasta ${['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][Number(k.periodo[1].slice(5, 7))]}: no se compara con un año entero.`,
+    fuente: 'la nota del periodo',
+  },
+  {
+    ve: 'Una columna de correo que se repite',
+    sin: 'Hay clientes fieles que repiten compra.',
+    con: 'El correo lo comparten personas distintas. No hay clave de cliente.',
+    fuente: 'la comprobación de la página 15',
+  },
+];
+---
+<Layout current="/cuadro-mando/recomendacion" title="Anatomía de un sistema de recomendación · TechSoluciones Analytics">
+  <Concepto
+    ficha="J4"
+    madre={madre}
+    titulo="Entre los datos y la IA hace falta el contexto, que evita que la IA invente"
+    pregunta="¿Qué hace falta para que una IA recomiende algo sensato a partir de un panel?"
+  >
+    <Fragment slot="problema">
+      <p>
+        La promesa es sencilla: se conectan los datos a un modelo de lenguaje y sale la recomendación de la
+        semana. Hay herramientas que ya ofrecen ese paso de los datos a la acción con un solo botón.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Si al modelo le falta información, puede completarla con lo que es habitual
+        en general, que no tiene por qué coincidir con lo que pasa en esta empresa. El texto sale igual de seguro cuando
+        acierta que cuando inventa.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Datos, contexto, modelo, acción">
+        El segundo paso es el que falta cuando todo se reduce a un botón. El contexto es todo lo que los datos no explican por sí mismos: qué
+        significa cada columna, qué está mal, qué falta, qué se persigue. Sin él, el modelo rellena los huecos
+        inventando.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <ol class="mt-2 space-y-2">
+        {pasos.map((x, i) => (
+          <li class="tarjeta p-3">
+            <span class="font-semibold text-tinta">{i + 1} · {x.t}.</span>{' '}
+            <span class="text-[.9rem]">{x.d}</span>
+          </li>
+        ))}
+      </ol>
+      <p class="mt-3">
+        En esta web el contexto ya existe: es el
+        {' '}<a href="/diccionario" class="text-acento no-underline hover:underline">diccionario de datos</a>
+        {' '}de la página 5, con la regla de cada columna.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <p>Tres cosas que un modelo vería en estos datos, leídas con y sin contexto:</p>
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full border-collapse text-[.85rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">Lo que ve</th>
+              <th class="py-2 pr-3 font-semibold">Sin contexto diría</th>
+              <th class="py-2 font-semibold">Con contexto dice</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sinContexto.map((x) => (
+              <tr class="border-b border-linea/60 align-top">
+                <td class="py-2 pr-3 font-semibold">{x.ve}</td>
+                <td class="py-2 pr-3 text-suave">{x.sin}</td>
+                <td class="py-2 text-tinta-soft">{x.con} <span class="text-[.78rem] text-suave">({x.fuente})</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Callout tipo="warn" titulo="Las tres lecturas sin contexto son plausibles">
+        Como ninguna es absurda, es fácil aceptarlas sin revisarlas si no se conoce el fichero.
+        Las lecturas de la columna del centro son ejemplos escritos para esta página: enseñan el tipo de error,
+        no son la salida de un modelo concreto.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Antes de montar cualquier asistente que redacte sobre datos de la empresa. La primera pregunta que hay
+        que contestar es dónde está escrito el contexto. Si la respuesta es «en la cabeza de alguien», el
+        sistema no está listo.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Las cifras salen de <code>eda.json</code> (<code>kpis</code> y <code>anomalias</code>) y de
+        {' '}<code>diccionario.json</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

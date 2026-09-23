@@ -1,0 +1,129 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import ak from '../../data/atipicos_kpi.json';
+
+const c = ak.e9_clases_de_anomalia;
+const f = (v, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(v);
+const madre = { slug: '/atipicos', t: '8 · Atípicos y anomalías' };
+
+const code = `# Puntual: rara contra TODO el histórico
+puntual = importe > q3 + 1.5 * iqr_global
+
+# Contextual: normal en el total, rara DENTRO de su provincia y su trimestre
+for (reg, trimestre), g in datos.groupby(["reg", trimestre]):
+    contextual += ((g.importe > limite_local(g)) & (g.importe <= limite_global)).sum()
+
+# Colectiva: ninguna venta llama la atencion, el MES entero se sale
+mensual = datos.groupby(mes)["importe"].sum()
+colectiva = (abs(mensual - mensual.mean()) > 2 * mensual.std()).sum()`;
+---
+<Layout current="/atipicos/clases" title="Las tres clases de anomalía · TechSoluciones Analytics">
+  <Concepto
+    ficha="E9"
+    madre={madre}
+    titulo="Algunas anomalías no aparecen en ninguna venta concreta"
+    pregunta="¿Buscar valores raros es lo mismo que buscar comportamientos raros?"
+  >
+    <Fragment slot="problema">
+      <p>
+        La <a href="/atipicos" class="text-acento no-underline hover:underline">página 8</a> busca ventas cuyo
+        importe se sale del rango. Ese criterio encuentra una clase de problema y deja fuera otras dos, que en una
+        empresa real pueden costar más.
+      </p>
+      <p>
+        Un pedido de 6.000 € es normal en el histórico. En una provincia que nunca ha pasado de 3.000, no lo
+        es. Y un mes en el que nadie facturó nada raro puede ser, una vez sumado, el peor del histórico.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Un solo detector responde a una sola pregunta. Al mirar solo los valores extremos, lo que se escapa es
+        precisamente lo que no destaca por sí mismo: el fraude pequeño repetido, la caída lenta de un canal, el
+        cliente que deja de comprar sin avisar.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Tres clases, tres criterios">
+        <p><strong>Puntual:</strong> el valor es raro contra todo el conjunto.</p>
+        <p class="mt-1"><strong>Contextual:</strong> el valor es normal en general y raro en su contexto, que
+        puede ser su provincia, su trimestre o su segmento.</p>
+        <p class="mt-1"><strong>Colectiva:</strong> ningún valor suelto es raro y el conjunto sí.</p>
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Cada una pide su propio cálculo. La puntual sale del límite global. La contextual exige agrupar antes
+        de medir, aquí por provincia y trimestre. La colectiva compara los totales mensuales con su propia
+        banda, sin mirar las ventas una a una.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Puntual</div>
+          <div class="mt-1 font-display text-[1.5rem] font-bold text-tinta">{f(c.puntual, 0)}</div>
+          <div class="text-[.78rem] text-suave">ventas sobre el límite global</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Contextual</div>
+          <div class="mt-1 font-display text-[1.5rem] font-bold text-acento-deep">{f(c.contextual, 0)}</div>
+          <div class="text-[.78rem] text-suave">normales en el total, raras en su provincia</div>
+        </div>
+        <div class="tarjeta p-4">
+          <div class="text-[.8rem] font-semibold text-suave">Colectiva</div>
+          <div class="mt-1 font-display text-[1.5rem] font-bold text-tinta">{c.colectiva_meses}</div>
+          <div class="text-[.78rem] text-suave">meses de {c.meses_analizados}</div>
+        </div>
+      </div>
+      <p class="mt-4">
+        Las <strong>{f(c.contextual, 0)} contextuales</strong> son el resultado nuevo: ninguna habría aparecido en la
+        página 8, porque todas están por debajo del límite global. Son ventas que solo llaman la atención
+        cuando se las compara con lo que suele pasar en su provincia ese trimestre. Ninguna está entre las
+        anomalías de la regla, así que son un criterio que hay que validar antes de usarlo, no errores
+        encontrados.
+      </p>
+      <p>
+        Y hay <strong>{c.colectiva_meses} meses</strong> cuyo total se sale de la banda de dos desviaciones,
+        que va de {f(c.banda_mensual[0], 0)} a {f(c.banda_mensual[1], 0)} €. No bastan para hablar de anomalía
+        colectiva. La banda se calculó con todas las ventas, anomalías incluidas, y al menos uno de esos meses
+        se sale solo por una de ellas. Además, si los meses se repartieran como una campana, unos 4 de 88
+        quedarían fuera por puro azar. Habría que mirar qué pasó en cada uno.
+      </p>
+      <Callout tipo="warn" titulo="Un criterio que hubo que rehacer">
+        La primera versión medía lo contextual contra el producto y daba cero. La razón es que una venta rara
+        para un producto caro ya es rara en el total, así que los dos criterios detectaban lo mismo. Al cambiar
+        el contexto a provincia y trimestre, el criterio empezó a encontrar ventas que el límite global no ve.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Para saber qué no está vigilando un control. Un detector de valores extremos no ve ni el fraude
+        repartido en pedidos pequeños ni la caída progresiva de un canal.
+      </p>
+      <p>
+        En contabilidad esto tiene nombre propio: el fraccionamiento de pagos justo por debajo del umbral de
+        autorización es un ejemplo típico de anomalía colectiva y ningún control de importe máximo la encuentra.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Límite de Tukey en las dos primeras, con el contexto agrupado por provincia y trimestre y un mínimo de
+        20 ventas por grupo. La colectiva usa media más menos dos desviaciones sobre los totales mensuales,
+        dejando fuera el mes en curso por incompleto.
+      </p>
+      <Code titulo="Ver los tres criterios" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/atipicos_kpi.json" class="text-acento no-underline hover:underline"><code>atipicos_kpi.json</code></a>, campo <code>e9_clases_de_anomalia</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

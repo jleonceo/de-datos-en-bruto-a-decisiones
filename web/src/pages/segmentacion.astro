@@ -1,0 +1,53 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import Kpi from '../components/Kpi.astro';
+import ml from '../data/ml.json';
+const s = ml.segmentacion_clientes;
+const nf = (v, d = 0) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: d }).format(v);
+import IndiceSub from '../components/IndiceSub.astro';
+---
+<Layout current="/segmentacion" title="¿Se pueden segmentar los clientes? · TechSoluciones Analytics">
+  <p class="eyebrow">Parte V · Machine Learning</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">15 · ¿Se pueden segmentar los clientes?</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    La técnica habitual es RFM: describir a cada cliente por su <strong>Recencia</strong> (cuánto hace de
+    su última compra), su <strong>Frecuencia</strong> (cuántas veces compra) y su <strong>Monetario</strong>
+    (cuánto gasta) y dejar que un algoritmo como K-Means agrupe a los parecidos. Antes de entrenar nada
+    hay que comprobar dos condiciones: que se sepa quién es cada cliente y que los clientes repitan.
+  </p>
+
+  <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <Kpi valor={nf(s.clientes_por_email)} etiqueta="correos distintos" sub="ventas válidas" />
+    <Kpi valor={nf(s.emails_con_varios_nombres)} etiqueta="correos usados por varias personas" sub={`hasta ${s.max_nombres_por_email} por correo`} />
+    <Kpi valor={nf(s.nombres_con_dos_o_mas_compras)} etiqueta="nombres que aparecen dos veces" sub={`${nf(s.de_ellos_con_telefonos_distintos)} con teléfonos distintos`} />
+    <Kpi valor={nf(s.pct_una_compra_por_persona, 2) + ' %'} etiqueta="personas con una sola compra" sub="por nombre y teléfono" />
+  </div>
+
+  <Callout tipo="warn" titulo="Primera condición: no hay una clave de cliente en el fichero">
+    Agrupar por correo junta a personas distintas: {nf(s.emails_con_varios_nombres)} direcciones las usan varios
+    nombres. El nombre tampoco sirve: de los {nf(s.nombres_con_dos_o_mas_compras)} nombres que aparecen en dos
+    ventas, {nf(s.de_ellos_con_telefonos_distintos)} llevan un teléfono distinto en cada una. Son personas distintas
+    con el mismo nombre, no clientes que repiten.
+  </Callout>
+
+  <Callout tipo="warn" titulo="Segunda condición: nadie repite">
+    Contando por nombre y teléfono hay {nf(s.personas_por_nombre_y_telefono)} personas para el mismo número de
+    ventas válidas: el {nf(s.pct_una_compra_por_persona, 2)} % compra una sola vez. Sin repetición, la Frecuencia es
+    la misma para todos y la Recencia es solo la fecha de esa compra. K-Means siempre devuelve grupos, pero aquí
+    describirían cómo divide los datos el algoritmo y no cómo son los clientes.
+  </Callout>
+
+  <Callout tipo="info" titulo="Conclusión y lo que haría falta">
+    Con este fichero la segmentación de clientes <strong>no es viable</strong> y entregar segmentos sería
+    entregar un resultado falso. Para hacerla haría falta un identificador de cliente asignado en origen y varios
+    años de compras repetidas. Es una de las <a href="/recomendaciones" class="lnk">recomendaciones</a>.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Siguiente: <a href="/prediccion" class="lnk font-semibold">¿se puede predecir? →</a>
+  </p>
+  <IndiceSub slug="/segmentacion" titulo="Las técnicas de agrupamiento, vistas sobre esta tabla" entrada="Sin clave de cliente no hay segmentos que entregar, pero las técnicas se pueden explicar igualmente. Estas páginas las aplican a la tabla agrupada por correo, sabiendo que sus grupos no son clientes." />
+
+</Layout>

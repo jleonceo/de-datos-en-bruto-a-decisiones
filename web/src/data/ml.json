@@ -1,0 +1,60 @@
+{
+  "seed": 42,
+  "segmentacion_clientes": {
+    "viable": false,
+    "base": "ventas validas",
+    "clientes_por_email": 12953,
+    "clientes_por_nombre": 19887,
+    "emails_con_varios_nombres": 5035,
+    "max_nombres_por_email": 7,
+    "nombres_con_varios_emails": 0,
+    "pct_una_compra_por_nombre": 99.51,
+    "max_compras": 2,
+    "nombres_con_dos_o_mas_compras": 97,
+    "de_ellos_con_telefonos_distintos": 97,
+    "personas_por_nombre_y_telefono": 19984,
+    "pct_una_compra_por_persona": 100.0,
+    "motivo": "el email lo comparten personas distintas, asi que agrupar por email mezcla clientes; los pocos nombres que repiten tienen telefonos distintos, o sea son homonimos; por persona nadie compra dos veces, asi que no hay Frecuencia ni Recencia que separe grupos. Un KMeans sobre esto produce segmentos que describen el algoritmo, no a los clientes.",
+    "que_haria_falta": "un identificador de cliente en origen y varios anios de recompra"
+  },
+  "prediccion_satisfaccion": {
+    "base": "ventas validas con satisfaccion",
+    "n_train": 12784,
+    "n_test": 3196,
+    "resultados": {
+      "baseline_media": {
+        "r2_test": -0.0,
+        "mae_test": 2.491
+      },
+      "regresion_lineal": {
+        "r2_test": -0.002,
+        "mae_test": 2.488
+      },
+      "random_forest": {
+        "r2_test": -0.002,
+        "mae_test": 2.483
+      }
+    },
+    "conclusion": "R^2 de test ~ 0: con estas variables la satisfaccion no se puede predecir."
+  },
+  "anomalias": {
+    "base": "las 20.000 ventas registradas",
+    "isolationforest_n": 760,
+    "anomalias_regla_n": 16,
+    "anomalias_regla_cazadas": 15,
+    "anomalias_regla_no_cazadas": [
+      {
+        "id_venta": "V0050",
+        "prod": "Switch Gestionable 24p",
+        "cant": 44,
+        "precio": 180.0,
+        "importe": 7920.0
+      }
+    ],
+    "marcadas_que_no_son_anomalia_de_regla": 745,
+    "marcadas_normales_por_producto": {
+      "Servidor Rack Xeon": 745
+    },
+    "lectura": "IsolationForest no conoce la regla: aisla lo raro en importe, cantidad y precio a la vez. Caza casi todas las ventas de la regla, pero marca tambien cientos de ventas normales de productos caros. Sirve de contraste para encontrar candidatas; la regla de negocio decide."
+  }
+}

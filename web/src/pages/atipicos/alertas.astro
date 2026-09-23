@@ -1,0 +1,169 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import ak from '../../data/atipicos_kpi.json';
+
+const a = ak.e8_fatiga_alertas;
+const t = ak.e7_tiempo_deteccion;
+const f = (v, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(v);
+const madre = { slug: '/atipicos', t: '8 · Atípicos y anomalías' };
+// El motivo viene del script en ASCII: se escribe aquí en español legible.
+const motivo = (m) => m
+  .replace('fuera de 1-5', 'fuera de 1 a 5')
+  .replace(/precio x2\.00 del de catalogo \((\d+)\.00\)/, (_, n) => `precio el doble del de catálogo (${f(Number(n))} €)`)
+  .replace(/precio x3\.00 del de catalogo \((\d+)\.00\)/, (_, n) => `precio el triple del de catálogo (${f(Number(n))} €)`);
+const mejor = a.por_umbral.find((x) => x.precision_pct === 100);
+
+const code = `for umbral in [5000, 8000, 10000, 15000, 20000, 30000]:
+    marca = importe > umbral
+    avisos    = marca.sum()
+    aciertos  = (marca & es_anomalia).sum()
+    precision = aciertos / avisos        # de lo que aviso, cuanto acierta
+    cobertura = aciertos / total_reales  # de lo real, cuanto pilla`;
+---
+<Layout current="/atipicos/alertas" title="Calibrar una alerta · TechSoluciones Analytics">
+  <Concepto
+    ficha="E7 · E8"
+    madre={madre}
+    titulo={`Con un umbral de ${f(a.por_umbral[0].umbral_euros)} €, llegan ${f(a.por_umbral[0].avisos_por_mes, 1)} avisos al mes y solo acierta el ${f(a.por_umbral[0].precision_pct, 2)} %`}
+    pregunta="¿En qué cifra se fija el umbral de una alerta y cuánto tarda en saltar?"
+  >
+    <Fragment slot="problema">
+      <p>
+        El <a href="/cuadro-mando" class="text-acento no-underline hover:underline">cuadro de mando</a> enseña
+        las ventas anómalas como alertas, pero no dice a partir de qué importe debería saltar un aviso
+        automático. Fijar ese umbral parece sencillo, porque basta con elegir una cifra redonda.
+      </p>
+      <p>
+        Esa cifra decide a la vez dos cosas que van en direcciones opuestas: cuántos avisos genera y
+        cuántas anomalías reales se escapan.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Un umbral bajo parece prudente, porque no se escapa nada. Pero el equipo pasa a recibir
+        {' '}{f(a.por_umbral[0].avisos_por_mes, 0)} avisos al mes, casi todos falsos, y es fácil que al poco
+        tiempo deje de abrirlos.
+      </p>
+      <p>
+        Desde ese momento la alerta sigue activa, pero ya no protege de nada. Este efecto se llama fatiga
+        de alertas.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Precisión y cobertura">
+        La precisión dice qué parte de los avisos acierta. La cobertura, qué parte de lo real se detecta. Subir
+        el umbral suele mejorar la primera y empeorar la segunda.
+      </Callout>
+      <p>
+        El umbral adecuado depende de lo que cuesta revisar cada aviso y de lo que cuesta que se escape
+        una anomalía.
+      </p>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Calcular las dos para varios umbrales y enseñar la tabla a quien va a recibir los avisos. Con las
+        {' '}{a.anomalias_reales} anomalías etiquetadas del catálogo hay respuesta verdadera, así que las dos
+        columnas se pueden calcular con exactitud.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full border-collapse text-[.86rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">Umbral</th>
+              <th class="py-2 pr-3 text-right font-semibold">Avisos/mes</th>
+              <th class="py-2 pr-3 text-right font-semibold">Aciertos</th>
+              <th class="py-2 pr-3 text-right font-semibold">Precisión</th>
+              <th class="py-2 text-right font-semibold">Cobertura</th>
+            </tr>
+          </thead>
+          <tbody>
+            {a.por_umbral.map((x) => (
+              <tr class={`border-b border-linea/60 ${x.precision_pct === 100 ? 'bg-acento-claro/40' : ''}`}>
+                <td class="py-2 pr-3 tabular-nums">{f(x.umbral_euros, 0)} €</td>
+                <td class="py-2 pr-3 text-right tabular-nums">{f(x.avisos_por_mes, 1)}</td>
+                <td class="py-2 pr-3 text-right tabular-nums">{x.aciertos}</td>
+                <td class="py-2 pr-3 text-right tabular-nums font-semibold">{f(x.precision_pct, 2)} %</td>
+                <td class="py-2 text-right tabular-nums">{f(x.cobertura_pct, 1)} %</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4">
+        A {f(mejor.umbral_euros, 0)} € la alerta acierta el <strong>100 %</strong> con
+        {' '}{f(mejor.avisos_por_mes, 1)} avisos al mes y aun así detecta el {f(mejor.cobertura_pct, 1)} % de lo
+        real. A {f(a.por_umbral[0].umbral_euros, 0)} € cubre todo, pero pide revisar
+        {' '}{f(a.por_umbral[0].avisos_por_mes, 1)} avisos mensuales para una precisión del
+        {' '}{f(a.por_umbral[0].precision_pct, 2)} %.
+      </p>
+
+      <h3 class="mt-7 font-display text-[1.02rem] font-bold">Cuánto tarda en saltar la alerta</h3>
+      <p class="mt-2">
+        El momento en que salta la alerta también cuenta. Si el control forma parte del informe mensual,
+        la anomalía no se ve hasta el cierre del mes: de media <strong>{f(t.media_dias, 1)} días</strong>, con casos de hasta {t.max_dias}.
+      </p>
+      <div class="mt-3 overflow-x-auto">
+        <table class="w-full border-collapse text-[.82rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-1.5 pr-3 font-semibold">Venta</th>
+              <th class="py-1.5 pr-3 font-semibold">Fecha</th>
+              <th class="py-1.5 pr-3 text-right font-semibold">Días de espera</th>
+              <th class="py-1.5 font-semibold">Motivo</th>
+            </tr>
+          </thead>
+          <tbody>
+            {t.detalle.map((x) => (
+              <tr class="border-b border-linea/60">
+                <td class="py-1.5 pr-3 font-mono text-[.76rem]">{x.id}</td>
+                <td class="py-1.5 pr-3 tabular-nums">{x.fecha}</td>
+                <td class="py-1.5 pr-3 text-right tabular-nums font-semibold">{x.dias_hasta_cierre_de_mes}</td>
+                <td class="py-1.5 text-[.78rem] text-suave">{motivo(x.motivo)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Callout tipo="ok" titulo="Qué se gana al revisar a diario en lugar de cada mes">
+        Las mismas {t.n_anomalias} anomalías, el mismo detector y la espera baja de {f(t.media_dias, 1)} días a
+        como mucho uno, que es lo que tarda en llegar la revisión siguiente. Ese uno es un supuesto del
+        diseño, no una medida. La mejora no requiere un modelo mejor, solo ejecutar el mismo con más frecuencia.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Antes de encender cualquier aviso automático. La pregunta que hay que contestar por escrito es cuántos
+        avisos a la semana está dispuesto a leer quien los recibe.
+      </p>
+      <p>
+        Cuando no hay anomalías etiquetadas con las que medir, el umbral sale de la variación normal del propio
+        indicador, mes a mes. La página del
+        {' '}<a href="/senal-ruido/margen-kpi" class="text-acento no-underline hover:underline">margen del KPI</a>
+        {' '}explica por qué esa banda es más ancha que la de la media.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Sobre los {f(a.meses, 0)} meses del histórico. La primera versión de esta tabla usaba umbrales
+        de z y no servía: z mayor que 1,5 y z mayor que 2 marcaban exactamente las mismas ventas, porque
+        el importe solo toma unos pocos valores. El problema estaba en el criterio de medida y no en los datos.
+      </p>
+      <Code titulo="Ver las dos columnas" code={code} lang="python" />
+      <p class="mt-3">
+        Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/atipicos_kpi.json" class="text-acento no-underline hover:underline"><code>atipicos_kpi.json</code></a>, campos <code>e8_fatiga_alertas</code> y
+        {' '}<code>e7_tiempo_deteccion</code>.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

@@ -1,0 +1,107 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import Code from '../components/Code.astro';
+import eda from '../data/eda.json';
+import ml from '../data/ml.json';
+const contrato = `{
+  "status": "OK",              // OK | WARN | BLOCKED
+  "risk": "LOW",               // LOW | MEDIUM | HIGH
+  "summary": "${eda.kpis.n_validas.toLocaleString('es-ES')} ventas válidas (${eda.kpis.n_ventas.toLocaleString('es-ES')} sin duplicados, ${eda.kpis.n_anomalias} anómalas fuera); sin correlación ventas~satisfacción.",
+  "artifacts": ["eda.json", "robustez.json"],
+  "next": "Modelado y cuadro de mando"
+}`;
+const prompt = `Eres el verificador independiente. NO reutilices los scripts:
+recalcula desde cero, con tu propio código, sobre el fichero crudo.
+Reglas que tienes que reproducir: quitar duplicados exactos; importe = cant * precio;
+anomalía = cantidad fuera de 1-5 o precio distinto del de catálogo de su producto.
+Confirma o refuta cada cifra (al céntimo):
+ - facturación registrada y facturación válida
+ - número de anomalías y su importe
+ - mes con más facturación y mes del año con mayor media (meses completos)
+ - k mínima de [año, provincia] en el fichero público
+Devuelve una tabla: cifra | tu_valor | publicado | CUADRA/NO CUADRA.`;
+const scripts = [
+  ['01_perfilado.py', 'Inspección: tipos, huecos, formatos, variantes.'],
+  ['02_etl.py', 'Limpieza idempotente, marca de anomalías y log de transformaciones.'],
+  ['03_diccionario.py', 'Diccionario de datos (hechos + descripción).'],
+  ['04_anonimizacion.py', 'Pseudónimo aleatorio; fichero interno y público; k y l medidos sobre el público.'],
+  ['05_eda.py', 'Descriptivos, anomalías, las 3 preguntas, KPI y mapa de calor, sobre ventas válidas.'],
+  ['06_robustez.py', 'Tests de permutación que miden lo mismo que se afirma.'],
+  ['07_ml.py', '¿Se puede segmentar?, predicción de la satisfacción, IsolationForest contra la regla.'],
+  ['08_inferencia.py', 'Los contrastes de la parte de señal frente a ruido: intervalos, potencia, comparaciones múltiples y Simpson.'],
+  ['09_segmentacion.py', 'Las técnicas de agrupamiento y de validación de modelos, sobre la tabla agrupada por correo.'],
+  ['10_atipicos_kpi.py', 'Los conceptos de atípicos, estadística descriptiva y cuadro de mando que no calculaban los anteriores.'],
+];
+---
+<Layout current="/metodologia" title="Metodología y determinismo · TechSoluciones Analytics">
+  <p class="eyebrow">Parte VII · Cómo se hizo</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">19 · Metodología y determinismo</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    Todas las cifras de esta web se pueden reproducir a partir del fichero original. Ninguna la calcula un modelo de lenguaje: salen de
+    scripts deterministas (misma entrada, misma salida, con semilla fija) y la web los lee de los
+    ficheros que esos scripts escriben.
+  </p>
+
+  <h2 class="mt-7 font-display text-[1.2rem] font-bold">El proceso, en {scripts.length} scripts</h2>
+  <div class="mt-3 overflow-x-auto">
+    <table class="w-full border-collapse text-[.83rem]">
+      <tbody>
+        {scripts.map(([f, d]) => (
+          <tr class="border-b border-linea/60">
+            <td class="py-2 pr-3 font-mono text-[.78rem] font-semibold text-acento-deep">{f}</td>
+            <td class="py-2 text-tinta-soft">{d}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="mt-8 font-display text-[1.2rem] font-bold">Las reglas que sigue el análisis</h2>
+  <ul class="mt-3 ml-4 list-disc space-y-1.5 text-[.9rem] text-tinta-soft">
+    <li><strong>El encargo es la referencia:</strong> cada requisito del encargo tiene su evidencia en un fichero y un script de comprobación, <code>verificar_correcciones.py</code>, revisa que esté.</li>
+    <li><strong>Rango antes que agregado:</strong> se mira el rango de cada variable dentro de su producto antes de sumar nada. Lo que cae fuera es error hasta que se demuestre lo contrario.</li>
+    <li><strong>La regla decide, el algoritmo contrasta:</strong> las {eda.anomalias.n} anomalías las marca una regla de negocio; IsolationForest, sin conocerla, detecta {ml.anomalias.anomalias_regla_cazadas} de ellas.</li>
+    <li><strong>Misma base al comparar:</strong> meses completos y ventas válidas; nunca sumas de periodos desiguales.</li>
+    <li><strong>El test mide lo que se afirma:</strong> cada test declara su estadístico y el código calcula exactamente ese.</li>
+    <li><strong>No inventar dato:</strong> la satisfacción ausente se deja ausente y las anomalías no se «corrigen».</li>
+    <li><strong>Verificación independiente:</strong> el 13/09/2026 un verificador recalculó 16 cifras desde el CSV crudo con código propio y sin pandas y cuadraron todas. Un revisor intentó refutar las siete conclusiones con otros métodos. No lo consiguió con ninguna, matizó cinco y encontró dos defectos de anonimización que se corrigieron. El 23/09/2026, antes de publicar, se repitió con la web entera: tres verificadores recalcularon desde el fichero original 1.439 cifras de las páginas. Cuadraron 1.423. Ocho no cuadraban por redondeos o por cómo las leía la página, y se corrigieron. Tres son un mismo p de 0,60 que con más barajados sale 0,62, sin cambiar la conclusión. Las cinco restantes no son medidas del dato. Un revisor intentó refutar 51 conclusiones: se sostuvieron 23, se matizaron 23 y se corrigieron las cinco que caían.</li>
+  </ul>
+
+  <Callout tipo="warn" titulo="Qué se corrigió el 13/09/2026">
+    <p>La primera versión de esta web se dio por verificada con una comprobación de sumas y tenía errores que una revisión posterior encontró:</p>
+    <ul class="mt-2 ml-4 list-disc space-y-1">
+      <li>las {eda.anomalias.n} ventas fuera de las reglas del catálogo se daban por pedidos legítimos;</li>
+      <li>el mes del año se elegía sumando meses con distinto número de años y el test medía la variación del ticket medio en vez de la facturación;</li>
+      <li>los correos conservaban las tildes y los clientes se agrupaban por un correo que comparten personas distintas;</li>
+      <li>la k-anonimidad se medía sobre columnas distintas de las que se entregaban, con pseudónimos numerados por orden;</li>
+      <li>en la primera corrección del mismo día, el fichero público seguía llevando el producto y el pseudónimo juntaba a personas distintas con el mismo nombre. Lo encontró el revisor.</li>
+      <li>faltaban el mapa de calor, los KPI de crecimiento y satisfacción, las alertas y el informe técnico.</li>
+    </ul>
+    <p class="mt-2">Todo está corregido en los scripts y los ficheros de la web salen de ellos.</p>
+  </Callout>
+
+  <h2 class="mt-8 font-display text-[1.2rem] font-bold">Piezas propias que se reutilizan</h2>
+  <p class="mt-2 max-w-2xl text-tinta-soft">
+    Una de ellas es el <strong>contrato de resultado</strong>, con el que cada etapa entrega su salida en
+    un formato que pueden leer tanto un programa como una persona:
+  </p>
+  <Code titulo="Contrato de resultado (Result Contract)" code={contrato} lang="json" />
+
+  <p class="mt-2 max-w-2xl text-tinta-soft">
+    El encargo pide mostrar los prompts utilizados. Este es el que recibió el verificador independiente de cifras.
+  </p>
+  <Code titulo="Prompt del verificador independiente" code={prompt} />
+
+  <Callout tipo="ok" titulo="Por qué importa el determinismo">
+    Un análisis que no se puede repetir no se puede auditar. Con scripts, semillas y logs, quien tenga el
+    fichero original puede reproducir estas cifras y comprobar que son correctas. Ese fichero no se publica
+    porque contiene datos personales. Así se encontraron los errores de la primera
+    versión.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Siguiente: <a href="/conclusiones" class="lnk font-semibold">conclusiones y siguientes pasos →</a>
+  </p>
+</Layout>

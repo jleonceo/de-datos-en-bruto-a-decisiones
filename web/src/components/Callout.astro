@@ -1,0 +1,13 @@
+---
+const { tipo = 'info', titulo = '' } = Astro.props;
+const estilos = {
+  info: 'border-l-acento bg-acento-claro',
+  ok: 'border-l-acento bg-acento-claro',
+  warn: 'border-l-amber-400 bg-amber-50',
+  idea: 'border-l-tinta-soft bg-crema',
+};
+---
+<div class={`my-4 rounded-r-lg border-l-4 p-4 ${estilos[tipo] || estilos.info}`}>
+  {titulo && <div class="mb-1 text-[.9rem] font-semibold text-tinta">{titulo}</div>}
+  <div class="text-[.9rem] text-tinta-soft"><slot /></div>
+</div>

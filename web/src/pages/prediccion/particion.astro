@@ -1,0 +1,115 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import seg from '../../data/segmentacion.json';
+
+const h = seg.h5_particion;
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/prediccion', t: '16 · ¿Se puede predecir? Y las anomalías' };
+const primera = h.por_semilla[0];
+const titulo = `Medido con los datos con los que aprendió, un modelo sin señal saca un ${f(primera.r2_entrenamiento, 2)}`;
+
+const code = `X_ent, X_prueba, y_ent, y_prueba = train_test_split(X, y, test_size=0.2, random_state=42)
+modelo = RandomForestRegressor(n_estimators=80, random_state=42).fit(X_ent, y_ent)
+r2_score(y_ent, modelo.predict(X_ent))        # la nota sobre lo que ya vio
+r2_score(y_prueba, modelo.predict(X_prueba))  # la nota que vale`;
+---
+<Layout current="/prediccion/particion" title="Entrenar y probar por separado · TechSoluciones Analytics">
+  <Concepto
+    ficha="H5"
+    madre={madre}
+    titulo={titulo}
+    pregunta="¿Cómo se sabe si un modelo ha aprendido algo o solo ha memorizado los datos?"
+  >
+    <Fragment slot="problema">
+      <p>
+        La página 16 intenta predecir la satisfacción de cada venta con lo que se sabe de ella (producto,
+        categoría, provincia, importe, cantidad, precio y mes). Concluye que no se puede. Esa conclusión depende de un paso que es fácil
+        saltarse: apartar una parte de las ventas antes de entrenar y medir el modelo solo sobre ellas.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Un modelo flexible, como un bosque de árboles sin límite de profundidad, puede memorizar los datos con
+        los que se entrena. Medido sobre esos mismos datos acierta mucho, pero lo que se mide entonces
+        es lo que ha memorizado, que no sirve para predecir una venta nueva.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="La nota que cuenta es la de los datos que el modelo no ha visto">
+        Se reserva una parte de los datos, se entrena con el resto y se mide sobre la reservada. Si las dos
+        notas se parecen, el modelo generaliza. Si la de entrenamiento es mucho mejor, ha memorizado.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Separar los datos antes de entrenar, con una semilla fija para poder reproducir el corte. Después
+        se repite con varias particiones distintas para ver cuánto varía la nota de prueba.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full max-w-md border-collapse text-[.88rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">Partición</th>
+              <th class="py-2 pr-3 text-right font-semibold">R² entrenamiento</th>
+              <th class="py-2 text-right font-semibold">R² prueba</th>
+            </tr>
+          </thead>
+          <tbody>
+            {h.por_semilla.map((x) => (
+              <tr class="border-b border-linea/60">
+                <td class="py-2 pr-3 tabular-nums">semilla {x.semilla_particion}</td>
+                <td class="py-2 pr-3 text-right tabular-nums">{f(x.r2_entrenamiento, 4)}</td>
+                <td class="py-2 text-right tabular-nums font-semibold text-acento-deep">{f(x.r2_prueba, 4)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4">
+        Sobre las {f(h.n_entrenamiento)} ventas con las que aprende, el bosque explica en torno a dos tercios de
+        la satisfacción, un {f(primera.r2_entrenamiento, 2)}. Sobre las {f(h.n_prueba)} que no ha visto, el R²
+        sale entre {f(h.r2_prueba_min, 2)} y {f(h.r2_prueba_max, 2)}: negativo, es decir, peor que predecir la media
+        para todas las ventas.
+      </p>
+      <p>
+        Las cinco particiones dan un resultado muy parecido, así que no depende de un corte concreto. Sin la parte apartada,
+        este mismo bosque se habría presentado como un modelo que explica dos tercios de la satisfacción.
+      </p>
+      <Callout tipo="warn" titulo="Separar los datos no protege de una fuga de información">
+        La partición protege de la memorización, pero no de usar una variable que no se conoce en el momento de predecir.
+        Eso es la <a href="/prediccion/fuga" class="text-acento no-underline hover:underline">fuga de
+        información</a> y se manifiesta al revés: la nota de prueba sale buena y es igual de falsa.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        En cualquier modelo que vaya a usarse con datos nuevos: previsión de demanda, riesgo de impago,
+        probabilidad de baja. Si alguien presenta un modelo sin decir sobre qué datos se midió, esa cifra
+        todavía no es fiable.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        R² de un bosque aleatorio que predice la satisfacción, medido sobre las ventas que vio y sobre las que no
+        vio, con cinco particiones. {f(h.n)} ventas válidas con satisfacción y como variables producto, provincia,
+        categoría, mes y cantidad. 80 % para entrenar y 20 %
+        para probar, el mismo corte que la página 16. Aquí el bosque va sin límite de profundidad, para que
+        se vea bien la memorización; la página 16 lo limita a doce niveles, suma importe y precio y su nota de
+        prueba se queda en torno a cero.
+      </p>
+      <Code titulo="Las dos notas" code={code} lang="python" />
+      <p class="mt-3">Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/segmentacion.json" class="text-acento no-underline hover:underline"><code>segmentacion.json</code></a>, campo <code>h5_particion</code>.</p>
+    </Fragment>
+  </Concepto>
+</Layout>

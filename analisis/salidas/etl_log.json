@@ -1,0 +1,166 @@
+{
+  "transformaciones": [
+    {
+      "paso": "duplicados_exactos_eliminados",
+      "antes": 20827,
+      "despues": 20000,
+      "detalle": {
+        "eliminadas": 827
+      }
+    },
+    {
+      "paso": "producto_canonicalizado",
+      "antes": 10,
+      "despues": 8,
+      "detalle": {
+        "mapa": {
+          "Modulo Nominas": "Módulo Nóminas",
+          "Módulo Nóminas": "Módulo Nóminas",
+          "Portatil Core i7": "Portátil Core i7",
+          "Portátil Core i7": "Portátil Core i7",
+          "Suscripcion CRM Pro": "Suscripción CRM Pro",
+          "Suscripción CRM Pro": "Suscripción CRM Pro"
+        }
+      }
+    },
+    {
+      "paso": "region_canonicalizada",
+      "antes": 55,
+      "despues": 52,
+      "detalle": {
+        "mapa": {
+          "Gerona": "Girona",
+          "Lérida": "Lleida",
+          "Sta. Cruz de Tenerife": "Santa Cruz de Tenerife"
+        }
+      }
+    },
+    {
+      "paso": "email_normalizado",
+      "antes": 9024,
+      "despues": 0,
+      "detalle": {
+        "emails_con_espacio_corregidos": 884,
+        "emails_con_tilde_corregidos": 8952,
+        "emails_con_los_dos_defectos": 812,
+        "emails_no_ascii_tras_limpieza": 0,
+        "emails_distintos": 12957,
+        "emails_no_validos_tras_limpieza": 0
+      }
+    },
+    {
+      "paso": "fechas_estandarizadas_ISO",
+      "antes": "4 formatos",
+      "despues": "1 formato ISO",
+      "detalle": {
+        "no_parseadas": 0,
+        "rango_anios": [
+          2019,
+          2026
+        ]
+      }
+    },
+    {
+      "paso": "importe_calculado",
+      "antes": null,
+      "despues": null,
+      "detalle": {
+        "formula": "cant * precio"
+      }
+    },
+    {
+      "paso": "satisfaccion_normalizada",
+      "antes": null,
+      "despues": null,
+      "detalle": {
+        "escala": "1-10",
+        "nulos": 4006,
+        "pct_nulos": 20.03,
+        "fuera_de_escala": 0,
+        "politica": "no imputar; se analiza sobre casos disponibles"
+      }
+    },
+    {
+      "paso": "coherencia_prod_categoria",
+      "antes": null,
+      "despues": null,
+      "detalle": {
+        "productos_con_mas_de_una_categoria": [],
+        "categoria_dominante_por_producto": {
+          "Antivirus Corporativo": "Software",
+          "Licencia ERP Cloud": "Software",
+          "Monitor UltraWide 27": "Hardware",
+          "Módulo Nóminas": "Software",
+          "Portátil Core i7": "Hardware",
+          "Servidor Rack Xeon": "Hardware",
+          "Suscripción CRM Pro": "Software",
+          "Switch Gestionable 24p": "Hardware"
+        }
+      }
+    },
+    {
+      "paso": "anomalias_marcadas",
+      "antes": 20000,
+      "despues": 16,
+      "detalle": {
+        "regla": "cant fuera de 1-5 o precio distinto de la moda de precio de su producto",
+        "precio_catalogo": {
+          "Antivirus Corporativo": 45.0,
+          "Licencia ERP Cloud": 1200.0,
+          "Monitor UltraWide 27": 280.0,
+          "Módulo Nóminas": 300.0,
+          "Portátil Core i7": 950.0,
+          "Servidor Rack Xeon": 3500.0,
+          "Suscripción CRM Pro": 450.0,
+          "Switch Gestionable 24p": 180.0
+        },
+        "por_cantidad": 16,
+        "por_precio": 12,
+        "por_ambas": 12,
+        "importe_marcado": 798360.0,
+        "ids": [
+          "V0050",
+          "V0100",
+          "V0150",
+          "V0200",
+          "V0250",
+          "V0300",
+          "V0350",
+          "V0400",
+          "V0450",
+          "V0500",
+          "V1000",
+          "V2000",
+          "V2500",
+          "V2600",
+          "V3500",
+          "V4000"
+        ],
+        "politica": "marcar y excluir de los KPI de analisis; no borrar ni corregir"
+      }
+    }
+  ],
+  "avisos": [],
+  "filas_crudas": 20827,
+  "filas_limpias": 20000,
+  "columnas_finales": [
+    "id_venta",
+    "fecha",
+    "anio",
+    "mes",
+    "anio_mes",
+    "trimestre",
+    "nombre_completo",
+    "email",
+    "telefono",
+    "reg",
+    "cat",
+    "prod",
+    "cant",
+    "precio",
+    "importe",
+    "satisfaccion",
+    "anomalia",
+    "motivo_anomalia"
+  ]
+}

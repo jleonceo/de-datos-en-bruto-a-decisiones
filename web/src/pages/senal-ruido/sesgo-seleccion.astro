@@ -1,0 +1,111 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import eda from '../../data/eda.json';
+
+const a = eda.ausencia_satisfaccion;
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/senal-ruido', t: '14 · La lección: señal frente a ruido' };
+const nombres = { reg: 'Provincia', anio: 'Año', prod: 'Producto', cat: 'Categoría' };
+const filas = Object.entries(a.chi2_por_variable);
+
+const code = `falta = ventas["satisfaccion"].isna()
+for col in ["reg", "anio", "prod", "cat"]:
+    tabla = pd.crosstab(ventas[col], falta)       # cuantas faltan en cada grupo
+    chi2, p, gl, _ = chi2_contingency(tabla)       # ¿cambia la proporcion de un grupo a otro?`;
+---
+<Layout current="/senal-ruido/sesgo-seleccion" title="Quién contesta la encuesta · TechSoluciones Analytics">
+  <Concepto
+    ficha="F14"
+    madre={madre}
+    titulo="Una de cada cinco ventas no tiene nota y hay que saber por qué"
+    pregunta="¿La satisfacción de quien contesta representa a todas las ventas?"
+  >
+    <Fragment slot="problema">
+      <p>
+        El {f(a.pct_global, 2)} % de las ventas válidas no tiene satisfacción. Las páginas 12 y 13 trabajan con las que
+        sí la tienen y dan medias, clasificaciones por provincia y correlaciones con el importe.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Si contestar la encuesta depende de algo, lo que se mide es la satisfacción de quien contesta. Los
+        clientes enfadados responden más en unos negocios y los contentos en otros; si una región contesta
+        menos, su media sale de un grupo que no se parece al resto.
+      </p>
+      <p>
+        Ninguna técnica aplicada después lo arregla, porque el sesgo está en qué filas llegaron a la tabla.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Antes de analizar lo que hay, preguntar por lo que falta">
+        Si la proporción de ausentes es igual en todos los grupos, la ausencia es compatible con el azar,
+        al menos en lo que esos grupos permiten ver. Si cambia, el análisis necesita corregirla o decir
+        claramente a quién representa.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Cruzar la marca de «falta» con cada variable que la podría explicar y contrastar si la proporción
+        cambia de un grupo a otro, con una prueba de chi-cuadrado por variable.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full max-w-md border-collapse text-[.88rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">¿Depende de…?</th>
+              <th class="py-2 pr-3 text-right font-semibold">Chi-cuadrado</th>
+              <th class="py-2 text-right font-semibold">p</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filas.map(([k, x]) => (
+              <tr class="border-b border-linea/60">
+                <td class="py-2 pr-3">{nombres[k]}</td>
+                <td class="py-2 pr-3 text-right tabular-nums">{f(x.chi2, 2)} ({x.gl} gl)</td>
+                <td class="py-2 text-right tabular-nums">{f(x.p, 4)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4">
+        Ninguna de las cuatro variables cambia la proporción de ausentes: todas dan p por encima de 0,05.
+        Con estas cuatro variables, la ausencia es compatible con el azar. Queda sin cruzar con el importe y
+        la cantidad, que son justo las variables de la página 13, así que para esa página la comprobación no
+        está completa.
+      </p>
+      <Callout tipo="warn" titulo="Lo que esta prueba no puede ver">
+        Solo mira variables que están en el fichero. Si los que no contestan son los insatisfechos, la
+        ausencia depende de la propia nota que falta. Ningún cruce lo detecta. Para descartarlo haría
+        falta preguntar a una muestra de los que no contestaron.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Encuestas, formularios opcionales, valoraciones en una tienda online, cualquier dato que alguien
+        decide si da o no. Junto a cualquier media de satisfacción conviene dar el porcentaje de
+        ausentes y su prueba.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Chi-cuadrado de independencia entre la marca de ausencia y cada variable, sobre las ventas válidas.
+        En términos técnicos, la prueba es compatible con una ausencia completamente aleatoria (MCAR) y no puede
+        descartar la que depende del valor que falta (MNAR).
+      </p>
+      <Code titulo="Cruzar la ausencia con cada variable" code={code} lang="python" />
+      <p class="mt-3">Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/eda.json" class="text-acento no-underline hover:underline"><code>eda.json</code></a>, campo <code>ausencia_satisfaccion</code>.</p>
+    </Fragment>
+  </Concepto>
+</Layout>

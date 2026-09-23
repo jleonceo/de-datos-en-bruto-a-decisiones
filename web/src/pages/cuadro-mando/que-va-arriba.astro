@@ -1,0 +1,123 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import eda from '../../data/eda.json';
+import ak from '../../data/atipicos_kpi.json';
+import robustez from '../../data/robustez.json';
+
+const k = eda.kpis;
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/cuadro-mando', t: '17 · Cuadro de mando' };
+const anios = Object.keys(k.crecimiento_interanual_pct);
+const ultimo = anios[anios.length - 1];
+const crec = k.crecimiento_interanual_pct[ultimo];
+const signo = (v) => (v > 0 ? '+' : '') + f(v, 2);
+
+const hoy = [
+  { t: 'Facturación válida', v: `${f(k.facturacion_valida)} €`, j: 'Acumulado de todo el histórico. Solo puede subir, así que no avisa de nada.', mueve: 'abajo' },
+  { t: 'Crecimiento 2019-2025', v: `${signo(k.crecimiento_2019_2025_pct)} %`, j: 'Útil como contexto, pero compara dos años lejanos y oculta lo que pasó en los años intermedios.', mueve: 'abajo' },
+  { t: 'Satisfacción media', v: `${f(k.satisfaccion_media, 1)} / 10`, j: 'Ningún contraste de la web encontró una variable que la explique, así que no pide ninguna decisión.', mueve: 'abajo' },
+  { t: 'Alertas de anomalía', v: f(eda.anomalias.n), j: 'Es lo único del panel que obliga a hacer algo hoy: revisar ventas imposibles.', mueve: 'arriba' },
+];
+const propuesta = [
+  { n: 1, t: 'Lo que exige actuar', d: `Las ${f(eda.anomalias.n)} alertas pendientes, con su importe y un enlace a cada venta.` },
+  { n: 2, t: 'Lo que dice si la empresa va bien', d: `El último año completo contra el anterior, ${ultimo}: ${signo(crec)} % y el ticket medio de ${f(ak.j1_kpi_vs_vanidad.kpi_ticket_medio, 2)} € con su margen.` },
+  { n: 3, t: 'Lo que explica por qué', d: 'La tendencia mensual, el reparto por producto y el mapa por provincia.' },
+  { n: 4, t: 'El contexto', d: 'La facturación acumulada, el crecimiento de toda la serie y la satisfacción media.' },
+];
+---
+<Layout current="/cuadro-mando/que-va-arriba" title="Qué va arriba en el panel · TechSoluciones Analytics">
+  <Concepto
+    ficha="J5"
+    madre={madre}
+    titulo="Arriba va lo que obliga a decidir algo, abajo lo que lo explica"
+    pregunta="¿Qué cifras merecen la primera fila de un cuadro de mando?"
+  >
+    <Fragment slot="problema">
+      <p>
+        Quien abre un panel empieza por la primera fila, y esa fila marca qué se comenta en la reunión. Es
+        fácil llenarla con las cifras más grandes, que no son las que exigen una acción.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        Una cifra grande y bien presentada da sensación de control. Pero si no cambia de un día a otro, o si
+        cuando cambia nadie sabría qué hacer, ocupa el lugar de otra que sí la exigiría.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Cada fila responde a una pregunta distinta">
+        La primera, ¿hay algo que atender ya? La segunda, ¿va bien la empresa comparada con su objetivo? La tercera,
+        ¿por qué? Lo demás es contexto y va al final aunque sea la cifra más vistosa.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Pasar cada tarjeta por dos preguntas: si cambiara mañana, ¿haría alguien algo distinto? y ¿contra qué
+        se compara? Las que no tienen respuesta pasan a una fila inferior.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <p>La primera fila del panel de la página 17, pasada por esas dos preguntas:</p>
+      <div class="overflow-x-auto">
+        <table class="mt-2 w-full border-collapse text-[.86rem]">
+          <thead>
+            <tr class="border-b border-linea text-left text-suave">
+              <th class="py-2 pr-3 font-semibold">Tarjeta</th>
+              <th class="py-2 pr-3 text-right font-semibold">Valor</th>
+              <th class="py-2 pr-3 font-semibold">Qué pide</th>
+              <th class="py-2 font-semibold">Dónde va</th>
+            </tr>
+          </thead>
+          <tbody>
+            {hoy.map((x) => (
+              <tr class="border-b border-linea/60 align-top">
+                <td class="py-2 pr-3 font-semibold">{x.t}</td>
+                <td class="py-2 pr-3 text-right tabular-nums whitespace-nowrap">{x.v}</td>
+                <td class="py-2 pr-3 text-tinta-soft">{x.j}</td>
+                <td class={`py-2 ${x.mueve === 'arriba' ? 'font-semibold text-acento-deep' : 'text-suave'}`}>{x.mueve}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4">
+        {hoy.filter((x) => x.mueve === 'abajo').length} de las {hoy.length} tarjetas de arriba son contexto. La satisfacción, además, es la variable que las
+        páginas 12, 13 y 16 dejaron sin nada que la explique: la región que más parecía mejorar da p =
+        {' '}{f(robustez.p2_region_satisfaccion.p_valor_permutacion, 2)} contra el azar.
+      </p>
+      <ol class="mt-3 space-y-2">
+        {propuesta.map((x) => (
+          <li class="tarjeta p-3">
+            <span class="font-semibold text-tinta">{x.n} · {x.t}.</span>{' '}
+            <span class="text-[.9rem]">{x.d}</span>
+          </li>
+        ))}
+      </ol>
+      <Callout tipo="ok" titulo="El panel de la página 17 se queda como está">
+        Reproduce lo que pedía el encargo de la dirección, con sus KPI de crecimiento y de satisfacción y sus
+        alertas de anomalía. Esta página enseña cómo se ordenaría si el panel fuera a usarse cada semana.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Para cualquier panel que alguien vaya a mirar con prisa. Y como prueba rápida de uno heredado: si la
+        primera fila no pide ninguna acción, el panel informa, pero no ayuda a decidir.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>
+        Las cifras salen de <code>eda.json</code> (<code>kpis</code> y <code>anomalias</code>),
+        {' '}<code>atipicos_kpi.json</code> (<code>j1_kpi_vs_vanidad</code>) y <code>robustez.json</code>. La
+        clasificación de cada tarjeta es criterio de diseño y no sale de ningún cálculo.
+      </p>
+    </Fragment>
+  </Concepto>
+</Layout>

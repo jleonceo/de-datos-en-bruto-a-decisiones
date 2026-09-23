@@ -1,0 +1,357 @@
+{
+  "semilla": 42,
+  "base": "ventas validas (sin las 16 anomalias), agregadas por cliente",
+  "h1_rfm": {
+    "estadistico": "recencia en dias, frecuencia en compras y valor acumulado por correo, que no identifica al cliente",
+    "clave": "hash del correo, 12 caracteres",
+    "fecha_de_corte": "2026-05-24",
+    "n_correos": 12953,
+    "correos_que_repiten": 5069,
+    "pct_correos_que_repiten": 39.1,
+    "R": {
+      "min": 0,
+      "mediana": 1056,
+      "max": 2700
+    },
+    "F": {
+      "min": 1,
+      "mediana": 1,
+      "max": 7
+    },
+    "M": {
+      "min": 45.0,
+      "mediana": 1900.0,
+      "max": 39700.0
+    },
+    "reparto_frecuencia": {
+      "1": 7884,
+      "2": 3555,
+      "3": 1155,
+      "4": 286,
+      "5": 58,
+      "6": 14,
+      "7": 1
+    },
+    "lectura": "los correos que repiten los usan personas distintas: no son clientes que vuelven, asi que no hay historia de cliente que agrupar"
+  },
+  "h2_h3_kmeans": {
+    "estadistico": "inercia y silueta de k-means sobre RFM tipificado, para k de 2 a 6",
+    "base": "RFM tipificado",
+    "n": 12953,
+    "muestra_silueta": 4000,
+    "por_k": [
+      {
+        "k": 2,
+        "inercia": 25175.5,
+        "silueta": 0.3874,
+        "tamanos": [
+          8687,
+          4266
+        ]
+      },
+      {
+        "k": 3,
+        "inercia": 17654.7,
+        "silueta": 0.3721,
+        "tamanos": [
+          5602,
+          4873,
+          2478
+        ]
+      },
+      {
+        "k": 4,
+        "inercia": 13140.6,
+        "silueta": 0.3966,
+        "tamanos": [
+          4313,
+          3754,
+          3703,
+          1183
+        ]
+      },
+      {
+        "k": 5,
+        "inercia": 10766.5,
+        "silueta": 0.4043,
+        "tamanos": [
+          4178,
+          3728,
+          2670,
+          1293,
+          1084
+        ]
+      },
+      {
+        "k": 6,
+        "inercia": 9374.8,
+        "silueta": 0.4136,
+        "tamanos": [
+          4139,
+          3724,
+          2654,
+          1210,
+          902,
+          324
+        ]
+      }
+    ],
+    "k_por_silueta": 6,
+    "mejor_silueta": 0.4136,
+    "caida_inercia_2_a_6": 62.8,
+    "lectura": "la inercia siempre baja al subir k, asi que sola no elige nada; la silueta si opina"
+  },
+  "h8_escalado": {
+    "estadistico": "k=4 sobre las mismas tres variables, crudas y tipificadas",
+    "rango_de_cada_variable": {
+      "R": 2700.0,
+      "F": 6.0,
+      "M": 39655.0
+    },
+    "veces_que_M_aplasta_a_F": 6609,
+    "sin_escalar": {
+      "tamanos": [
+        8030,
+        3472,
+        932,
+        519
+      ],
+      "centros": [
+        {
+          "R": 1228.5,
+          "F": 1.3,
+          "M": 1198.4
+        },
+        {
+          "R": 983.7,
+          "F": 2.1,
+          "M": 11844.8
+        },
+        {
+          "R": 1029.3,
+          "F": 1.9,
+          "M": 4984.7
+        },
+        {
+          "R": 889.5,
+          "F": 2.3,
+          "M": 19467.7
+        }
+      ]
+    },
+    "escalado": {
+      "tamanos": [
+        4313,
+        3754,
+        3703,
+        1183
+      ],
+      "centros": [
+        {
+          "R": 908.3,
+          "F": 2.1,
+          "M": 15675.4
+        },
+        {
+          "R": 2018.3,
+          "F": 1.1,
+          "M": 2060.5
+        },
+        {
+          "R": 686.0,
+          "F": 1.0,
+          "M": 1699.2
+        },
+        {
+          "R": 665.0,
+          "F": 2.4,
+          "M": 3829.1
+        }
+      ]
+    },
+    "lectura": "k-means mide distancias: sin escalar, la variable de rango grande decide sola los grupos"
+  },
+  "h12_dimensionalidad": {
+    "estadistico": "contraste entre la distancia mayor y la menor, al anadir columnas de ruido",
+    "n_puntos": 1500,
+    "por_dimension": [
+      {
+        "dimensiones": 1,
+        "dist_min": 0.0,
+        "dist_max": 3.536,
+        "contraste": 3.069
+      },
+      {
+        "dimensiones": 2,
+        "dist_min": 0.0,
+        "dist_max": 7.195,
+        "contraste": 4.139
+      },
+      {
+        "dimensiones": 3,
+        "dist_min": 0.0,
+        "dist_max": 9.137,
+        "contraste": 4.288
+      },
+      {
+        "dimensiones": 5,
+        "dist_min": 0.088,
+        "dist_max": 9.9,
+        "contraste": 3.329
+      },
+      {
+        "dimensiones": 10,
+        "dist_min": 0.682,
+        "dist_max": 11.287,
+        "contraste": 2.437
+      },
+      {
+        "dimensiones": 20,
+        "dist_min": 2.141,
+        "dist_max": 13.335,
+        "contraste": 1.787
+      },
+      {
+        "dimensiones": 50,
+        "dist_min": 5.739,
+        "dist_max": 15.142,
+        "contraste": 0.942
+      }
+    ],
+    "caida_contraste": 78.0,
+    "lectura": "al subir la dimension, la distancia mas lejana y la mas cercana se parecen: agrupar pierde sentido"
+  },
+  "h13_escalado_robusto": {
+    "estadistico": "la misma variable M tipificada por media y desviacion, y por mediana e IQR",
+    "asimetria": 2.369,
+    "estandar": {
+      "media": -0.0,
+      "max": 7.89,
+      "pct_dentro_de_mas_menos_1": 88.6
+    },
+    "robusto": {
+      "mediana": 0.0,
+      "max": 9.82,
+      "pct_dentro_de_mas_menos_1": 81.2
+    },
+    "valor_p99": 20000.0,
+    "lectura": "con cola larga, el estandar deja a casi todos apinados cerca del cero y a los grandes lejisimos"
+  },
+  "h14_mezclas": {
+    "estadistico": "k=4 por k-means y por mezcla gaussiana, comparando la seguridad de cada asignacion",
+    "kmeans_tamanos": [
+      4313,
+      3754,
+      3703,
+      1183
+    ],
+    "mezcla_tamanos": [
+      7581,
+      3549,
+      1155,
+      668
+    ],
+    "pertenencia_media": 0.9993,
+    "pct_asignacion_dudosa": 0.0,
+    "pct_asignacion_segura": 99.9,
+    "bic": -56623.7,
+    "lectura": "k-means asigna siempre al 100 %; la mezcla dice cuanto duda, y aqui casi no duda aunque la silueta sea baja"
+  },
+  "h7_h10_fuga_e_importancia": {
+    "estadistico": "R2 en prueba de un bosque que predice el importe, con y sin las dos variables que solo se saben al firmar",
+    "n": 19984,
+    "particion": "70 % entrenamiento, 30 % prueba, semilla 42",
+    "conocido_de_antemano": "producto, provincia, categoria y mes",
+    "que_es_la_fuga": "cantidad y precio final, que no existen hasta cerrar la venta",
+    "sin_fuga": {
+      "r2_prueba": 0.6507,
+      "n_variables": 60
+    },
+    "importancia_sin_fuga": [
+      {
+        "variable": "prod_Servidor Rack Xeon",
+        "peso": 0.7121
+      },
+      {
+        "variable": "mes",
+        "peso": 0.0657
+      },
+      {
+        "variable": "prod_Portátil Core i7",
+        "peso": 0.0643
+      },
+      {
+        "variable": "prod_Licencia ERP Cloud",
+        "peso": 0.0501
+      },
+      {
+        "variable": "prod_Suscripción CRM Pro",
+        "peso": 0.0046
+      }
+    ],
+    "con_fuga": {
+      "r2_prueba": 1.0,
+      "n_variables": 62
+    },
+    "importancia_con_fuga": [
+      {
+        "variable": "precio",
+        "peso": 0.4385
+      },
+      {
+        "variable": "prod_Servidor Rack Xeon",
+        "peso": 0.2872
+      },
+      {
+        "variable": "cantidad",
+        "peso": 0.2698
+      },
+      {
+        "variable": "cat_Software",
+        "peso": 0.0012
+      },
+      {
+        "variable": "prod_Portátil Core i7",
+        "peso": 0.0012
+      }
+    ],
+    "lectura": "un R2 casi perfecto hay que revisarlo como posible fuga: aqui la respuesta se colaba por cantidad y precio"
+  },
+  "h5_particion": {
+    "estadistico": "R2 de un bosque que predice la satisfaccion, medido sobre lo que vio y sobre lo que no vio, con cinco particiones",
+    "n": 15980,
+    "n_entrenamiento": 12784,
+    "n_prueba": 3196,
+    "variables": "producto, provincia, categoria, mes y cantidad",
+    "por_semilla": [
+      {
+        "semilla_particion": 42,
+        "r2_entrenamiento": 0.6527,
+        "r2_prueba": -0.2489
+      },
+      {
+        "semilla_particion": 7,
+        "r2_entrenamiento": 0.656,
+        "r2_prueba": -0.2989
+      },
+      {
+        "semilla_particion": 123,
+        "r2_entrenamiento": 0.6561,
+        "r2_prueba": -0.2793
+      },
+      {
+        "semilla_particion": 2024,
+        "r2_entrenamiento": 0.6528,
+        "r2_prueba": -0.2629
+      },
+      {
+        "semilla_particion": 99,
+        "r2_entrenamiento": 0.6564,
+        "r2_prueba": -0.2823
+      }
+    ],
+    "r2_prueba_min": -0.2989,
+    "r2_prueba_max": -0.2489,
+    "lectura": "medido sobre lo que ya vio, un modelo sin senal parece bueno; solo la parte apartada dice la verdad"
+  }
+}

@@ -1,0 +1,29 @@
+---
+/* Índice de las subpáginas de una página madre. Lee site.js, así que basta con registrar la
+   subpágina allí para que aparezca aquí: no hay dos listas que mantener a la vez.
+
+   Props: slug (el de la madre), titulo y entrada (una frase de presentación). */
+import { partes } from '../data/site.js';
+const { slug, titulo = 'Para profundizar', entrada = '' } = Astro.props;
+const madre = partes.flatMap((p) => p.items).find((x) => x.slug === slug);
+const subs = madre?.sub || [];
+---
+{subs.length > 0 && (
+  <section class="mt-12 border-t border-linea pt-8">
+    <h2 class="font-display text-[1.25rem] font-bold">{titulo}</h2>
+    {entrada && <p class="mt-2 max-w-2xl text-tinta-soft">{entrada}</p>}
+    <ul class="mt-5 space-y-2">
+      {subs.map((x) => (
+        <li>
+          <a href={x.slug} class="tarjeta flex items-baseline gap-3 p-3 no-underline transition hover:border-acento">
+            <span class="mt-[2px] rounded bg-crema px-1.5 py-[2px] font-mono text-[.68rem] text-suave">{x.ficha}</span>
+            <span>
+              <span class="block font-semibold text-tinta">{x.t}</span>
+              {x.d && <span class="block text-[.84rem] text-suave">{x.d}</span>}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

@@ -1,0 +1,81 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Kpi from '../components/Kpi.astro';
+import Callout from '../components/Callout.astro';
+import { partes } from '../data/site.js';
+import eda from '../data/eda.json';
+import robustez from '../data/robustez.json';
+import ml from '../data/ml.json';
+import etlLog from '../data/etl_log.json';
+const k = eda.kpis;
+const an = eda.anomalias;
+const MESES = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const nombreMes = (am) => `${MESES[Number(am.slice(5))]} de ${am.slice(0, 4)}`;
+const nf = (v, d = 0) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: d }).format(v);
+const cants = an.lista.map((x) => x.cant);
+const recorrido = partes.filter((p) => p.id !== 'inicio');
+---
+<Layout current="/">
+  <section class="reveal">
+    <p class="eyebrow">Analítica de datos, de principio a fin</p>
+    <h1 class="mt-3 font-display text-[2.5rem] font-bold leading-[1.08]">
+      De datos sucios a decisiones de negocio
+    </h1>
+    <p class="mt-5 max-w-2xl text-[1.06rem] text-tinta-soft">
+      La dirección de <strong>TechSoluciones S.L.</strong> entrega un histórico de ventas
+      2019-2026 con una calidad «cuestionable»: formatos incoherentes, filas duplicadas, huecos y
+      errores. El encargo consiste en prepararlo, analizarlo y convertirlo en decisiones. Esta web
+      recoge el recorrido completo, paso a paso, y explica el método que se ha seguido en cada uno.
+    </p>
+  </section>
+
+  <section class="mt-9 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <Kpi valor={nf(k.n_validas)} etiqueta="ventas válidas" sub={`de ${nf(etlLog.filas_crudas)} filas: fuera ${nf(etlLog.filas_crudas - k.n_ventas)} duplicadas y ${nf(k.n_anomalias)} anómalas`} />
+    <Kpi valor={nf(k.facturacion_valida) + ' €'} etiqueta="facturación válida" sub={`registrada: ${nf(k.facturacion_registrada)} €`} />
+    <Kpi valor={nf(k.ticket_medio) + ' €'} etiqueta="ticket medio" sub="ventas válidas" />
+    <Kpi valor={nf(k.n_regiones)} etiqueta="provincias" sub={nf(k.n_productos) + ' productos'} />
+  </section>
+
+  <Callout tipo="idea" titulo="Lo que dice el dato una vez limpio">
+    <p>
+      <strong>{an.n} ventas rompen las reglas del catálogo.</strong> Llevan entre {Math.min(...cants)} y
+      {Math.max(...cants)} unidades cuando el resto va de 1 a 5 y {an.por_precio} de ellas tienen además el precio
+      doblado o triplicado. Suman {nf(an.importe_total)} €. Todo indica que son errores de registro, aunque el fichero no
+      permite confirmarlo. Se marcan, se explican y quedan fuera del análisis.
+    </p>
+    <p class="mt-2">
+      <strong>Las preguntas del encargo tienen respuesta, aunque ninguna muestra un patrón que se sostenga.</strong> El mes con más
+      ventas fue {nombreMes(eda.p1_mes_mayores_ventas.anio_mes_top)}. Ningún mes del año ni ninguna provincia destaca más
+      de lo que produce el azar (p = {nf(robustez.p1_estacionalidad.p_valor_permutacion, 2)} y
+      p = {new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(robustez.p2_region_satisfaccion.p_valor_permutacion)}). La satisfacción tampoco tiene relación
+      con lo que se vende.
+    </p>
+    <p class="mt-2">
+      <strong>Con este fichero no se pueden segmentar clientes:</strong> varias personas comparten correo, los
+      nombres repetidos son de personas distintas y el {nf(ml.segmentacion_clientes.pct_una_compra_por_persona, 1)} % de las
+      personas compra una sola vez.
+    </p>
+  </Callout>
+
+  <section class="mt-10">
+    <h2 class="font-display text-[1.4rem] font-bold">El recorrido</h2>
+    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+      {recorrido.map((p) => (
+        <div class="tarjeta p-4">
+          <div class="text-[.78rem] font-semibold text-acento-deep">{p.titulo}</div>
+          <ul class="mt-2 space-y-1">
+            {p.items.map((it) => (
+              <li>
+                <a href={it.slug} class="lnk text-[.88rem]">{it.t}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <p class="mt-8 text-[.9rem] text-suave">
+    El recorrido empieza por <a href="/contexto" class="lnk font-semibold">el contexto y la misión →</a>
+  </p>
+</Layout>

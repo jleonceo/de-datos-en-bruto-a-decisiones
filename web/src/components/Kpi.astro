@@ -1,0 +1,8 @@
+---
+const { valor, etiqueta, sub = '' } = Astro.props;
+---
+<div class="tarjeta p-4">
+  <div class="font-display text-[1.55rem] font-bold leading-none text-acento">{valor}</div>
+  <div class="mt-1.5 text-[.8rem] text-tinta-soft">{etiqueta}</div>
+  {sub && <div class="mt-0.5 text-[.72rem] text-suave">{sub}</div>}
+</div>

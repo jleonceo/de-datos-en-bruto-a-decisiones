@@ -1,0 +1,55 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Callout from '../components/Callout.astro';
+import eda from '../data/eda.json';
+import etlLog from '../data/etl_log.json';
+const nf = (v, d = 0) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: d }).format(v);
+const an = eda.anomalias;
+const bifurcaciones = [
+  ['Con datos reales', 'El mismo proceso permitiría separar los patrones que se sostienen de los que produce el azar. El método no cambia, solo la calidad de los datos de entrada.'],
+  ['Previsión de ventas', 'Con un histórico fiable, un modelo de previsión validado sobre periodos pasados podría proyectar las ventas y detectar cambios de tendencia.'],
+  ['Instrumentación', 'Recoger la satisfacción ligada a venta, canal y producto abriría preguntas causales que hoy no se pueden responder.'],
+  ['Automatización', 'El proceso puede ejecutarse automáticamente con cada nueva carga de datos, marcar las ventas que incumplan las reglas y avisar solo cuando un cambio supere la variación normal.'],
+];
+---
+<Layout current="/conclusiones" title="Conclusiones y siguientes pasos · TechSoluciones Analytics">
+  <p class="eyebrow">Parte VII · Cómo se hizo</p>
+  <h1 class="mt-2 font-display text-[2rem] font-bold">20 · Conclusiones y siguientes pasos</h1>
+
+  <p class="mt-4 max-w-2xl text-tinta-soft">
+    El trabajo parte de {nf(etlLog.filas_crudas)} filas con errores y termina con un recorrido completo: los
+    datos quedan limpios, protegidos, explorados, contrastados y presentados en un cuadro de mando.
+  </p>
+
+  <Callout tipo="warn" titulo={`El hallazgo: ${an.n} ventas fuera de las reglas del catálogo`}>
+    Lo que destacaba en los datos eran {an.n} ventas con cantidades fuera de rango y, en {an.por_precio},
+    precios fuera de catálogo, por {nf(an.importe_total)} €. Todo indica que son errores de registro, aunque falta confirmarlo. Si se dan por buenas, inflan la
+    facturación de los meses en que caen y contribuyeron a que la primera versión encontrara un «mes estrella»
+    que no se sostenía. Por eso se separan antes de agregar.
+  </Callout>
+
+  <Callout tipo="idea" titulo="Lo que muestra este trabajo">
+    Preparar bien los datos y <strong>reconocer cuándo no permiten concluir nada</strong> aporta más que un
+    cuadro de mando lleno de «hallazgos». Sin las anomalías, ningún mes supera al azar, ninguna provincia destaca en satisfacción, la satisfacción no
+    acompaña a las ventas y los clientes no se pueden segmentar. Cada una de esas conclusiones se comprobó con
+    estadística y se explica en su página.
+  </Callout>
+
+  <h2 class="mt-8 font-display text-[1.2rem] font-bold">Siguientes pasos posibles</h2>
+  <div class="mt-4 grid gap-3 sm:grid-cols-2">
+    {bifurcaciones.map(([t, p]) => (
+      <div class="tarjeta p-4">
+        <h3 class="text-[.95rem] font-semibold text-tinta">{t}</h3>
+        <p class="mt-1.5 text-[.85rem] text-tinta-soft">{p}</p>
+      </div>
+    ))}
+  </div>
+
+  <Callout tipo="ok" titulo="El resumen en una frase">
+    De datos sucios a decisiones, con un método que se puede revisar, repetir y defender.
+  </Callout>
+
+  <p class="mt-6 text-[.9rem] text-suave">
+    Cierre: <a href="/ecosistema" class="lnk font-semibold">el ecosistema y los créditos →</a>
+  </p>
+</Layout>

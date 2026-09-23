@@ -1,0 +1,27 @@
+---
+// Línea temporal en SVG. points = [{x: 'etiqueta', y: número}]
+const { points = [], height = 240, unit = '', color = 'var(--color-acento)', nticks = 6, label = 'Serie temporal' } = Astro.props;
+const W = 760, H = height, padL = 56, padR = 18, padT = 16, padB = 30;
+const ys = points.map((p) => p.y);
+const ymin = Math.min(...ys), ymax = Math.max(...ys);
+const span = ymax - ymin || 1;
+const n = points.length;
+const X = (i) => padL + (n <= 1 ? 0 : (i * (W - padL - padR)) / (n - 1));
+const Y = (v) => padT + (1 - (v - ymin) / span) * (H - padT - padB);
+const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${X(i).toFixed(1)},${Y(p.y).toFixed(1)}`).join(' ');
+const area = `${line} L${X(n - 1).toFixed(1)},${(H - padB).toFixed(1)} L${X(0).toFixed(1)},${(H - padB).toFixed(1)} Z`;
+const fmt = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: 0 }).format(v);
+const step = Math.max(1, Math.floor((n - 1) / (nticks - 1)));
+const xticks = points.map((p, i) => ({ i, ...p })).filter((_, i) => i % step === 0 || i === n - 1);
+---
+<svg viewBox={`0 0 ${W} ${H}`} class="w-full h-auto" role="img" aria-label={label}>
+  <line x1={padL} y1={padT} x2={padL} y2={H - padB} stroke="var(--color-linea)" stroke-width="1" />
+  <line x1={padL} y1={H - padB} x2={W - padR} y2={H - padB} stroke="var(--color-linea)" stroke-width="1" />
+  <text x={padL - 8} y={Y(ymax) + 4} text-anchor="end" font-size="11" fill="var(--color-suave)">{fmt(ymax)}{unit}</text>
+  <text x={padL - 8} y={Y(ymin) + 4} text-anchor="end" font-size="11" fill="var(--color-suave)">{fmt(ymin)}{unit}</text>
+  <path d={area} fill={color} opacity="0.10" />
+  <path d={line} fill="none" stroke={color} stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" />
+  {xticks.map((t) => (
+    <text x={X(t.i)} y={H - padB + 16} text-anchor="middle" font-size="10.5" fill="var(--color-suave)">{t.x}</text>
+  ))}
+</svg>

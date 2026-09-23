@@ -1,0 +1,89 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Concepto from '../../components/Concepto.astro';
+import Callout from '../../components/Callout.astro';
+import Code from '../../components/Code.astro';
+import Kpi from '../../components/Kpi.astro';
+import ak from '../../data/atipicos_kpi.json';
+
+const v = ak.d3_d11_forma.variables;
+const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: n, maximumFractionDigits: n, useGrouping: true }).format(x);
+const madre = { slug: '/descriptiva', t: '7 · Estadística descriptiva' };
+const veces = v.importe.media / v.importe.mediana;
+
+const code = `media   = ventas["importe"].mean()
+mediana = ventas["importe"].median()
+por_debajo = (ventas["importe"] < media).mean()   # que parte de las ventas no llega a la media`;
+---
+<Layout current="/descriptiva/media-mediana" title="Media frente a mediana · TechSoluciones Analytics">
+  <Concepto
+    ficha="D11"
+    madre={madre}
+    titulo={`El ${f(v.importe.pct_por_debajo_de_la_media, 0)} % de las ventas queda por debajo de la venta media`}
+    pregunta="¿Cuánto vale una venta normal de TechSoluciones?"
+  >
+    <Fragment slot="problema">
+      <p>
+        La respuesta habitual es el ticket medio, {f(v.importe.media, 2)} €. Con esa cifra se fijan
+        objetivos por comercial, se calcula cuántas ventas hacen falta para cubrir un gasto y se compara una
+        provincia con otra.
+      </p>
+    </Fragment>
+
+    <Fragment slot="engana">
+      <p>
+        La media reparte el total a partes iguales entre todas las ventas. Cuando unas pocas son muy grandes,
+        el resultado queda por encima del importe de la mayoría de las ventas y la cifra deja de describir la
+        venta habitual.
+      </p>
+    </Fragment>
+
+    <Fragment slot="principio">
+      <Callout tipo="idea" titulo="Cuando unas pocas ventas son muy grandes, la venta típica la da la mediana">
+        La mediana es la venta que queda justo en el medio al ordenarlas. Las ventas muy grandes apenas la
+        mueven, así que describe mejor la venta habitual. La media sigue siendo útil para repartir un
+        total.
+      </Callout>
+    </Fragment>
+
+    <Fragment slot="solucion">
+      <p>
+        Dar las dos cifras e indicar para qué sirve cada una. Para describir la venta habitual se usa la
+        mediana. Para calcular cuánto se facturará con cien ventas más se usa la media, porque al multiplicarla
+        por el número de ventas se obtiene el total.
+      </p>
+    </Fragment>
+
+    <Fragment slot="datos">
+      <div class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <Kpi valor={`${f(v.importe.media, 2)} €`} etiqueta="media del importe" />
+        <Kpi valor={`${f(v.importe.mediana, 2)} €`} etiqueta="mediana del importe" />
+        <Kpi valor={`${f(v.importe.pct_por_debajo_de_la_media, 1)} %`} etiqueta="ventas por debajo de la media" />
+      </div>
+      <p class="mt-4">
+        La media es {f(veces, 2)} veces la mediana y el {f(v.importe.pct_por_debajo_de_la_media, 1)} %
+        de las ventas no llega a ella. Un objetivo de ticket medio de {f(v.importe.media, 0)} € exigiría a la
+        mayoría de las operaciones un importe que no alcanzan.
+      </p>
+      <p>
+        Con la cantidad no ocurre: media {f(v.cant.media, 2)} y mediana {f(v.cant.mediana, 2)}, porque no hay unas pocas
+        cantidades mucho más grandes que el resto. El error está en usar la media con una variable que la
+        {' '}<a href="/descriptiva/forma" class="text-acento no-underline hover:underline">forma de la
+        distribución</a> ya había descartado.
+      </p>
+    </Fragment>
+
+    <Fragment slot="sirve">
+      <p>
+        Salarios, precios de vivienda, tiempo de atención, valor de un pedido. Las variables de dinero o de
+        tiempo que no bajan de cero y no tienen techo suelen comportarse así.
+      </p>
+    </Fragment>
+
+    <Fragment slot="tecnico">
+      <p>Sobre las {f(v.importe.n)} ventas válidas, sin las ventas marcadas como anomalía.</p>
+      <Code titulo="Las dos cifras" code={code} lang="python" />
+      <p class="mt-3">Fuente: <a href="https://github.com/jleonceo/de-datos-sucios-a-decisiones/blob/main/analisis/salidas/atipicos_kpi.json" class="text-acento no-underline hover:underline"><code>atipicos_kpi.json</code></a>, campo <code>d3_d11_forma.variables</code>.</p>
+    </Fragment>
+  </Concepto>
+</Layout>

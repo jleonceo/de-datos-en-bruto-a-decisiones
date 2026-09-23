@@ -1,0 +1,1204 @@
+{
+  "semilla": 42,
+  "e2_zscore": {
+    "estadistico": "ventas marcadas por z-score a tres umbrales, frente al limite de Tukey por IQR",
+    "n": 20000,
+    "media": 2443.41,
+    "desviacion": 3701.73,
+    "marcados_por_z": {
+      "2": 1185,
+      "2.5": 760,
+      "3": 760
+    },
+    "limite_iqr_superior": 6285.0,
+    "marcados_por_iqr": 1588,
+    "anomalias_reales": 16,
+    "reales_cazadas_por_z3": 15,
+    "reales_cazadas_por_iqr": 16,
+    "z_del_mayor": 33.22,
+    "lectura": "el z-score usa media y desviacion, que los propios atipicos inflan; aqui la anomalia que se escapa lo hace porque su importe es normal entre los productos caros"
+  },
+  "e7_tiempo_deteccion": {
+    "estadistico": "dias entre la venta anomala y el cierre del mes, que es cuando la veria un informe mensual",
+    "n_anomalias": 16,
+    "media_dias": 14.6,
+    "max_dias": 28,
+    "min_dias": 2,
+    "detalle": [
+      {
+        "id": "V0050",
+        "fecha": "2019-10-10",
+        "dias_hasta_cierre_de_mes": 21,
+        "motivo": "cantidad 44 fuera de 1-5"
+      },
+      {
+        "id": "V0100",
+        "fecha": "2024-05-29",
+        "dias_hasta_cierre_de_mes": 2,
+        "motivo": "cantidad 44 fuera de 1-5; precio x3.00 del de catalogo (950.00)"
+      },
+      {
+        "id": "V0150",
+        "fecha": "2024-07-20",
+        "dias_hasta_cierre_de_mes": 11,
+        "motivo": "cantidad 44 fuera de 1-5; precio x2.00 del de catalogo (300.00)"
+      },
+      {
+        "id": "V0200",
+        "fecha": "2022-08-21",
+        "dias_hasta_cierre_de_mes": 10,
+        "motivo": "cantidad 42 fuera de 1-5; precio x3.00 del de catalogo (300.00)"
+      },
+      {
+        "id": "V0250",
+        "fecha": "2024-03-12",
+        "dias_hasta_cierre_de_mes": 19,
+        "motivo": "cantidad 42 fuera de 1-5"
+      },
+      {
+        "id": "V0300",
+        "fecha": "2022-05-06",
+        "dias_hasta_cierre_de_mes": 25,
+        "motivo": "cantidad 44 fuera de 1-5; precio x2.00 del de catalogo (950.00)"
+      },
+      {
+        "id": "V0350",
+        "fecha": "2023-01-19",
+        "dias_hasta_cierre_de_mes": 12,
+        "motivo": "cantidad 43 fuera de 1-5; precio x3.00 del de catalogo (300.00)"
+      },
+      {
+        "id": "V0400",
+        "fecha": "2020-03-15",
+        "dias_hasta_cierre_de_mes": 16,
+        "motivo": "cantidad 41 fuera de 1-5; precio x3.00 del de catalogo (180.00)"
+      },
+      {
+        "id": "V0450",
+        "fecha": "2022-06-14",
+        "dias_hasta_cierre_de_mes": 16,
+        "motivo": "cantidad 41 fuera de 1-5"
+      },
+      {
+        "id": "V0500",
+        "fecha": "2021-05-23",
+        "dias_hasta_cierre_de_mes": 8,
+        "motivo": "cantidad 45 fuera de 1-5"
+      },
+      {
+        "id": "V1000",
+        "fecha": "2025-12-03",
+        "dias_hasta_cierre_de_mes": 28,
+        "motivo": "cantidad 44 fuera de 1-5; precio x3.00 del de catalogo (300.00)"
+      },
+      {
+        "id": "V2000",
+        "fecha": "2023-11-14",
+        "dias_hasta_cierre_de_mes": 16,
+        "motivo": "cantidad 42 fuera de 1-5; precio x2.00 del de catalogo (950.00)"
+      },
+      {
+        "id": "V2500",
+        "fecha": "2025-10-23",
+        "dias_hasta_cierre_de_mes": 8,
+        "motivo": "cantidad 43 fuera de 1-5; precio x2.00 del de catalogo (1200.00)"
+      },
+      {
+        "id": "V2600",
+        "fecha": "2020-10-08",
+        "dias_hasta_cierre_de_mes": 23,
+        "motivo": "cantidad 41 fuera de 1-5; precio x3.00 del de catalogo (300.00)"
+      },
+      {
+        "id": "V3500",
+        "fecha": "2021-09-19",
+        "dias_hasta_cierre_de_mes": 11,
+        "motivo": "cantidad 44 fuera de 1-5; precio x3.00 del de catalogo (450.00)"
+      },
+      {
+        "id": "V4000",
+        "fecha": "2022-09-22",
+        "dias_hasta_cierre_de_mes": 8,
+        "motivo": "cantidad 41 fuera de 1-5; precio x3.00 del de catalogo (300.00)"
+      }
+    ],
+    "con_control_diario": 1,
+    "lectura": "un control mensual tarda de media dos semanas en ver lo que un control diario ve al dia siguiente"
+  },
+  "e8_fatiga_alertas": {
+    "estadistico": "avisos al mes, precision y cobertura de cada umbral en euros",
+    "meses": 89,
+    "anomalias_reales": 16,
+    "por_umbral": [
+      {
+        "umbral_euros": 5000,
+        "avisos": 1974,
+        "avisos_por_mes": 22.2,
+        "aciertos": 16,
+        "precision_pct": 0.81,
+        "cobertura_pct": 100.0
+      },
+      {
+        "umbral_euros": 8000,
+        "avisos": 1185,
+        "avisos_por_mes": 13.3,
+        "aciertos": 15,
+        "precision_pct": 1.27,
+        "cobertura_pct": 93.8
+      },
+      {
+        "umbral_euros": 10000,
+        "avisos": 1185,
+        "avisos_por_mes": 13.3,
+        "aciertos": 15,
+        "precision_pct": 1.27,
+        "cobertura_pct": 93.8
+      },
+      {
+        "umbral_euros": 15000,
+        "avisos": 373,
+        "avisos_por_mes": 4.2,
+        "aciertos": 15,
+        "precision_pct": 4.02,
+        "cobertura_pct": 93.8
+      },
+      {
+        "umbral_euros": 20000,
+        "avisos": 14,
+        "avisos_por_mes": 0.2,
+        "aciertos": 14,
+        "precision_pct": 100.0,
+        "cobertura_pct": 87.5
+      },
+      {
+        "umbral_euros": 30000,
+        "avisos": 12,
+        "avisos_por_mes": 0.1,
+        "aciertos": 12,
+        "precision_pct": 100.0,
+        "cobertura_pct": 75.0
+      }
+    ],
+    "lectura": "bajar el umbral multiplica los avisos y hunde la precision, y con muchos avisos falsos es facil dejar de mirarlos"
+  },
+  "e9_clases_de_anomalia": {
+    "estadistico": "cada clase contada con el criterio que le corresponde, sobre la misma tabla",
+    "puntual": 1588,
+    "contextual": 76,
+    "colectiva_meses": 6,
+    "meses_analizados": 88,
+    "banda_mensual": [
+      431300.39,
+      669326.99
+    ],
+    "lectura": "son tres preguntas distintas: raro a secas, raro para su grupo, y raro como racha"
+  },
+  "e11_lof_dbscan": {
+    "estadistico": "LOF al 1 % y DBSCAN sobre una muestra de 4.000 ventas tipificadas en tres variables",
+    "n_muestra": 4000,
+    "anomalias_reales_en_la_muestra": 3,
+    "lof_marcadas": 36,
+    "lof_aciertos": 3,
+    "dbscan_ruido": 3,
+    "dbscan_grupos": 5,
+    "dbscan_aciertos": 3,
+    "lectura": "LOF mira la densidad local y DBSCAN llama ruido a lo que no cabe en ningun grupo denso"
+  },
+  "e6_tasas": {
+    "estadistico": "tasa de falsos positivos, precision y exhaustividad de cuatro detectores contra las 16 de la regla",
+    "normales": 19984,
+    "anomalias_reales": 16,
+    "detectores": [
+      {
+        "detector": "iqr_global_importe",
+        "marcadas": 1588,
+        "verdaderos": 16,
+        "falsos": 1572,
+        "tasa_falsos_positivos_pct": 7.87,
+        "precision_pct": 1.0,
+        "exhaustividad_pct": 100.0
+      },
+      {
+        "detector": "zscore_mayor_3",
+        "marcadas": 760,
+        "verdaderos": 15,
+        "falsos": 745,
+        "tasa_falsos_positivos_pct": 3.73,
+        "precision_pct": 2.0,
+        "exhaustividad_pct": 93.8
+      },
+      {
+        "detector": "iqr_por_producto_cantidad",
+        "marcadas": 16,
+        "verdaderos": 16,
+        "falsos": 0,
+        "tasa_falsos_positivos_pct": 0.0,
+        "precision_pct": 100.0,
+        "exhaustividad_pct": 100.0
+      },
+      {
+        "detector": "isolationforest",
+        "marcadas": 760,
+        "verdaderos": 15,
+        "falsos": 745,
+        "tasa_falsos_positivos_pct": 3.73,
+        "precision_pct": 2.0,
+        "exhaustividad_pct": 93.8
+      }
+    ],
+    "lectura": "una tasa de falsos positivos baja puede esconder una precision pesima cuando lo raro es muy raro"
+  },
+  "d3_d11_forma": {
+    "estadistico": "asimetria, curtosis y media frente a mediana de cuatro variables, con el histograma del importe",
+    "variables": {
+      "importe": {
+        "n": 19984,
+        "media": 2405.41,
+        "mediana": 1200.0,
+        "asimetria": 2.781,
+        "curtosis_exceso": 8.244,
+        "pct_por_debajo_de_la_media": 72.2
+      },
+      "precio": {
+        "n": 19984,
+        "media": 806.23,
+        "mediana": 300.0,
+        "asimetria": 2.048,
+        "curtosis_exceso": 3.205,
+        "pct_por_debajo_de_la_media": 60.2
+      },
+      "cant": {
+        "n": 19984,
+        "media": 2.99,
+        "mediana": 3.0,
+        "asimetria": 0.006,
+        "curtosis_exceso": -1.283,
+        "pct_por_debajo_de_la_media": 40.0
+      },
+      "satisfaccion": {
+        "n": 15980,
+        "media": 5.5,
+        "mediana": 5.0,
+        "asimetria": 0.011,
+        "curtosis_exceso": -1.23,
+        "pct_por_debajo_de_la_media": 50.3
+      }
+    },
+    "histograma_importe": [
+      {
+        "desde": 0,
+        "hasta": 1000,
+        "ventas": 9287
+      },
+      {
+        "desde": 1000,
+        "hasta": 2000,
+        "ventas": 4314
+      },
+      {
+        "desde": 2000,
+        "hasta": 3000,
+        "ventas": 1670
+      },
+      {
+        "desde": 3000,
+        "hasta": 4000,
+        "ventas": 1604
+      },
+      {
+        "desde": 4000,
+        "hasta": 5000,
+        "ventas": 1151
+      },
+      {
+        "desde": 5000,
+        "hasta": 6000,
+        "ventas": 0
+      },
+      {
+        "desde": 6000,
+        "hasta": 7000,
+        "ventas": 386
+      },
+      {
+        "desde": 7000,
+        "hasta": 8000,
+        "ventas": 402
+      },
+      {
+        "desde": 8000,
+        "hasta": 9000,
+        "ventas": 0
+      },
+      {
+        "desde": 9000,
+        "hasta": 10000,
+        "ventas": 0
+      },
+      {
+        "desde": 10000,
+        "hasta": 11000,
+        "ventas": 425
+      },
+      {
+        "desde": 11000,
+        "hasta": 12000,
+        "ventas": 0
+      },
+      {
+        "desde": 12000,
+        "hasta": 13000,
+        "ventas": 0
+      },
+      {
+        "desde": 13000,
+        "hasta": 14000,
+        "ventas": 0
+      },
+      {
+        "desde": 14000,
+        "hasta": 15000,
+        "ventas": 387
+      },
+      {
+        "desde": 15000,
+        "hasta": 16000,
+        "ventas": 0
+      },
+      {
+        "desde": 16000,
+        "hasta": 17000,
+        "ventas": 0
+      },
+      {
+        "desde": 17000,
+        "hasta": 18000,
+        "ventas": 358
+      }
+    ],
+    "pct_facturacion_del_10pct_mayor": 44.7,
+    "lectura": "con cola larga a la derecha la media se va hacia la cola y deja de describir la venta tipica"
+  },
+  "d4_pareto": {
+    "estadistico": "cuanta facturacion concentra el primer 20 % de productos, de provincias y de ventas",
+    "productos": {
+      "n": 8,
+      "n_para_80pct": 3,
+      "pct_elementos_para_80pct": 37.5,
+      "pct_facturacion_del_20pct_mayor": 65.9,
+      "curva": [
+        {
+          "pct_elementos": 12.5,
+          "pct_facturacion": 42.1
+        },
+        {
+          "pct_elementos": 25.0,
+          "pct_facturacion": 65.9
+        },
+        {
+          "pct_elementos": 37.5,
+          "pct_facturacion": 80.7
+        },
+        {
+          "pct_elementos": 50.0,
+          "pct_facturacion": 88.0
+        },
+        {
+          "pct_elementos": 62.5,
+          "pct_facturacion": 93.8
+        },
+        {
+          "pct_elementos": 75.0,
+          "pct_facturacion": 97.2
+        },
+        {
+          "pct_elementos": 87.5,
+          "pct_facturacion": 99.4
+        },
+        {
+          "pct_elementos": 100.0,
+          "pct_facturacion": 100.0
+        }
+      ]
+    },
+    "provincias": {
+      "n": 52,
+      "n_para_80pct": 40,
+      "pct_elementos_para_80pct": 76.9,
+      "pct_facturacion_del_20pct_mayor": 25.9,
+      "curva": [
+        {
+          "pct_elementos": 1.9,
+          "pct_facturacion": 4.1
+        },
+        {
+          "pct_elementos": 3.8,
+          "pct_facturacion": 7.7
+        },
+        {
+          "pct_elementos": 5.8,
+          "pct_facturacion": 11.2
+        },
+        {
+          "pct_elementos": 7.7,
+          "pct_facturacion": 13.5
+        },
+        {
+          "pct_elementos": 9.6,
+          "pct_facturacion": 15.7
+        },
+        {
+          "pct_elementos": 11.5,
+          "pct_facturacion": 17.8
+        },
+        {
+          "pct_elementos": 13.5,
+          "pct_facturacion": 19.8
+        },
+        {
+          "pct_elementos": 15.4,
+          "pct_facturacion": 21.9
+        },
+        {
+          "pct_elementos": 17.3,
+          "pct_facturacion": 23.9
+        },
+        {
+          "pct_elementos": 19.2,
+          "pct_facturacion": 25.9
+        },
+        {
+          "pct_elementos": 21.2,
+          "pct_facturacion": 27.8
+        },
+        {
+          "pct_elementos": 23.1,
+          "pct_facturacion": 29.8
+        },
+        {
+          "pct_elementos": 25.0,
+          "pct_facturacion": 31.6
+        },
+        {
+          "pct_elementos": 26.9,
+          "pct_facturacion": 33.5
+        },
+        {
+          "pct_elementos": 28.8,
+          "pct_facturacion": 35.4
+        },
+        {
+          "pct_elementos": 30.8,
+          "pct_facturacion": 37.3
+        },
+        {
+          "pct_elementos": 32.7,
+          "pct_facturacion": 39.2
+        },
+        {
+          "pct_elementos": 34.6,
+          "pct_facturacion": 41.1
+        },
+        {
+          "pct_elementos": 36.5,
+          "pct_facturacion": 43.0
+        },
+        {
+          "pct_elementos": 38.5,
+          "pct_facturacion": 44.8
+        },
+        {
+          "pct_elementos": 40.4,
+          "pct_facturacion": 46.7
+        },
+        {
+          "pct_elementos": 42.3,
+          "pct_facturacion": 48.6
+        },
+        {
+          "pct_elementos": 44.2,
+          "pct_facturacion": 50.4
+        },
+        {
+          "pct_elementos": 46.2,
+          "pct_facturacion": 52.3
+        },
+        {
+          "pct_elementos": 48.1,
+          "pct_facturacion": 54.1
+        },
+        {
+          "pct_elementos": 50.0,
+          "pct_facturacion": 55.9
+        },
+        {
+          "pct_elementos": 51.9,
+          "pct_facturacion": 57.7
+        },
+        {
+          "pct_elementos": 53.8,
+          "pct_facturacion": 59.4
+        },
+        {
+          "pct_elementos": 55.8,
+          "pct_facturacion": 61.2
+        },
+        {
+          "pct_elementos": 57.7,
+          "pct_facturacion": 63.0
+        },
+        {
+          "pct_elementos": 59.6,
+          "pct_facturacion": 64.8
+        },
+        {
+          "pct_elementos": 61.5,
+          "pct_facturacion": 66.6
+        },
+        {
+          "pct_elementos": 63.5,
+          "pct_facturacion": 68.3
+        },
+        {
+          "pct_elementos": 65.4,
+          "pct_facturacion": 70.1
+        },
+        {
+          "pct_elementos": 67.3,
+          "pct_facturacion": 71.9
+        },
+        {
+          "pct_elementos": 69.2,
+          "pct_facturacion": 73.6
+        },
+        {
+          "pct_elementos": 71.2,
+          "pct_facturacion": 75.4
+        },
+        {
+          "pct_elementos": 73.1,
+          "pct_facturacion": 77.1
+        },
+        {
+          "pct_elementos": 75.0,
+          "pct_facturacion": 78.9
+        },
+        {
+          "pct_elementos": 76.9,
+          "pct_facturacion": 80.6
+        },
+        {
+          "pct_elementos": 78.8,
+          "pct_facturacion": 82.3
+        },
+        {
+          "pct_elementos": 80.8,
+          "pct_facturacion": 84.0
+        },
+        {
+          "pct_elementos": 82.7,
+          "pct_facturacion": 85.7
+        },
+        {
+          "pct_elementos": 84.6,
+          "pct_facturacion": 87.4
+        },
+        {
+          "pct_elementos": 86.5,
+          "pct_facturacion": 89.1
+        },
+        {
+          "pct_elementos": 88.5,
+          "pct_facturacion": 90.8
+        },
+        {
+          "pct_elementos": 90.4,
+          "pct_facturacion": 92.4
+        },
+        {
+          "pct_elementos": 92.3,
+          "pct_facturacion": 94.0
+        },
+        {
+          "pct_elementos": 94.2,
+          "pct_facturacion": 95.5
+        },
+        {
+          "pct_elementos": 96.2,
+          "pct_facturacion": 97.0
+        },
+        {
+          "pct_elementos": 98.1,
+          "pct_facturacion": 98.5
+        },
+        {
+          "pct_elementos": 100.0,
+          "pct_facturacion": 100.0
+        }
+      ]
+    },
+    "ventas": {
+      "n": 19984,
+      "n_para_80pct": 7159,
+      "pct_elementos_para_80pct": 35.8,
+      "pct_facturacion_del_20pct_mayor": 62.7,
+      "curva": [
+        {
+          "pct_elementos": 5,
+          "pct_facturacion": 29.9
+        },
+        {
+          "pct_elementos": 10,
+          "pct_facturacion": 44.7
+        },
+        {
+          "pct_elementos": 15,
+          "pct_facturacion": 54.6
+        },
+        {
+          "pct_elementos": 20,
+          "pct_facturacion": 62.7
+        },
+        {
+          "pct_elementos": 25,
+          "pct_facturacion": 69.6
+        },
+        {
+          "pct_elementos": 30,
+          "pct_facturacion": 75.1
+        },
+        {
+          "pct_elementos": 35,
+          "pct_facturacion": 79.4
+        },
+        {
+          "pct_elementos": 40,
+          "pct_facturacion": 82.9
+        },
+        {
+          "pct_elementos": 45,
+          "pct_facturacion": 85.8
+        },
+        {
+          "pct_elementos": 50,
+          "pct_facturacion": 88.4
+        },
+        {
+          "pct_elementos": 55,
+          "pct_facturacion": 90.6
+        },
+        {
+          "pct_elementos": 60,
+          "pct_facturacion": 92.6
+        },
+        {
+          "pct_elementos": 65,
+          "pct_facturacion": 94.4
+        },
+        {
+          "pct_elementos": 70,
+          "pct_facturacion": 96.1
+        },
+        {
+          "pct_elementos": 75,
+          "pct_facturacion": 97.3
+        },
+        {
+          "pct_elementos": 80,
+          "pct_facturacion": 98.3
+        },
+        {
+          "pct_elementos": 85,
+          "pct_facturacion": 98.9
+        },
+        {
+          "pct_elementos": 90,
+          "pct_facturacion": 99.5
+        },
+        {
+          "pct_elementos": 95,
+          "pct_facturacion": 99.8
+        },
+        {
+          "pct_elementos": 100,
+          "pct_facturacion": 100.0
+        }
+      ]
+    },
+    "lectura": "el 80/20 no es una ley: por producto hay concentracion, menor que la de la regla, y por provincia la facturacion esta repartida"
+  },
+  "d6_nivel_agregacion": {
+    "estadistico": "la misma pregunta (que provincia va primera) respondida con tres niveles de agregacion",
+    "anio_inicio": 2019,
+    "anio_fin": 2025,
+    "ventas_usadas": 18877,
+    "por_venta_top3": [
+      {
+        "reg": "Islas Baleares",
+        "v": 2866.51
+      },
+      {
+        "reg": "Teruel",
+        "v": 2827.33
+      },
+      {
+        "reg": "Segovia",
+        "v": 2655.15
+      }
+    ],
+    "por_mes_top3": [
+      {
+        "reg": "Santa Cruz de Tenerife",
+        "v": 22636.61
+      },
+      {
+        "reg": "Girona",
+        "v": 19228.69
+      },
+      {
+        "reg": "Lleida",
+        "v": 19040.12
+      }
+    ],
+    "por_anio_top3": [
+      {
+        "reg": "Santa Cruz de Tenerife",
+        "v": 271639.29
+      },
+      {
+        "reg": "Girona",
+        "v": 230744.29
+      },
+      {
+        "reg": "Lleida",
+        "v": 228481.43
+      }
+    ],
+    "coinciden_los_tres_primeros": false,
+    "lectura": "cambiar el nivel de agregacion cambia el ganador: se elige por la decision que se va a tomar"
+  },
+  "d12_denominador": {
+    "estadistico": "las mismas provincias ordenadas por facturacion total y por facturacion por venta",
+    "n_provincias": 52,
+    "lider_por_total": "Santa Cruz de Tenerife",
+    "lider_por_venta": "Islas Baleares",
+    "mayores_saltos": [
+      {
+        "reg": "Girona",
+        "puesto_por_total": 3,
+        "puesto_por_venta": 32,
+        "salto": 29
+      },
+      {
+        "reg": "Toledo",
+        "puesto_por_total": 16,
+        "puesto_por_venta": 40,
+        "salto": 24
+      },
+      {
+        "reg": "Ceuta",
+        "puesto_por_total": 37,
+        "puesto_por_venta": 14,
+        "salto": 23
+      },
+      {
+        "reg": "Lugo",
+        "puesto_por_total": 25,
+        "puesto_por_venta": 4,
+        "salto": 21
+      },
+      {
+        "reg": "Salamanca",
+        "puesto_por_total": 22,
+        "puesto_por_venta": 43,
+        "salto": 21
+      }
+    ],
+    "lectura": "un total premia al que tiene mas ventas; el denominador decide a quien estas llamando mejor"
+  },
+  "j1_kpi_vs_vanidad": {
+    "estadistico": "tres magnitudes mensuales, dos de vanidad y una accionable",
+    "vanidad_numero_de_ventas": {
+      "media": 225.0,
+      "crecimiento_pct": -12.3
+    },
+    "vanidad_facturacion_acumulada": 48069780.0,
+    "kpi_ticket_medio": 2405.41,
+    "kpi_recurrencia": null,
+    "kpi_recurrencia_motivo": "no hay clave de cliente: el correo lo comparten personas distintas",
+    "lectura": "el acumulado solo puede subir, asi que nunca avisa de nada; el ticket medio si, y la recurrencia lo haria con una clave de cliente"
+  },
+  "j9_mapa": {
+    "estadistico": "las cuatro magnitudes por provincia que necesita un mapa coropletico",
+    "n_provincias": 52,
+    "provincias": [
+      {
+        "reg": "Santa Cruz de Tenerife",
+        "ventas": 778,
+        "importe": 1975270.0,
+        "ticket": 2538.91,
+        "satisfaccion": 5.363
+      },
+      {
+        "reg": "Lleida",
+        "ventas": 706,
+        "importe": 1726460.0,
+        "ticket": 2445.41,
+        "satisfaccion": 5.502
+      },
+      {
+        "reg": "Girona",
+        "ventas": 720,
+        "importe": 1702395.0,
+        "ticket": 2364.44,
+        "satisfaccion": 5.339
+      },
+      {
+        "reg": "Teruel",
+        "ventas": 391,
+        "importe": 1091405.0,
+        "ticket": 2791.32,
+        "satisfaccion": 5.611
+      },
+      {
+        "reg": "Islas Baleares",
+        "ventas": 366,
+        "importe": 1029285.0,
+        "ticket": 2812.25,
+        "satisfaccion": 5.423
+      },
+      {
+        "reg": "Álava",
+        "ventas": 390,
+        "importe": 1014940.0,
+        "ticket": 2602.41,
+        "satisfaccion": 5.639
+      },
+      {
+        "reg": "Sevilla",
+        "ventas": 400,
+        "importe": 996300.0,
+        "ticket": 2490.75,
+        "satisfaccion": 5.744
+      },
+      {
+        "reg": "Las Palmas",
+        "ventas": 385,
+        "importe": 978070.0,
+        "ticket": 2540.44,
+        "satisfaccion": 5.669
+      },
+      {
+        "reg": "Segovia",
+        "ventas": 376,
+        "importe": 974135.0,
+        "ticket": 2590.78,
+        "satisfaccion": 5.744
+      },
+      {
+        "reg": "Valencia",
+        "ventas": 370,
+        "importe": 972575.0,
+        "ticket": 2628.58,
+        "satisfaccion": 5.385
+      },
+      {
+        "reg": "Cantabria",
+        "ventas": 387,
+        "importe": 923700.0,
+        "ticket": 2386.82,
+        "satisfaccion": 5.35
+      },
+      {
+        "reg": "Cuenca",
+        "ventas": 382,
+        "importe": 917245.0,
+        "ticket": 2401.16,
+        "satisfaccion": 5.456
+      },
+      {
+        "reg": "Huesca",
+        "ventas": 359,
+        "importe": 910385.0,
+        "ticket": 2535.89,
+        "satisfaccion": 5.507
+      },
+      {
+        "reg": "Ávila",
+        "ventas": 365,
+        "importe": 909600.0,
+        "ticket": 2492.05,
+        "satisfaccion": 5.239
+      },
+      {
+        "reg": "Soria",
+        "ventas": 376,
+        "importe": 908660.0,
+        "ticket": 2416.65,
+        "satisfaccion": 5.629
+      },
+      {
+        "reg": "Toledo",
+        "ventas": 398,
+        "importe": 905585.0,
+        "ticket": 2275.34,
+        "satisfaccion": 5.319
+      },
+      {
+        "reg": "Badajoz",
+        "ventas": 391,
+        "importe": 905190.0,
+        "ticket": 2315.06,
+        "satisfaccion": 5.385
+      },
+      {
+        "reg": "Córdoba",
+        "ventas": 356,
+        "importe": 904305.0,
+        "ticket": 2540.18,
+        "satisfaccion": 5.846
+      },
+      {
+        "reg": "Pontevedra",
+        "ventas": 362,
+        "importe": 902100.0,
+        "ticket": 2491.99,
+        "satisfaccion": 5.145
+      },
+      {
+        "reg": "Zamora",
+        "ventas": 349,
+        "importe": 901640.0,
+        "ticket": 2583.5,
+        "satisfaccion": 5.702
+      },
+      {
+        "reg": "Castellón",
+        "ventas": 370,
+        "importe": 897475.0,
+        "ticket": 2425.61,
+        "satisfaccion": 5.323
+      },
+      {
+        "reg": "Salamanca",
+        "ventas": 399,
+        "importe": 895175.0,
+        "ticket": 2243.55,
+        "satisfaccion": 5.471
+      },
+      {
+        "reg": "León",
+        "ventas": 366,
+        "importe": 894320.0,
+        "ticket": 2443.5,
+        "satisfaccion": 5.744
+      },
+      {
+        "reg": "Guadalajara",
+        "ventas": 371,
+        "importe": 887170.0,
+        "ticket": 2391.29,
+        "satisfaccion": 5.23
+      },
+      {
+        "reg": "Lugo",
+        "ventas": 332,
+        "importe": 869110.0,
+        "ticket": 2617.8,
+        "satisfaccion": 5.302
+      },
+      {
+        "reg": "Ciudad Real",
+        "ventas": 375,
+        "importe": 862485.0,
+        "ticket": 2299.96,
+        "satisfaccion": 5.76
+      },
+      {
+        "reg": "Vizcaya",
+        "ventas": 355,
+        "importe": 861300.0,
+        "ticket": 2426.2,
+        "satisfaccion": 5.441
+      },
+      {
+        "reg": "Almería",
+        "ventas": 345,
+        "importe": 861155.0,
+        "ticket": 2496.1,
+        "satisfaccion": 5.401
+      },
+      {
+        "reg": "Cádiz",
+        "ventas": 385,
+        "importe": 857035.0,
+        "ticket": 2226.06,
+        "satisfaccion": 5.443
+      },
+      {
+        "reg": "Palencia",
+        "ventas": 364,
+        "importe": 856665.0,
+        "ticket": 2353.48,
+        "satisfaccion": 5.616
+      },
+      {
+        "reg": "Asturias",
+        "ventas": 341,
+        "importe": 854840.0,
+        "ticket": 2506.86,
+        "satisfaccion": 5.521
+      },
+      {
+        "reg": "Burgos",
+        "ventas": 365,
+        "importe": 853725.0,
+        "ticket": 2338.97,
+        "satisfaccion": 5.731
+      },
+      {
+        "reg": "Navarra",
+        "ventas": 355,
+        "importe": 852700.0,
+        "ticket": 2401.97,
+        "satisfaccion": 5.64
+      },
+      {
+        "reg": "Melilla",
+        "ventas": 352,
+        "importe": 851050.0,
+        "ticket": 2417.76,
+        "satisfaccion": 5.283
+      },
+      {
+        "reg": "La Coruña",
+        "ventas": 342,
+        "importe": 846005.0,
+        "ticket": 2473.7,
+        "satisfaccion": 5.452
+      },
+      {
+        "reg": "Tarragona",
+        "ventas": 342,
+        "importe": 845550.0,
+        "ticket": 2472.37,
+        "satisfaccion": 5.645
+      },
+      {
+        "reg": "Ceuta",
+        "ventas": 339,
+        "importe": 845140.0,
+        "ticket": 2493.04,
+        "satisfaccion": 5.462
+      },
+      {
+        "reg": "Valladolid",
+        "ventas": 340,
+        "importe": 843070.0,
+        "ticket": 2479.62,
+        "satisfaccion": 5.386
+      },
+      {
+        "reg": "Madrid",
+        "ventas": 352,
+        "importe": 840330.0,
+        "ticket": 2387.3,
+        "satisfaccion": 5.435
+      },
+      {
+        "reg": "Zaragoza",
+        "ventas": 387,
+        "importe": 825545.0,
+        "ticket": 2133.19,
+        "satisfaccion": 5.352
+      },
+      {
+        "reg": "Málaga",
+        "ventas": 354,
+        "importe": 822145.0,
+        "ticket": 2322.44,
+        "satisfaccion": 5.308
+      },
+      {
+        "reg": "Granada",
+        "ventas": 363,
+        "importe": 821410.0,
+        "ticket": 2262.84,
+        "satisfaccion": 5.391
+      },
+      {
+        "reg": "Alicante",
+        "ventas": 365,
+        "importe": 818265.0,
+        "ticket": 2241.82,
+        "satisfaccion": 5.682
+      },
+      {
+        "reg": "La Rioja",
+        "ventas": 360,
+        "importe": 811885.0,
+        "ticket": 2255.24,
+        "satisfaccion": 5.433
+      },
+      {
+        "reg": "Albacete",
+        "ventas": 353,
+        "importe": 806170.0,
+        "ticket": 2283.77,
+        "satisfaccion": 5.576
+      },
+      {
+        "reg": "Guipúzcoa",
+        "ventas": 344,
+        "importe": 801235.0,
+        "ticket": 2329.17,
+        "satisfaccion": 5.495
+      },
+      {
+        "reg": "Murcia",
+        "ventas": 375,
+        "importe": 775490.0,
+        "ticket": 2067.97,
+        "satisfaccion": 5.837
+      },
+      {
+        "reg": "Orense",
+        "ventas": 346,
+        "importe": 771745.0,
+        "ticket": 2230.48,
+        "satisfaccion": 5.551
+      },
+      {
+        "reg": "Jaén",
+        "ventas": 338,
+        "importe": 741890.0,
+        "ticket": 2194.94,
+        "satisfaccion": 5.708
+      },
+      {
+        "reg": "Huelva",
+        "ventas": 336,
+        "importe": 722965.0,
+        "ticket": 2151.68,
+        "satisfaccion": 5.455
+      },
+      {
+        "reg": "Barcelona",
+        "ventas": 335,
+        "importe": 720970.0,
+        "ticket": 2152.15,
+        "satisfaccion": 5.482
+      },
+      {
+        "reg": "Cáceres",
+        "ventas": 331,
+        "importe": 706520.0,
+        "ticket": 2134.5,
+        "satisfaccion": 5.56
+      }
+    ],
+    "importe_max": 1975270.0,
+    "importe_min": 706520.0,
+    "lectura": "el mapa pinta 52 provincias, y lo que decide si engaña es que magnitud se pinta"
+  }
+}
