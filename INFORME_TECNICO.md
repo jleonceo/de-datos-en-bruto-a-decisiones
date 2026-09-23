@@ -121,7 +121,7 @@ No hay ventas extremadamente bajas: la más baja es de 45 €, una unidad del pr
 
 El rango intercuartílico sobre el importe marca 1.588 ventas: las 16 anomalías y 1.572 ventas normales
 del servidor, que es el producto más caro. Mezclar productos de 45 € y de 3.500 € confunde caro con
-extraño. Dentro de cada producto la cantidad va de 1 a 5, y el mismo método aplicado por producto aísla
+extraño. Dentro de cada producto la cantidad va de 1 a 5. El mismo método aplicado por producto aísla
 exactamente las 16.
 
 ### Detección automática
@@ -155,7 +155,7 @@ que una estacionalidad suave no queda descartada.
 Medido como la pendiente de la satisfacción media anual, Navarra es la primera (pasa de 4,58 a 6,56). Con
 52 provincias alguna tenía que serlo: barajando la satisfacción 2.000 veces, el azar produce una pendiente
 igual o mayor con p = 0,60. Sin 2026, que solo tiene unos meses, la primera pasa a ser Madrid y el test da
-p = 0,36. Ninguna región crece más de lo que se puede distinguir del azar, y la que sale primera cambia según el periodo
+p = 0,36. Ninguna región crece más de lo que se puede distinguir del azar. La que sale primera cambia según el periodo
 y la forma de medir.
 
 ### P3 · correlación entre ventas y satisfacción
@@ -197,11 +197,11 @@ resultados decían algo que el dato no sostiene. Todo quedó corregido y el banc
 - Las causas de las anomalías son hipótesis; solo el origen del dato puede confirmarlas.
 - 2026 está incompleto y se excluye de los crecimientos y de la comparación de meses.
 - Un 20 % de la satisfacción falta. La ausencia es compatible con el azar por provincia, año, producto y
-  categoría. Queda sin cruzar con el importe y la cantidad, y no se puede descartar que dependa de la propia nota.
+  categoría. Queda sin cruzar con el importe y la cantidad. Tampoco se puede descartar que dependa de la propia nota.
 - La clave de persona es nombre más teléfono. Si una misma persona cambió de teléfono contaría como dos.
 - El encargo sugería Power BI, sus funciones de anomalías y de preguntas en lenguaje natural, y ARX para la
   anonimización. No se han usado: el cuadro de mando está en la web, las anomalías y las preguntas se
-  resuelven con Python, y k y l se calculan con pandas.
+  resuelven con Python. La k y la l se calculan con pandas.
 - No se ha contrastado el crecimiento de ventas por provincia; solo el de satisfacción, que es lo que pregunta la P2.
 - Los datos son sintéticos: la falta de patrones puede venir de cómo se generaron.
 
@@ -220,5 +220,5 @@ cd ../web && npm run build
 El primer script lee el fichero original, que no se publica porque contiene datos personales. Quien solo
 tenga el repositorio ve los resultados en la web y el fichero anonimizado, pero no puede ejecutar la cadena.
 
-Requiere Python con pandas, numpy, scipy y scikit-learn, y Node para la web. Las semillas son fijas, así que
+Requiere Python con pandas, numpy, scipy y scikit-learn. La web necesita Node. Las semillas son fijas, así que
 dos ejecuciones dan los mismos ficheros.
