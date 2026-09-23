@@ -1,7 +1,6 @@
 # de-datos-en-bruto-a-decisiones
 
 **Análisis completo de un fichero de ventas en bruto para responder a tres preguntas de negocio, con cada cifra comprobada**
-**A complete analysis of a raw sales file to answer three business questions, with every figure checked**
 
 [Español](#español) · [English](#english)
 
@@ -161,6 +160,8 @@ MIT. Los datos son sintéticos y la empresa es ficticia.
 ---
 
 ## English
+
+**A complete analysis of a raw sales file to answer three business questions, with every figure checked**
 
 ### The problem
 
