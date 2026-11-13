@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Concepto from '../../components/Concepto.astro';
 import Callout from '../../components/Callout.astro';
 import Code from '../../components/Code.astro';
+import CurvaAcumulada from '../../components/CurvaAcumulada.astro';
 import ak from '../../data/atipicos_kpi.json';
 
 const p = ak.d4_pareto;
@@ -58,6 +59,21 @@ n_para_80 = (acumulado < 0.80).sum() + 1      # cuantos hacen falta para llegar 
     </Fragment>
 
     <Fragment slot="datos">
+      <div class="tarjeta mt-2 p-4">
+        <h3 class="text-[.9rem] font-semibold text-tinta">Facturación acumulada: los productos se concentran y las provincias no</h3>
+        <div class="mt-3">
+          <CurvaAcumulada
+            series={[
+              { nombre: 'Productos', curva: p.productos.curva, marca: { x: p.productos.pct_elementos_para_80pct, texto: `${p.productos.n_para_80pct} de ${p.productos.n} productos` } },
+              { nombre: 'Provincias', curva: p.provincias.curva, gris: true, marca: { x: p.provincias.pct_elementos_para_80pct, texto: `${p.provincias.n_para_80pct} de ${p.provincias.n} provincias` } },
+            ]}
+            label="Curva de facturación acumulada por producto y por provincia" />
+        </div>
+        <p class="mt-2 text-[.82rem] text-suave">
+          Cuanto más se separa una curva de la línea de puntos, más concentrada está la facturación. El
+          punto marca dónde llega cada una al 80 %.
+        </p>
+      </div>
       <div class="overflow-x-auto">
         <table class="mt-2 w-full max-w-xl border-collapse text-[.88rem]">
           <thead>

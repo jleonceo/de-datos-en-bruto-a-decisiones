@@ -1,7 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Callout from '../components/Callout.astro';
-import eda from '../data/eda.json';
 const propio = [
   ['Este proyecto en GitHub', 'https://github.com/jleonceo/de-datos-en-bruto-a-decisiones', 'El código de esta web, los diez scripts del análisis con sus resultados, el banco de comprobaciones, el fichero anonimizado y el informe técnico.'],
 ];
@@ -60,10 +59,8 @@ const grupos = [
   </Callout>
 
   <Callout tipo="idea" titulo="Créditos y método">
-    La primera versión, del 01/07/2026, se hizo sin aplicar las reglas
-    de revisión del proyecto y dio por buenas {eda.anomalias.n} ventas erróneas. La corrección del
-    13/09/2026 pasó por un verificador que recalculó las cifras desde el fichero original y por un revisor
-    que intentó refutar cada conclusión, y el 23/09/2026 se repitió con la web entera antes de publicarla.
+    La primera versión es del 01/07/2026. Qué se corrigió después y cómo se verificó cada cifra está en
+    {' '}<a href="/metodologia#correcciones" class="lnk">la metodología</a>.
     Está hecho con ayuda de IA: Claude, de Anthropic, escribió buena parte del análisis, del código y del
     texto, y las decisiones y la revisión de cada página son del autor, Juan Luis León Rodríguez.
   </Callout>

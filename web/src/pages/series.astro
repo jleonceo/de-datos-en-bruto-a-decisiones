@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Callout from '../components/Callout.astro';
 import LineChart from '../components/LineChart.astro';
 import BarList from '../components/BarList.astro';
+import Columnas from '../components/Columnas.astro';
 import eda from '../data/eda.json';
 const am = Object.entries(eda.ventas_por_anio_mes)
   .sort(([a], [b]) => a.localeCompare(b))
@@ -12,6 +13,7 @@ const k = eda.kpis;
 const a0 = k.periodo[0].slice(0, 4);
 const a1 = k.periodo[1].slice(0, 4);
 const fd = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: 'exceptZero' }).format(v);
+const interanual = Object.entries(k.crecimiento_interanual_pct).map(([a, v]) => ({ label: a, value: v }));
 const topSube = Object.entries(k.crecimiento_interanual_pct).sort((a, b) => b[1] - a[1])[0];
 ---
 <Layout current="/series" title="Series y estacionalidad · TechSoluciones Analytics">
@@ -31,6 +33,15 @@ const topSube = Object.entries(k.crecimiento_interanual_pct).sort((a, b) => b[1]
 
   <h2 class="mt-8 font-display text-[1.2rem] font-bold">Facturación por año (€)</h2>
   <div class="mt-3"><BarList items={anios} unit=" €" /></div>
+
+  <div class="tarjeta mt-6 p-4">
+    <h3 class="text-[.9rem] font-semibold text-tinta">Cambio de la facturación respecto al año anterior (%)</h3>
+    <div class="mt-3"><Columnas items={interanual} unit=" %" decimals={2} signo={true} height={230} label="Cambio porcentual de la facturación de cada año respecto al anterior" /></div>
+    <p class="mt-2 text-[.82rem] text-suave">
+      Solo años completos. A la mayor subida le sigue la mayor bajada, y entre las dos la facturación
+      vuelve casi al mismo sitio.
+    </p>
+  </div>
 
   <Callout tipo="idea" titulo={`Sin tendencia y con ${a1} incompleto`}>
     De {a0} a {Number(a1) - 1} la facturación válida se mueve en una banda estrecha, sin tendencia: entre el primer y el

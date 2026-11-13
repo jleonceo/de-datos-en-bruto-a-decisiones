@@ -69,8 +69,13 @@ const scripts = [
     <li><strong>Verificación independiente:</strong> el 13/09/2026 un verificador recalculó 16 cifras desde el CSV crudo con código propio y sin pandas y cuadraron todas. Un revisor intentó refutar las siete conclusiones con otros métodos. No lo consiguió con ninguna, matizó cinco y encontró dos defectos de anonimización que se corrigieron. El 23/09/2026, antes de publicar, se repitió con la web entera: tres verificadores recalcularon desde el fichero original 1.439 cifras de las páginas. Cuadraron 1.423. Ocho no cuadraban por redondeos o por cómo las leía la página, y se corrigieron. Tres son un mismo p de 0,60 que con más barajados sale 0,62, sin cambiar la conclusión. Las cinco restantes no son medidas del dato. Un revisor intentó refutar 51 conclusiones: se sostuvieron 23, se matizaron 23 y se corrigieron las cinco que caían.</li>
   </ul>
 
-  <Callout tipo="warn" titulo="Qué se corrigió el 13/09/2026">
-    <p>La primera versión de esta web se dio por verificada con una comprobación de sumas y tenía errores que una revisión posterior encontró:</p>
+  <h2 id="correcciones" class="mt-8 scroll-mt-6 font-display text-[1.2rem] font-bold">Qué hubo que corregir</h2>
+  <p class="mt-2 max-w-2xl text-tinta-soft">
+    Las correcciones de este trabajo se cuentan aquí, todas juntas. Las demás páginas explican solo el
+    método correcto.
+  </p>
+  <Callout tipo="warn" titulo="La corrección del 13/09/2026">
+    <p>La primera versión de esta web, del 01/07/2026, se hizo sin aplicar las reglas de revisión del proyecto. Se dio por verificada con una comprobación de sumas y tenía errores que una revisión posterior encontró:</p>
     <ul class="mt-2 ml-4 list-disc space-y-1">
       <li>las {eda.anomalias.n} ventas fuera de las reglas del catálogo se daban por pedidos legítimos;</li>
       <li>el mes del año se elegía sumando meses con distinto número de años y el test medía la variación del ticket medio en vez de la facturación;</li>
@@ -80,6 +85,14 @@ const scripts = [
       <li>faltaban el mapa de calor, los KPI de crecimiento y satisfacción, las alertas y el informe técnico.</li>
     </ul>
     <p class="mt-2">Todo está corregido en los scripts y los ficheros de la web salen de ellos.</p>
+  </Callout>
+  <Callout tipo="warn" titulo="Tres ejemplos que hubo que rehacer">
+    <p>Al escribir las páginas de concepto, tres ejemplos no enseñaban lo que decían enseñar:</p>
+    <ul class="mt-2 ml-4 list-disc space-y-1">
+      <li>la tabla de <a href="/atipicos/alertas" class="lnk">alertas</a> usaba umbrales de z, y z mayor que 1,5 marcaba las mismas ventas que z mayor que 2. Ahora los umbrales van en euros;</li>
+      <li>la <a href="/atipicos/clases" class="lnk">anomalía contextual</a> se medía contra el producto y daba cero. Ahora el contexto es la provincia y el trimestre;</li>
+      <li>el ejemplo de <a href="/prediccion/fuga" class="lnk">fuga de información</a> tenía la fuga en las dos ramas, también en la que se llamaba limpia, y las dos daban 1,0000.</li>
+    </ul>
   </Callout>
 
   <h2 class="mt-8 font-display text-[1.2rem] font-bold">Piezas propias que se reutilizan</h2>

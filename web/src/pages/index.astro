@@ -29,6 +29,23 @@ const recorrido = partes.filter((p) => p.id !== 'inicio');
     </p>
   </section>
 
+  <section class="mt-8 rounded-lg border border-linea bg-crema p-5">
+    <h2 class="font-display text-[1.15rem] font-bold">Si solo tienes dos minutos</h2>
+    <p class="mt-1 text-[.9rem] text-tinta-soft">Estas tres páginas enseñan cómo está hecho el trabajo.</p>
+    <div class="mt-4 grid gap-3 sm:grid-cols-3">
+      {[
+        { slug: '/pregunta-mes', t: 'Una pregunta de negocio, contestada y contrastada', d: 'Cuál fue el mes con más ventas y por qué ningún mes del año destaca más de lo que produce el azar.' },
+        { slug: '/senal-ruido/simpson', t: 'Una cifra correcta que engaña', d: 'La provincia que más factura por venta debe su ventaja a los productos que vende.' },
+        { slug: '/metodologia', t: 'Cómo se comprobó', d: 'Diez scripts, las cifras recalculadas por verificadores y la lista de lo que hubo que corregir.' },
+      ].map((x) => (
+        <a href={x.slug} class="tarjeta block p-4 no-underline">
+          <div class="text-[.92rem] font-semibold text-acento-deep">{x.t} →</div>
+          <div class="mt-1.5 text-[.82rem] text-tinta-soft">{x.d}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+
   <section class="mt-9 grid grid-cols-2 gap-3 sm:grid-cols-4">
     <Kpi valor={nf(k.n_validas)} etiqueta="ventas válidas" sub={`de ${nf(etlLog.filas_crudas)} filas: fuera ${nf(etlLog.filas_crudas - k.n_ventas)} duplicadas y ${nf(k.n_anomalias)} anómalas`} />
     <Kpi valor={nf(k.facturacion_valida) + ' €'} etiqueta="facturación válida" sub={`registrada: ${nf(k.facturacion_registrada)} €`} />

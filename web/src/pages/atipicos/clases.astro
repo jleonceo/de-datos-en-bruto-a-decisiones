@@ -96,10 +96,10 @@ colectiva = (abs(mensual - mensual.mean()) > 2 * mensual.std()).sum()`;
         se sale solo por una de ellas. Además, si los meses se repartieran como una campana, unos 4 de 88
         quedarían fuera por puro azar. Habría que mirar qué pasó en cada uno.
       </p>
-      <Callout tipo="warn" titulo="Un criterio que hubo que rehacer">
-        La primera versión medía lo contextual contra el producto y daba cero. La razón es que una venta rara
-        para un producto caro ya es rara en el total, así que los dos criterios detectaban lo mismo. Al cambiar
-        el contexto a provincia y trimestre, el criterio empezó a encontrar ventas que el límite global no ve.
+      <Callout tipo="warn" titulo="Por qué el contexto es la provincia y el trimestre">
+        Medido contra el producto, lo contextual da cero. La razón es que una venta rara
+        para un producto caro ya es rara en el total, así que los dos criterios detectan lo mismo. Con la
+        provincia y el trimestre como contexto, el criterio encuentra ventas que el límite global no ve.
       </Callout>
     </Fragment>
 

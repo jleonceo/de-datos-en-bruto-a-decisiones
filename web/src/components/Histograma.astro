@@ -1,0 +1,35 @@
+---
+// Histograma en SVG. tramos = [{ desde, hasta, ventas }], todos del mismo ancho.
+// marcas = [{ valor, etiqueta }] dibuja líneas verticales, por ejemplo la media y la mediana.
+const { tramos = [], marcas = [], height = 270, unit = ' €', cada = 3, label = 'Histograma' } = Astro.props;
+const W = 760, H = height, padL = 56, padR = 18, padT = 14, padB = 30;
+const x0 = tramos[0]?.desde ?? 0;
+const x1 = tramos[tramos.length - 1]?.hasta ?? 1;
+const ymax = Math.max(...tramos.map((t) => t.ventas), 1);
+const X = (v) => padL + ((v - x0) / (x1 - x0)) * (W - padL - padR);
+const Y = (v) => padT + (1 - v / ymax) * (H - padT - padB);
+const fmt = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, maximumFractionDigits: 0 }).format(v);
+const ticks = tramos.filter((_, i) => i % cada === 0).map((t) => t.desde).concat([x1]);
+const ms = [...marcas].sort((a, b) => a.valor - b.valor);
+---
+<svg viewBox={`0 0 ${W} ${H}`} class="w-full h-auto" role="img" aria-label={label}>
+  <line x1={padL} y1={Y(ymax / 2)} x2={W - padR} y2={Y(ymax / 2)} stroke="var(--color-linea)" stroke-width="1" />
+  <line x1={padL} y1={padT} x2={padL} y2={H - padB} stroke="var(--color-linea)" stroke-width="1" />
+  <text x={padL - 8} y={Y(ymax) + 4} text-anchor="end" font-size="11" fill="var(--color-suave)">{fmt(ymax)}</text>
+  <text x={padL - 8} y={Y(ymax / 2) + 4} text-anchor="end" font-size="11" fill="var(--color-suave)">{fmt(ymax / 2)}</text>
+  <text x={padL - 8} y={Y(0) + 4} text-anchor="end" font-size="11" fill="var(--color-suave)">0</text>
+  {tramos.map((t) => (
+    <rect x={(X(t.desde) + 1).toFixed(1)} y={Y(t.ventas).toFixed(1)} width={(X(t.hasta) - X(t.desde) - 2).toFixed(1)}
+      height={(Y(0) - Y(t.ventas)).toFixed(1)} fill="var(--color-acento)" opacity="0.85" />
+  ))}
+  <line x1={padL} y1={H - padB} x2={W - padR} y2={H - padB} stroke="var(--color-suave)" stroke-width="1" />
+  {ticks.map((v) => (
+    <text x={X(v)} y={H - padB + 16} text-anchor="middle" font-size="10.5" fill="var(--color-suave)">{fmt(v)}{unit}</text>
+  ))}
+  {ms.map((m, i) => (
+    <g>
+      <line x1={X(m.valor)} y1={padT + i * 20} x2={X(m.valor)} y2={H - padB} stroke="var(--color-tinta)" stroke-width="1.6" stroke-dasharray={i === 0 ? '' : '5 4'} />
+      <text x={X(m.valor) + 6} y={padT + 11 + i * 20} font-size="11.5" font-weight="600" fill="var(--color-tinta)" paint-order="stroke" stroke="#fff" stroke-width="3">{m.etiqueta}: {fmt(m.valor)}{unit}</text>
+    </g>
+  ))}
+</svg>

@@ -1,0 +1,38 @@
+---
+// Columnas verticales en SVG, siempre desde cero. Admite valores negativos.
+// items = [{ label, value, nota?, destacar? }]. `nota` es una segunda línea bajo la etiqueta.
+const { items = [], height = 250, unit = '', decimals = 0, signo = false, label = 'Gráfico de columnas' } = Astro.props;
+const conNota = items.some((i) => i.nota);
+const W = 760, H = height, padL = 14, padR = 14, padT = 26, padB = conNota ? 46 : 28;
+const vals = [...items.map((i) => i.value), 0];
+const ymax = Math.max(...vals), ymin = Math.min(...vals);
+const hayNeg = ymin < 0;
+const altoUtil = H - padT - padB - (hayNeg ? 16 : 0);
+const span = ymax - ymin || 1;
+const Y = (v) => padT + (1 - (v - ymin) / span) * altoUtil;
+const n = items.length || 1;
+const paso = (W - padL - padR) / n;
+const ancho = Math.min(70, paso * 0.62);
+const fmt = (v) => new Intl.NumberFormat('es-ES', { useGrouping: true, minimumFractionDigits: decimals, maximumFractionDigits: decimals, signDisplay: signo ? 'exceptZero' : 'auto' }).format(v);
+const cols = items.map((it, i) => {
+  const cx = padL + paso * (i + 0.5);
+  const y0 = Y(0), y1 = Y(it.value);
+  return { ...it, cx, x: cx - ancho / 2, y: Math.min(y0, y1), h: Math.max(1, Math.abs(y1 - y0)), yTexto: it.value >= 0 ? y1 - 6 : y1 + 14 };
+});
+---
+<svg viewBox={`0 0 ${W} ${H}`} class="w-full h-auto" role="img" aria-label={label}>
+  {cols.map((c) => (
+    <rect x={c.x.toFixed(1)} y={c.y.toFixed(1)} width={ancho.toFixed(1)} height={c.h.toFixed(1)} rx="2"
+      fill="var(--color-acento)" opacity={c.destacar === false ? 0.45 : 1} />
+  ))}
+  <line x1={padL} y1={Y(0)} x2={W - padR} y2={Y(0)} stroke="var(--color-suave)" stroke-width="1" />
+  {cols.map((c) => (
+    <text x={c.cx.toFixed(1)} y={c.yTexto.toFixed(1)} text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--color-tinta)">{fmt(c.value)}{unit}</text>
+  ))}
+  {cols.map((c) => (
+    <text x={c.cx.toFixed(1)} y={H - padB + 16} text-anchor="middle" font-size="11" fill="var(--color-suave)">{c.label}</text>
+  ))}
+  {conNota && cols.map((c) => (
+    <text x={c.cx.toFixed(1)} y={H - padB + 31} text-anchor="middle" font-size="10.5" fill="var(--color-suave)">{c.nota}</text>
+  ))}
+</svg>

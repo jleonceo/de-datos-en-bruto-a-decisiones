@@ -4,6 +4,7 @@ import Concepto from '../../components/Concepto.astro';
 import Callout from '../../components/Callout.astro';
 import Code from '../../components/Code.astro';
 import Kpi from '../../components/Kpi.astro';
+import Puntos from '../../components/Puntos.astro';
 import eda from '../../data/eda.json';
 import robustez from '../../data/robustez.json';
 
@@ -13,6 +14,12 @@ const f = (x, n = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: 
 const madre = { slug: '/senal-ruido', t: '14 · La lección: señal frente a ruido' };
 const MES = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 const ganador = MES[p1.mes_calendario_top_media];
+const medias = Object.entries(eda.estacionalidad_mes).map(([m, x]) => ({ label: MES[Number(m)].slice(0, 3), value: x.media_mensual, destacar: Number(m) === p1.mes_calendario_top_media }));
+const lineasAzar = [
+  { valor: p1.media_de_los_meses_completos, etiqueta: 'Media general', lado: 'izq', debajo: true },
+  { valor: r.null_max_media, etiqueta: 'El mejor mes que da el azar, de media', color: '#92400e' },
+  { valor: r.null_max_p95, etiqueta: 'Solo 1 de cada 20 barajados pasa de', color: '#92400e' },
+];
 
 const code = `# meses: una fila por mes completo, con su facturacion y su mes del anio (1 a 12)
 real = meses.groupby("mes_del_anio")["factura"].mean().max()   # el mejor de los doce
@@ -69,6 +76,13 @@ p = (np.array(azar) >= real).mean()`;
         <Kpi valor={`${f(r.media_observada)} €`} etiqueta={`media mensual de ${ganador}`} sub="el ganador real" />
         <Kpi valor={`${f(r.null_max_media)} €`} etiqueta="el ganador medio del azar" sub={`en ${f(robustez.n_permutaciones)} barajados`} />
         <Kpi valor={f(r.p_valor_permutacion, 3)} etiqueta="p del test del máximo" />
+      </div>
+      <div class="tarjeta mt-4 p-4">
+        <h3 class="text-[.9rem] font-semibold text-tinta">El ganador real queda por debajo del ganador que da el azar</h3>
+        <div class="mt-3"><Puntos items={medias} lineas={lineasAzar} unit=" €" label="Media de facturación de cada mes del año, comparada con el mejor mes que produce el azar" /></div>
+        <p class="mt-2 text-[.82rem] text-suave">
+          Media de facturación mensual de cada mes del año, en euros. El eje no empieza en cero.
+        </p>
       </div>
       <p class="mt-4">
         El mejor mes que produce el azar vende de media {f(r.null_max_media)} €, más que {ganador}. En el

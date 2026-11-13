@@ -3,10 +3,15 @@ import Layout from '../../layouts/Layout.astro';
 import Concepto from '../../components/Concepto.astro';
 import Callout from '../../components/Callout.astro';
 import Code from '../../components/Code.astro';
+import Columnas from '../../components/Columnas.astro';
 import inf from '../../data/inferencia.json';
 
 const s = inf.f9_simpson;
 const e = inf.f15_emparejamiento;
+const brechas = [
+  { label: 'Todo junto', value: s.brecha_pct },
+  ...s.detalle_por_producto.map((r) => ({ label: r.producto.split(' ')[0], value: 100 * (r.media_alto / r.media_bajo - 1), destacar: false })),
+];
 const tickets = s.detalle_por_producto.flatMap((r) => [r.media_alto, r.media_bajo]);
 const f = (v, d = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: true }).format(v);
 const madre = { slug: '/senal-ruido', t: '14 · La lección: señal frente a ruido' };
@@ -65,6 +70,13 @@ mix = val.assign(c=val["prod"] == "${s.producto_caro}").groupby("reg")["c"].mean
         {' '}{f(s.brecha_pct, 1)} % en el total queda, producto a producto, muy cerca de la otra, unas veces por
         encima y otras por debajo.
       </p>
+      <div class="tarjeta mt-4 p-4">
+        <h3 class="text-[.9rem] font-semibold text-tinta">Cuánto más factura por venta {s.region_agregado_alto} que {s.region_agregado_bajo} (%)</h3>
+        <div class="mt-3"><Columnas items={brechas} unit=" %" decimals={1} signo={true} height={250} label={`Diferencia porcentual del ticket medio de ${s.region_agregado_alto} frente a ${s.region_agregado_bajo}, en el total y producto a producto`} /></div>
+        <p class="mt-2 text-[.82rem] text-suave">
+          La primera columna es el total de las ventas. Las demás, la misma comparación dentro de cada producto.
+        </p>
+      </div>
     </Fragment>
 
     <Fragment slot="engana">
