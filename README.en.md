@@ -41,14 +41,17 @@ with different names and, counting by name and phone, nobody buys twice.
 ## What is inside
 
 ```mermaid
-flowchart TD
-    F[Raw sales file] --> P1[Profiling and cleaning]
-    P1 --> P2[Data dictionary and anonymisation]
-    P2 --> P3[Exploratory analysis and robustness]
-    P3 --> P4[Models, inference and segmentation]
-    P4 --> J[Results in JSON]
-    J --> W[63-page website]
-    J -.-> V[Independent verifiers<br/>recompute 1,439 figures]
+flowchart LR
+    F[Raw<br/>sales<br/>file] --> S1
+    subgraph S1[Analysis]
+        direction TB
+        P1[Profiling and cleaning] --> P2[Data dictionary and anonymisation]
+        P2 --> P3[Exploratory analysis and robustness]
+        P3 --> P4[Models, inference and segmentation]
+    end
+    S1 --> J[Results<br/>in JSON]
+    J --> W[63-page<br/>website]
+    J -.-> V[Independent<br/>verifiers<br/>recompute 1,439 figures]
     V -.-> W
     style W fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
     style V fill:#e3f2fd,stroke:#1565c0,color:#0d47a1

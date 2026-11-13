@@ -41,14 +41,17 @@ personas con nombres distintos y, contando por nombre y teléfono, nadie compra 
 ## Qué hay dentro
 
 ```mermaid
-flowchart TD
-    F[Fichero de ventas en bruto] --> P1[Perfilado y limpieza]
-    P1 --> P2[Diccionario y anonimización]
-    P2 --> P3[Análisis exploratorio y robustez]
-    P3 --> P4[Modelos, inferencia y segmentación]
-    P4 --> J[Resultados en JSON]
-    J --> W[Web de 63 páginas]
-    J -.-> V[Verificadores independientes<br/>recalculan 1.439 cifras]
+flowchart LR
+    F[Fichero<br/>de ventas<br/>en bruto] --> S1
+    subgraph S1[Análisis]
+        direction TB
+        P1[Perfilado y limpieza] --> P2[Diccionario y anonimización]
+        P2 --> P3[Análisis exploratorio y robustez]
+        P3 --> P4[Modelos, inferencia y segmentación]
+    end
+    S1 --> J[Resultados<br/>en JSON]
+    J --> W[Web de<br/>63 páginas]
+    J -.-> V[Verificadores<br/>independientes<br/>recalculan 1.439 cifras]
     V -.-> W
     style W fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
     style V fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
