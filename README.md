@@ -40,6 +40,21 @@ personas con nombres distintos y, contando por nombre y teléfono, nadie compra 
 
 ## Qué hay dentro
 
+```mermaid
+flowchart TD
+    F[Fichero de ventas en bruto] --> P1[Perfilado y limpieza]
+    P1 --> P2[Diccionario y anonimización]
+    P2 --> P3[Análisis exploratorio y robustez]
+    P3 --> P4[Modelos, inferencia y segmentación]
+    P4 --> J[Resultados en JSON]
+    J --> W[Web de 63 páginas]
+    J -.-> V[Verificadores independientes<br/>recalculan 1.439 cifras]
+    V -.-> W
+    style W fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    style V fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+```
+
+
 1. `analisis/` contiene los diez scripts de Python, en el orden en que se ejecutan: perfilado, limpieza,
    diccionario, anonimización, análisis exploratorio, robustez, modelos, inferencia, segmentación y atípicos.
 2. `analisis/salidas/` guarda sus resultados en JSON, que son los que lee la web.
